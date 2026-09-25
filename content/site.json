@@ -137,7 +137,32 @@
           }
         ]
       }
-    ]
+    ],
+    "ecosystem": {
+      "title": "A Unified Ecosystem of Excellence",
+      "text": "Our strength lies in our diversity — a family of companies operating across lifestyle, engineering, and social impact sectors. Each company operates independently but is united by a shared vision: to deliver excellence while transforming lives.",
+      "pills": [
+        "Lifestyle & Retail",
+        "Engineering & Energy",
+        "Social Impact"
+      ],
+      "image": "/assets/brand/cnm-group-reception.jpg",
+      "locations": [
+        [
+          "Lagos, Nigeria",
+          "Group Headquarters · CNM Essentials · CNMWorX"
+        ],
+        [
+          "Abuja, Nigeria",
+          "CNM Essentials Abuja · Garki Area 11"
+        ],
+        [
+          "Dallas, Texas",
+          "US Operations & Diaspora Engagement"
+        ]
+      ],
+      "status": "FROM_CNM_GROUP_SITE"
+    }
   },
   "motto": {
     "value": "Creating serenity, pioneering comfort.",

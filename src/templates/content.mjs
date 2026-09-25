@@ -211,6 +211,12 @@ export function groupPage(ctx) {
   </div>
 </section>
 <section class="section section--tight"><div class="container center stack"><p class="lead" style="margin-inline:auto">${escapeHtml(g.about)}</p><p class="h2" style="font-family:var(--serif)">${escapeHtml(g.motto)}</p></div></section>
+<section class="section section--cream"><div class="container" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:clamp(32px,6vw,96px);align-items:center">
+  <div class="stack"><span class="label muted">Who we are</span><h2 class="h1">${escapeHtml(g.ecosystem.title)}</h2><p class="lead">${escapeHtml(g.ecosystem.text)}</p>
+    <div class="search-chips">${g.ecosystem.pills.map((x) => `<span class="chip">${escapeHtml(x)}</span>`).join('')}</div>
+    <ul>${g.ecosystem.locations.map(([c, d]) => `<li style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)">${icon('pin')}<span><strong>${escapeHtml(c)}</strong><br><span class="muted">${escapeHtml(d)}</span></span></li>`).join('')}</ul></div>
+  <img src="${g.ecosystem.image}" alt="CNM Group reception" loading="lazy" style="width:100%;aspect-ratio:1020/846;object-fit:cover">
+</div></section>
 <div class="divisions" id="divisions">${g.divisions.map((d) => `<section class="division" aria-labelledby="div-${d.key}">
   <div class="stack"><span class="label">${escapeHtml(d.name)}</span><p class="display" id="div-${d.key}">${escapeHtml(d.name)}</p><p class="muted">${escapeHtml(d.summary)}</p></div>
   <div>${d.companies.map((c) => `<a class="company" href="${c.url}"${c.internal ? '' : ' rel="noopener"'} data-track="group_division" data-division="${d.key}"><img src="${c.logo}" alt="${escapeHtml(c.name)} logo" loading="lazy"><div><strong>${escapeHtml(c.name)}</strong><p class="muted" style="margin:4px 0">${escapeHtml(c.tagline)}</p>${c.text ? `<p style="font-size:.875rem;margin:0">${escapeHtml(c.text)}</p>` : ''}<span class="link" style="margin-top:8px">${c.internal ? 'Enter the store' : 'Visit'} ${icon('arrow')}</span></div></a>`).join('')}</div>
