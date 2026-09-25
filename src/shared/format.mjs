@@ -1,5 +1,5 @@
 // Formatting helpers shared by the build, the browser and functions.
-const naira = new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 });
+const naira = new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
 export const formatMoney = (amount) => (amount == null || Number.isNaN(amount) ? '—' : naira.format(amount).replace('NGN', '₦').replace(/\s/g, ''));
 

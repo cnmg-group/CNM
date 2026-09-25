@@ -1,6 +1,6 @@
 /* ==========================================================================
    CNM Essentials — design system
-   Colour base taken from the CNM-supplied Netlify prototype (#153f32 / #f5f1e8).
+   Colours sampled from the original CNM Essentials logo: charcoal #23221e, sage #d3dbce, yellow #fbcc39.
    ========================================================================== */
 
 @font-face {
@@ -21,16 +21,20 @@
 
 :root {
   /* colour */
-  --green: #153f32;
-  --green-deep: #0c261e;
-  --green-soft: #2a5a4a;
-  --cream: #f5f1e8;
-  --sand: #ebe5d8;
-  --stone: #d9d2c3;
+  --green: #23221e;
+  --green-deep: #121110;
+  --green-soft: #4a4843;
+  --cream: #f6f5f0;
+  --sand: #e9ece4;
+  --stone: #d3dbce;
   --ink: #111111;
   --ink-2: #3b3b39;
   --mute: #6d6b66;
-  --line: #e4dfd4;
+  --line: #e3e5de;
+  --gold: #fbcc39;
+  --gold-deep: #e0ae17;
+  --gold-ink: #7a5c00;
+  --sage: #d3dbce;
   --paper: #ffffff;
   --danger: #9b2c2c;
   --ok: #2f6b4f;
@@ -190,7 +194,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .mobile-menu__foot { margin-top: auto; padding: var(--s5) var(--gutter) var(--s7); background: var(--cream); display: grid; gap: 14px; font-size: .875rem; }
 
 /* ---------- overlays ---------- */
-.scrim { position: fixed; inset: 0; background: rgba(12, 20, 17, .42); z-index: 80; opacity: 0; visibility: hidden; transition: opacity .35s var(--ease), visibility .35s; }
+.scrim { position: fixed; inset: 0; background: rgba(10, 10, 9, .42); z-index: 80; opacity: 0; visibility: hidden; transition: opacity .35s var(--ease), visibility .35s; }
 .scrim.is-on { opacity: 1; visibility: visible; }
 .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(460px, 100vw); background: #fff; z-index: 85; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .45s var(--ease); }
 .drawer.is-open { transform: none; }
@@ -259,7 +263,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .hero { position: relative; min-height: 100svh; display: grid; align-items: end; background: var(--green); color: var(--cream); overflow: hidden; isolation: isolate; }
 .hero__media { position: absolute; inset: 0; z-index: -1; }
 .hero__media video, .hero__media img { width: 100%; height: 100%; object-fit: cover; }
-.hero__atmos { position: absolute; inset: -20%; background: radial-gradient(40% 35% at 70% 35%, rgba(245,241,232,.20), transparent 70%), radial-gradient(35% 40% at 25% 70%, rgba(42,90,74,.9), transparent 70%), radial-gradient(60% 60% at 50% 50%, #1b4a3c, var(--green-deep)); animation: drift 24s ease-in-out infinite alternate; }
+.hero__atmos { position: absolute; inset: -20%; background: radial-gradient(40% 35% at 70% 35%, rgba(251,204,57,.16), transparent 70%), radial-gradient(35% 40% at 25% 70%, rgba(74,72,67,.85), transparent 70%), radial-gradient(60% 60% at 50% 50%, #2c2b27, var(--green-deep)); animation: drift 24s ease-in-out infinite alternate; }
 @keyframes drift { from { transform: translate3d(-2%, -1%, 0) scale(1); } to { transform: translate3d(2%, 2%, 0) scale(1.08); } }
 .hero__vessel { position: absolute; right: clamp(-40px, 6vw, 140px); bottom: 0; width: clamp(220px, 30vw, 460px); opacity: .95; }
 .hero__inner { padding-block: calc(var(--header-h) + 48px) clamp(48px, 9vh, 112px); }
@@ -284,7 +288,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .tile { position: relative; display: block; aspect-ratio: 3 / 4; overflow: hidden; background: var(--green); color: var(--cream); }
 .tile__art { position: absolute; inset: 0; transition: transform 1.2s var(--ease); }
 .tile:hover .tile__art { transform: scale(1.04); }
-.tile__copy { position: absolute; left: 0; right: 0; bottom: 0; padding: var(--s6); background: linear-gradient(transparent, rgba(8, 24, 19, .6)); }
+.tile__copy { position: absolute; left: 0; right: 0; bottom: 0; padding: var(--s6); background: linear-gradient(transparent, rgba(10, 10, 9, .6)); }
 .tile__copy .h3 { font-family: var(--serif); font-size: clamp(1.6rem, 2.4vw, 2.2rem); font-weight: 400; margin: 8px 0 12px; }
 
 .rail { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(240px, calc((100% - 3 * 24px) / 4)); gap: 24px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 4px; }
@@ -642,7 +646,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .staging-bar { position: sticky; top: 0; z-index: 70; height: 34px; line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 body:has(.staging-bar) .site-header { top: 34px; }
 body:has(.staging-bar) { --header-offset: 34px; }
-.tile__copy { background: linear-gradient(transparent, rgba(8, 24, 19, .82) 55%); padding-top: 96px; }
+.tile__copy { background: linear-gradient(transparent, rgba(10, 10, 9, .82) 55%); padding-top: 96px; }
 .tile .ph__note, .tile__art img { }
 ol { margin: 0; padding: 0; list-style: none; }
 @media (max-width: 960px) {
@@ -663,3 +667,63 @@ ol { margin: 0; padding: 0; list-style: none; }
   .checkout-header .site-header__right .label { font-size: 0; }
   .checkout-header .sr-lock { width: 18px; height: 18px; }
 }
+
+/* ---------- CNM identity accents (from the original logo) ---------- */
+.section--green .label, .hero .label, .site-footer h2, .tile__copy .label, .division:hover .label { color: var(--gold); }
+.btn--light { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+.btn--light:hover { background: #fff; border-color: #fff; color: var(--ink); }
+.btn--ghost-light:hover { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+.btn--green:hover { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+.statement p em, .h1 em, .h2 em { color: var(--gold-ink); }
+.section--green em { color: var(--gold); }
+.badge-count { background: var(--gold); color: var(--ink); }
+::selection { background: var(--gold); color: var(--ink); }
+.site-footer .logo img, .site-header--overlay .logo img, .site-header--overlay.is-solid .logo img { filter: none; }
+.logo img { height: 48px; width: auto; }
+.site-footer .logo img { height: 96px; }
+@media (max-width: 960px) { .logo img { height: 40px; } }
+.brand-img { width: 100%; height: 100%; object-fit: contain; background: #fff; }
+.card__media { background: #fff; border: 1px solid var(--line); }
+.card__media img { object-fit: contain; padding: 6%; }
+.gallery__main, .gallery__thumbs button, .gallery__main > .slide, .line-item__media, .mini-line__media { background: #fff; }
+.gallery__main img, .gallery__main > .slide img, .line-item__media img, .mini-line__media img { object-fit: contain !important; }
+.promises { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s6); text-align: center; }
+.promises .ic { width: 56px; height: 56px; margin: 0 auto 14px; display: grid; place-items: center; background: #fff6d6; color: var(--gold-deep); }
+.promises .ic svg { width: 24px; height: 24px; }
+.promises strong { display: block; font-weight: 600; }
+.banner-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(12px, 1.6vw, 24px); }
+.banner { position: relative; display: block; overflow: hidden; aspect-ratio: 1; background: var(--sand); }
+.banner img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease); }
+.banner:hover img { transform: scale(1.04); }
+.banner__cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 16px; background: linear-gradient(transparent, rgba(10,10,9,.72)); color: #fff; display: flex; justify-content: space-between; align-items: center; font-size: .75rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+.brand-row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+.brand-row a { padding: 18px 28px; border: 1px solid var(--line); font-family: var(--serif); font-size: 1.5rem; transition: border-color .2s, background .2s; }
+.brand-row a:hover { border-color: var(--ink); background: var(--cream); }
+.pay-methods { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.pay-methods span { padding: 4px 10px; background: rgba(255,255,255,.08); font-size: .75rem; font-weight: 600; }
+.company { display: grid; grid-template-columns: 120px 1fr; gap: 20px; align-items: center; padding: 20px 0; border-top: 1px solid var(--line); }
+.company img { width: 120px; height: 120px; object-fit: contain; background: #fff; border: 1px solid var(--line); }
+.stat-row { display: flex; flex-wrap: wrap; gap: clamp(24px, 5vw, 72px); }
+.stat-row strong { display: block; font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1; color: var(--gold); }
+.values { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.values > div { background: #fff; padding: var(--s6); display: grid; gap: 8px; }
+@media (max-width: 960px) { .promises, .banner-grid { grid-template-columns: repeat(2, 1fr); } .values { grid-template-columns: 1fr; } }
+.hero { background: var(--ink); }
+.hero__inner--split { display: grid; grid-template-columns: 1.1fr .9fr; gap: clamp(32px, 5vw, 80px); align-items: center; }
+.hero__feature { display: block; aspect-ratio: 1; overflow: hidden; box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); }
+.hero__feature img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.4s var(--ease); }
+.hero__feature:hover img { transform: scale(1.03); }
+@media (max-width: 960px) { .hero__inner--split { grid-template-columns: 1fr; } .hero__feature { max-width: 420px; } .hero { align-items: start; } }
+.card__type { font-size: .625rem; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+.division { align-content: start; min-height: 0; gap: var(--s5); }
+.division:hover { background: #fff; color: inherit; }
+.division .display { font-size: clamp(2.5rem, 5vw, 4.5rem); }
+.company { color: inherit; }
+.company:hover strong { text-decoration: underline; }
+li > svg, .banner__cap svg, .info-list svg { width: 16px; height: 16px; flex: none; margin-top: 3px; }
+.banner__cap svg { margin-top: 0; }
+.site-footer li { align-items: flex-start; }
+.primary-nav > li > a, .primary-nav > li > button { white-space: nowrap; }
+:root { --header-h: 76px; }
+.logo img { height: 56px; }
+@media (max-width: 960px) { :root { --header-h: 60px; } .logo img { height: 44px; } }

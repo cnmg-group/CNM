@@ -14,7 +14,7 @@
 7. For the admin **Publish** button, create a build hook (**Site configuration → Build & deploy → Build hooks**) and set `NETLIFY_BUILD_HOOK_URL`.
 
 ### Staging test checklist
-Home · navigation/mega menu · Shop · category · search (try "difuser") · filters (mobile bottom sheet) · PDP (zoom, swipe) · wishlist · bag drawer and page (promo `STAGING10`) · checkout → simulate failed then successful payment · confirmation · account register/sign-in/email code/orders/preferences · Our story · Stores · Fragrance as a Service enquiry · Journal · CNM Group · `/styleguide/#loader` (butterfly loader) · `/admin/`.
+Home · navigation/mega menu · Shop · category · search (try "vanila") · filters (mobile bottom sheet) · PDP (zoom, swipe) · wishlist · bag drawer and page (promo `STAGING10`) · checkout → simulate failed then successful payment · confirmation · account register/sign-in/email code/orders/preferences · Our story · Stores · Fragrance as a Service enquiry · Journal · CNM Group · `/styleguide/#loader` (butterfly loader) · `/admin/`.
 
 ## 2. Import CNM's originals
 

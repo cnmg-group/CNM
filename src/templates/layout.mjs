@@ -6,20 +6,21 @@ export const approval = (what, detail = '') =>
 
 export function logo(ctx, { footer = false } = {}) {
   const inner = ctx.logoFile
-    ? `<img src="${ctx.logoFile}" alt="CNM Essentials" width="160" height="28">`
+    ? `<img src="${ctx.logoFile}" alt="CNM Essentials — crafting serenity, pioneering comfort" width="702" height="801">`
     : `<span><span class="logo__wordmark">CNM Essentials</span>${footer ? '' : '<span class="logo__flag">Logo placeholder · original file pending</span>'}</span>`;
   return `<a class="logo" href="/" aria-label="CNM Essentials — home">${inner}</a>`;
 }
 
 function megaMenu(ctx) {
   const cats = ctx.categories.map((c) => `<li><a href="/shop/${c.slug}/">${escapeHtml(c.name)}</a></li>`).join('');
-  const cols = ctx.collections.map((c) => `<li><a href="/collections/${c.slug}/">${escapeHtml(c.name)}</a></li>`).join('');
+  const brands = ctx.brands.map((b) => `<li><a href="/shop/?brand=${encodeURIComponent(b)}">${escapeHtml(b)}</a></li>`).join('');
+  const feature = ctx.categories.find((c) => c.banner);
   return `<div class="mega" id="mega-shop" data-mega>
   <div class="container mega__grid">
-    <div><h3 class="label">Shop</h3><ul><li><a href="/shop/new-in/">New in</a></li><li><a href="/shop/">Shop all</a></li><li><a href="/shop/best-sellers/">Best sellers</a></li><li><a href="/gifts/">Gift options</a></li></ul></div>
+    <div><h3 class="label">Shop</h3><ul><li><a href="/shop/">Shop all</a></li><li><a href="/gifts/">Gift options</a></li><li><a href="/fragrance-as-a-service/">Lease-to-Own diffusers</a></li><li><a href="/stores/">Stores</a></li></ul></div>
     <div><h3 class="label">Categories</h3><ul>${cats}</ul></div>
-    <div><h3 class="label">Collections &amp; services</h3><ul>${cols}<li><a href="/fragrance-as-a-service/">Fragrance as a Service</a></li><li><a href="/stores/">Stores</a></li></ul></div>
-    <a class="mega__feature" href="/shop/smart-scent-machines/"><span class="label">Smart scent technology</span><span class="h2" style="font-size:2rem">Scent, on schedule.</span></a>
+    <div><h3 class="label">Brands</h3><ul>${brands}</ul></div>
+    ${feature ? `<a class="mega__feature" href="/shop/${feature.slug}/" style="padding:0;position:relative;overflow:hidden"><img src="${feature.banner}" alt="${escapeHtml(feature.name)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0"></a>` : ''}
   </div>
 </div>`;
 }
@@ -38,8 +39,7 @@ function header(ctx, mode, current) {
       <button class="icon-btn menu-toggle" type="button" data-open="mobile-menu" aria-controls="mobile-menu" aria-expanded="false" aria-label="Open menu">${icon('menu')}</button>
       <nav aria-label="Primary"><ul class="primary-nav">
         <li><button type="button" data-mega-toggle aria-expanded="false" aria-controls="mega-shop"${cur('shop')}>Shop</button></li>
-        <li><a href="/shop/new-in/"${cur('new')}>New in</a></li>
-        <li><a href="/fragrance-as-a-service/"${cur('services')}>Fragrance as a Service</a></li>
+        <li><a href="/fragrance-as-a-service/"${cur('services')}>For business</a></li>
         <li><a href="/our-story/"${cur('story')}>Our story</a></li>
         <li><a href="/stores/"${cur('stores')}>Stores</a></li>
       </ul></nav>
@@ -61,8 +61,8 @@ function mobileMenu(ctx) {
   return `<div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu" data-panel="mobile-menu" hidden>
   <div class="mobile-menu__top">${logo(ctx)}<button class="icon-btn" type="button" data-close aria-label="Close menu">${icon('close')}</button></div>
   <nav aria-label="Mobile"><ul>
-    <li><details open><summary>Shop ${icon('plus', 'sr-only')}</summary><ul><li><a href="/shop/new-in/">New in</a></li><li><a href="/shop/">Shop all</a></li>${cats}<li><a href="/collections/stoneglow/">Stoneglow</a></li><li><a href="/gifts/">Gift options</a></li></ul></details></li>
-    <li><a href="/fragrance-as-a-service/">Fragrance as a Service</a></li>
+    <li><details open><summary>Shop ${icon('plus', 'sr-only')}</summary><ul><li><a href="/shop/">Shop all</a></li>${cats}<li><a href="/gifts/">Gift options</a></li></ul></details></li>
+    <li><a href="/fragrance-as-a-service/">For business</a></li>
     <li><a href="/our-story/">Our story</a></li>
     <li><a href="/stores/">Stores</a></li>
     <li><a href="/journal/">Journal</a></li>
@@ -70,7 +70,7 @@ function mobileMenu(ctx) {
   <div class="mobile-menu__foot">
     <a href="/account/" class="link">${icon('user')} Account</a>
     <a href="/wishlist/" class="link">${icon('heart')} Wishlist</a>
-    <a href="/cnm-group/" class="muted">CNM Group — Energy · Retail · Impact</a>
+    <a href="/cnm-group/" class="muted">CNM Group — Retail · Energy · Impact</a>
   </div>
 </div>`;
 }
@@ -114,29 +114,37 @@ export const butterflySVG = () => `<svg class="butterfly" viewBox="0 0 72 56" ar
 </svg>`;
 
 function footer(ctx) {
+  const { site } = ctx;
   const cats = ctx.categories.map((c) => `<li><a href="/shop/${c.slug}/">${escapeHtml(c.name)}</a></li>`).join('');
-  const social = ctx.site.social.filter((s) => s.url).map((s) => `<li><a href="${escapeHtml(s.url)}" rel="me noopener" target="_blank">${escapeHtml(s.network)}</a></li>`).join('');
+  const social = site.social.filter((s) => s.url).map((s) => `<li><a href="${escapeHtml(s.url)}" rel="me noopener" target="_blank">${escapeHtml(s.network)}</a></li>`).join('');
+  const nl = site.newsletter.value;
   return `<footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
       <div class="stack">
         ${logo(ctx, { footer: true })}
-        <p style="max-width:28rem">New arrivals, rituals and stories from CNM — sent sparingly.</p>
+        <p style="max-width:28rem">${escapeHtml(site.motto.value)}</p>
+        <p style="max-width:28rem" class="muted">${escapeHtml(nl.text)}</p>
         <form class="inline-form" data-newsletter="footer" novalidate>
           <label for="nl-footer" class="sr-only">Email address</label>
-          <input id="nl-footer" type="email" name="email" placeholder="Email address" autocomplete="email" required>
+          <input id="nl-footer" type="email" name="email" placeholder="Enter your email" autocomplete="email" required>
           <input type="hidden" name="consent" value="true">
           <button type="submit">Subscribe</button>
         </form>
-        <p class="muted" style="font-size:.75rem">By subscribing you agree to receive marketing emails. Unsubscribe any time. See our <a class="textlink" href="/privacy/">privacy notice</a>.</p>
+        <p style="font-size:.75rem;opacity:.7">By subscribing you agree to receive marketing emails. Unsubscribe any time. See our <a class="textlink" href="/privacy/">privacy notice</a>.</p>
       </div>
-      <div><h2>Shop</h2><ul><li><a href="/shop/new-in/">New in</a></li>${cats}<li><a href="/collections/stoneglow/">Stoneglow</a></li></ul></div>
-      <div><h2>Help</h2><ul><li><a href="/delivery-returns/">Delivery &amp; returns</a></li><li><a href="/faqs/">FAQs</a></li><li><a href="/contact/">Contact</a></li><li><a href="/account/orders/">Track an order</a></li></ul></div>
-      <div><h2>CNM</h2><ul><li><a href="/our-story/">Our story</a></li><li><a href="/stores/">Stores</a></li><li><a href="/fragrance-as-a-service/">Fragrance as a Service</a></li><li><a href="/journal/">Journal</a></li><li><a href="/cnm-group/">CNM Group</a></li></ul></div>
-      <div><h2>Follow</h2><ul>${social || '<li class="muted">Social links pending CNM approval</li>'}</ul></div>
+      <div><h2>Shop</h2><ul><li><a href="/shop/">Shop all</a></li>${cats}</ul></div>
+      <div><h2>Customer service</h2><ul><li><a href="/privacy/">Privacy policy</a></li><li><a href="/terms/">Terms &amp; conditions</a></li><li><a href="/delivery-returns/">Return policy</a></li><li><a href="/faqs/">FAQ</a></li><li><a href="/account/orders/">Track an order</a></li></ul></div>
+      <div><h2>CNM</h2><ul><li><a href="/our-story/">About us</a></li><li><a href="/stores/">Stores</a></li><li><a href="/fragrance-as-a-service/">For business</a></li><li><a href="/journal/">Journal</a></li><li><a href="/cnm-group/">CNM Group</a></li>${social}</ul></div>
+      <div><h2>Contact us</h2><ul>
+        ${ctx.stores.map((s) => `<li style="display:flex;gap:8px">${icon('pin')}<a href="/stores/${s.slug}/">${escapeHtml(s.address || s.city)}, ${escapeHtml(s.region === 'FCT' ? 'FCT' : `${s.region} State`)}.</a></li>`).join('')}
+        ${site.contact.phone.value ? `<li style="display:flex;gap:8px">${icon('phone')}<a href="tel:${site.contact.phone.value.replace(/\s/g, '')}">${escapeHtml(site.contact.phone.value)}</a></li>` : ''}
+        ${site.contact.email.value ? `<li style="display:flex;gap:8px">${icon('mail')}<a href="mailto:${site.contact.email.value}">${escapeHtml(site.contact.email.value)}</a></li>` : ''}
+      </ul></div>
     </div>
     <div class="footer-bottom">
-      <span>© ${new Date().getFullYear()} CNM Essentials. Part of CNM Group.</span>
+      <span>© ${new Date().getFullYear()} CNM Essentials. All rights reserved. Part of <a class="textlink" href="/cnm-group/">CNM Group</a>.</span>
+      <span class="pay-methods">We accept: ${site.acceptedPayments.value.map((m) => `<span>${escapeHtml(m)}</span>`).join('')}</span>
       <span><a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <button type="button" data-consent-open class="textlink" style="font-size:inherit;color:inherit">Cookie settings</button></span>
     </div>
   </div>
@@ -156,8 +164,8 @@ export function renderPage(ctx, o) {
   const ov = ctx.seo?.[o.path];
   if (ov?.title) o = { ...o, title: ov.title };
   if (ov?.description) o = { ...o, description: ov.description };
-  const title = o.title ? `${o.title} | CNM Essentials` : 'CNM Essentials — Home fragrance, body care & smart scenting';
-  const description = o.description || 'CNM Essentials: home fragrance, diffuser oils, body care and smart scent technology from Nigeria, with stores in Lagos and Abuja.';
+  const title = o.title ? `${o.title} | CNM Essentials` : 'CNM Essentials — Refresh your space. Indulge your senses.';
+  const description = o.description || 'CNM Essentials — luxury room sprays, Wallflowers diffusers and refills, body care and home fragrance. Shop online or visit us in Lekki, Lagos and Garki, Abuja.';
   const noindex = ctx.staging || o.noindex;
   const og = o.ogImage ? `${ctx.siteUrl}${o.ogImage}` : `${ctx.siteUrl}/assets/og-default.png`;
   const mode = o.header || 'solid';
@@ -171,7 +179,7 @@ export function renderPage(ctx, o) {
 <meta name="description" content="${escapeHtml(description)}">
 <link rel="canonical" href="${url}">
 ${noindex ? '<meta name="robots" content="noindex, nofollow">' : '<meta name="robots" content="index, follow, max-image-preview:large">'}
-<meta name="theme-color" content="#153f32">
+<meta name="theme-color" content="#23221e">
 <meta property="og:site_name" content="CNM Essentials">
 <meta property="og:type" content="${o.ogType || 'website'}">
 <meta property="og:title" content="${escapeHtml(o.title || 'CNM Essentials')}">
@@ -180,7 +188,7 @@ ${noindex ? '<meta name="robots" content="noindex, nofollow">' : '<meta name="ro
 <meta property="og:image" content="${og}">
 <meta property="og:locale" content="en_NG">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/brand/cnm-mark.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preload" href="/assets/fonts/hanken-grotesk-var.woff2" as="font" type="font/woff2" crossorigin>
@@ -192,7 +200,7 @@ ${ld}
 </head>
 <body data-page="${o.page}"${ctx.ga ? ` data-ga="${escapeHtml(ctx.ga)}"` : ''}>
 <a class="skip-link" href="#main">Skip to content</a>
-${ctx.staging ? `<div class="staging-bar">Staging preview — prices, stock and imagery are demo values awaiting CNM approval. No real payments are taken. <a href="/styleguide/">Design system</a></div>` : ''}
+${ctx.staging ? `<div class="staging-bar">Staging preview — products, prices and imagery from cnmessentials.com; stock, delivery fees and policies await CNM approval. No real payments are taken.</div>` : ''}
 ${ctx.announcement && mode !== 'checkout' ? `<div class="announce-bar">${ctx.announcement.href ? `<a href="${escapeHtml(ctx.announcement.href)}">${escapeHtml(ctx.announcement.message)}</a>` : escapeHtml(ctx.announcement.message)}</div>` : ''}
 ${header(ctx, mode, o.current)}
 ${mode === 'checkout' ? '' : mobileMenu(ctx)}

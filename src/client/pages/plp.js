@@ -3,7 +3,7 @@ import { escapeHtml } from '../../shared/format.mjs';
 import { track } from '../analytics.js';
 import * as S from '../store.js';
 
-const MULTI = ['category', 'collection', 'type', 'scent'];
+const MULTI = ['category', 'brand', 'collection', 'type', 'scent'];
 const FLAGS = ['instock', 'new', 'best'];
 
 export async function init() {
@@ -58,6 +58,7 @@ export async function init() {
   const matches = (c, s) => {
     const d = c.dataset;
     if (s.category.length && !s.category.includes(d.fCategory)) return false;
+    if (s.brand.length && !s.brand.includes(d.fBrand)) return false;
     if (s.collection.length && !s.collection.some((v) => d.fCollection.split(' ').includes(v))) return false;
     if (s.type.length && !s.type.includes(d.fType)) return false;
     if (s.scent.length && !s.scent.includes(d.fScent)) return false;

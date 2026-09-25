@@ -59,8 +59,8 @@ test('auth: password reset and OTP flows (dev link/code only in staging without 
 });
 
 test('security: CSRF header required for cookie requests; auth required for account', async () => {
-  assert.equal((await call('checkout', 'POST', '/api/checkout/quote', { body: { items: [{ id: 'refill-oil', qty: 1 }] }, csrf: false })).status, 403);
-  assert.equal((await call('checkout', 'POST', '/api/checkout/quote', { body: { items: [{ id: 'refill-oil', qty: 1 }] }, headers: { origin: 'https://evil.example' } })).status, 403);
+  assert.equal((await call('checkout', 'POST', '/api/checkout/quote', { body: { items: [{ id: 'midnight-vanilla-room-spray', qty: 1 }] }, csrf: false })).status, 403);
+  assert.equal((await call('checkout', 'POST', '/api/checkout/quote', { body: { items: [{ id: 'midnight-vanilla-room-spray', qty: 1 }] }, headers: { origin: 'https://evil.example' } })).status, 403);
   assert.equal((await call('account', 'GET', '/api/account/orders')).status, 401);
   const forged = 'cnm_session=eyJ0eXAiOiJ1c2VyIiwidWlkIjoieCIsInYiOjAsImV4cCI6OTk5OTk5OTk5OX0.forged';
   assert.equal((await call('auth', 'GET', '/api/auth/me', { cookie: forged })).status, 401);
@@ -73,11 +73,13 @@ test('security: rate limiting on login', async () => {
 });
 
 test('checkout: server prices (client prices ignored), simulated failure then success, stock committed', async () => {
+  const { store } = await import('../../netlify/lib/store.mjs');
+  await (await store('config')).set('inventory', { products: { 'midnight-vanilla-room-spray': { stock: 50 }, 'crushed-room-spray': { stock: 0 } } });
   const reg = await call('auth', 'POST', '/api/auth/register', { body: { email: 'buyer@example.com', password: 'buyer-password', firstName: 'B', lastName: 'Y' } });
-  const r = await call('checkout', 'POST', '/api/checkout', { cookie: reg.cookie, body: { items: [{ id: 'refill-oil', qty: 2, price: 1 }], contact, delivery, promoCode: 'STAGING10' } });
+  const r = await call('checkout', 'POST', '/api/checkout', { cookie: reg.cookie, body: { items: [{ id: 'midnight-vanilla-room-spray', qty: 2, price: 1 }], contact, delivery, promoCode: 'STAGING10' } });
   assert.equal(r.status, 201);
   assert.equal(r.data.payment.mode, 'simulated');
-  assert.equal(r.data.order.total, 44000 - 4400 + 3500);
+  assert.equal(r.data.order.total, 35700 - 3570 + 3500);
   const { number, accessToken } = r.data.order;
   assert.equal((await call('orders', 'GET', `/api/orders/${number}?token=wrong`)).status, 404);
   const fail = await call('payments', 'POST', '/api/payments/simulate', { body: { number, accessToken, outcome: 'failure' } });
@@ -87,16 +89,16 @@ test('checkout: server prices (client prices ignored), simulated failure then su
   const again = await call('payments', 'POST', '/api/payments/simulate', { body: { number, accessToken, outcome: 'success' } });
   assert.equal(again.data.order.history.filter((h) => h.status === 'paid').length, 1, 'idempotent');
   const live = await call('catalogue-live', 'GET', '/api/catalogue/live');
-  assert.equal(live.data.products['refill-oil'].stock, 48);
+  assert.equal(live.data.products['midnight-vanilla-room-spray'].stock, 48);
   const mine = await call('account', 'GET', '/api/account/orders', { cookie: reg.cookie });
   assert.equal(mine.data.orders[0].number, number);
 });
 
 test('checkout: validation — out of stock, region mismatch, bad email', async () => {
-  assert.equal((await call('checkout', 'POST', '/api/checkout', { body: { items: [{ id: 'car-diffuser', qty: 1 }], contact, delivery } })).status, 409);
-  const wrongRegion = await call('checkout', 'POST', '/api/checkout', { body: { items: [{ id: 'refill-oil', qty: 1 }], contact, delivery: { method: 'abuja-standard', address: delivery.address } } });
+  assert.equal((await call('checkout', 'POST', '/api/checkout', { body: { items: [{ id: 'crushed-room-spray', qty: 1 }], contact, delivery } })).status, 409);
+  const wrongRegion = await call('checkout', 'POST', '/api/checkout', { body: { items: [{ id: 'midnight-vanilla-room-spray', qty: 1 }], contact, delivery: { method: 'abuja-standard', address: delivery.address } } });
   assert.equal(wrongRegion.status, 422);
-  assert.equal((await call('checkout', 'POST', '/api/checkout', { body: { items: [{ id: 'refill-oil', qty: 1 }], contact: { ...contact, email: 'nope' }, delivery } })).status, 422);
+  assert.equal((await call('checkout', 'POST', '/api/checkout', { body: { items: [{ id: 'midnight-vanilla-room-spray', qty: 1 }], contact: { ...contact, email: 'nope' }, delivery } })).status, 422);
 });
 
 test('payments: Paystack webhook signature is verified', async () => {
@@ -124,9 +126,9 @@ test('admin: login, RBAC, order status transitions and notifications', async () 
   assert.equal(moved.data.order.status, 'processing');
   assert.equal(moved.data.order.accessToken, undefined);
   const owner = await call('admin', 'POST', '/api/admin/login', { body: { email: 'admin@cnm.local', password: 'cnm-local-admin' } });
-  const inv = await call('admin', 'PUT', '/api/admin/inventory', { cookie: owner.cookie, body: { products: { 'body-wash': { price: 16000, stock: 7 } } } });
+  const inv = await call('admin', 'PUT', '/api/admin/inventory', { cookie: owner.cookie, body: { products: { 'petalrich-room-spray': { price: 16000, stock: 7 } } } });
   assert.equal(inv.status, 200);
-  const q = await call('checkout', 'POST', '/api/checkout/quote', { body: { items: [{ id: 'body-wash', qty: 1 }] } });
+  const q = await call('checkout', 'POST', '/api/checkout/quote', { body: { items: [{ id: 'petalrich-room-spray', qty: 1 }] } });
   assert.equal(q.data.subtotal, 16000, 'admin price override is authoritative');
 });
 

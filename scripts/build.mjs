@@ -22,6 +22,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = path.join(ROOT, 'dist');
 const t0 = Date.now();
 
+
 // ---------- environment ----------
 const isProductionContext = process.env.CONTEXT === 'production';
 // Indexing is only allowed when CNM has approved launch AND this is the production deploy.
@@ -68,7 +69,8 @@ const findOut = (entry) => '/' + path.relative(DIST, outputs.find(([, o]) => o.e
 const assets = { js: findOut('src/client/main.js'), css: findOut('src/styles/site.css'), adminJs: findOut('src/client/admin/admin.js'), adminCss: findOut('src/styles/admin.css') };
 
 // Only expose categories the catalogue actually supports
-content.categories = content.categories.filter((c) => content.products.some((p) => p.category === c.slug));
+content.categories = content.categories.filter((c) => c.showWhenEmpty || content.products.some((p) => p.category === c.slug));
+content.brands = [...new Set(content.products.map((p) => p.brand))].sort((a, b) => content.products.filter((p) => p.brand === b).length - content.products.filter((p) => p.brand === a).length);
 content.collections = content.collections.filter((c) => content.products.some((p) => p.collections.includes(c.slug)));
 const ctx = { ...content, siteUrl, staging, ga, assets, logoFile: logoFile ? `/assets/brand/${logoFile}` : null };
 
@@ -95,10 +97,8 @@ await write('/', page({
 // Listing pages
 const { products, categories, collections } = content;
 const listings = [
-  { route: '/shop/', title: 'Shop all', intro: 'Home fragrance, oils, scent machines and body care.', products, trail: [{ name: 'Shop', path: '/shop/' }], list: 'shop_all', current: 'all' },
-  { route: '/shop/new-in/', title: 'New in', intro: 'The latest from CNM Essentials.', products: products.filter((p) => p.isNew), trail: [{ name: 'Shop', path: '/shop/' }, { name: 'New in', path: '/shop/new-in/' }], list: 'new_in', current: 'new-in' },
-  { route: '/shop/best-sellers/', title: 'Best sellers', intro: 'The pieces customers return to.', products: products.filter((p) => p.isBestSeller), trail: [{ name: 'Shop', path: '/shop/' }, { name: 'Best sellers', path: '/shop/best-sellers/' }], list: 'best_sellers', current: 'best' },
-  ...categories.map((c) => ({ route: `/shop/${c.slug}/`, title: c.name, intro: c.intro, introStatus: c.introStatus, products: products.filter((p) => p.category === c.slug), trail: [{ name: 'Shop', path: '/shop/' }, { name: c.name, path: `/shop/${c.slug}/` }], list: `category_${c.slug}`, showCategoryFacet: false, current: c.slug, seo: c.seo })),
+  { route: '/shop/', title: 'Shop now', intro: content.site.shopIntro.value, products, trail: [{ name: 'Shop', path: '/shop/' }], list: 'shop_all', current: 'all' },
+  ...categories.map((c) => ({ route: `/shop/${c.slug}/`, title: c.name, intro: c.intro, introStatus: c.introStatus, products: products.filter((p) => p.category === c.slug), trail: [{ name: 'Shop', path: '/shop/' }, { name: c.name, path: `/shop/${c.slug}/` }], list: `category_${c.slug}`, showCategoryFacet: false, current: c.slug, seo: c.seo, extraHead: c.banner ? `<img src="${c.banner}" alt="${c.name} — CNM Essentials campaign" width="1094" height="1092" style="width:min(100%,420px);aspect-ratio:1;object-fit:cover;margin-top:8px">` : '' })),
   ...collections.map((c) => ({ route: `/collections/${c.slug}/`, title: c.name, intro: c.intro, introStatus: c.introStatus, products: products.filter((p) => p.collections.includes(c.slug)), trail: [{ name: 'Collections', path: '/shop/' }, { name: c.name, path: `/collections/${c.slug}/` }], list: `collection_${c.slug}`, current: c.slug })),
 ];
 for (const l of listings) {
@@ -181,7 +181,7 @@ for (const i of info) { const r = infoPage(ctx, i); await write(i.path, page({ p
 // Utility pages
 await write('/404.html', page({ page: '404', path: '/404', title: 'Page not found', body: notFoundPage(ctx), noindex: true }), { sitemap: false });
 await write('/styleguide/', page({ page: 'styleguide', path: '/styleguide/', title: 'Design system', body: styleguidePage(ctx), noindex: true }), { sitemap: false });
-await write('/admin/', `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>CNM Admin</title><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="${assets.css}"><link rel="stylesheet" href="${assets.adminCss}"><script type="module" src="${assets.adminJs}"></script></head><body data-page="admin"${ctx.logoFile ? ` data-logo="${ctx.logoFile}"` : ''}>${adminPage()}</body></html>`, { sitemap: false });
+await write('/admin/', `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>CNM Admin</title><link rel="icon" href="/assets/brand/cnm-mark.png"><link rel="stylesheet" href="${assets.css}"><link rel="stylesheet" href="${assets.adminCss}"><script type="module" src="${assets.adminJs}"></script></head><body data-page="admin"${ctx.logoFile ? ` data-logo="${ctx.logoFile}"` : ''}>${adminPage()}</body></html>`, { sitemap: false });
 
 // ---------- data files ----------
 const catalogue = {
@@ -193,7 +193,7 @@ const catalogue = {
 await writeFile(path.join(DIST, 'catalogue.json'), JSON.stringify(catalogue));
 
 const searchDocs = [
-  ...products.map((p) => ({ type: 'product', id: p.id, title: p.name, url: productUrl(p), text: [p.productType, categories.find((c) => c.slug === p.category)?.name, p.description, p.scentFamily, p.scentNotes].filter(Boolean).join(' '), keywords: [...p.collections, p.category.replace(/-/g, ' ')], image: productImages(p)[0].src, price: p.price.amount })),
+  ...products.map((p) => ({ type: 'product', id: p.id, title: p.name, url: productUrl(p), text: [p.productType, categories.find((c) => c.slug === p.category)?.name, p.description, p.scentFamily, p.scentNotes].filter(Boolean).join(' '), keywords: [...p.collections, p.category.replace(/-/g, ' '), p.brand, 'wallflowers'].filter((k) => k !== 'wallflowers' || /wallflower/i.test(p.productType)), image: productImages(p)[0].src, price: p.price.amount })),
   ...categories.map((c) => ({ type: 'category', title: c.name, url: `/shop/${c.slug}/`, text: c.intro, keywords: [c.slug.replace(/-/g, ' ')] })),
   ...collections.map((c) => ({ type: 'collection', title: c.name, url: `/collections/${c.slug}/`, text: c.intro, keywords: ['collection'] })),
   ...content.articles.map((a) => ({ type: 'article', title: a.title, url: `/journal/${a.slug}/`, text: `${a.excerpt} ${a.category}`, keywords: [] })),

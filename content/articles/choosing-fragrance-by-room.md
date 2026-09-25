@@ -6,7 +6,7 @@ excerpt: Every room does a different job. A short guide to matching the scent to
 date: 2026-09-01
 author: CNM Essentials Editorial
 status: DRAFT_NEEDS_CNM_APPROVAL
-related: [stoneglow-reed-diffuser, signature-diffuser-oil, home-fragrance]
+related: [white-tea-and-sage-room-spray, midnight-vanilla-room-spray, sweet-pea-wallflower-plug-in-refill, white-jasmine-odour-eliminator]
 ---
 A home rarely has one mood. The entrance welcomes people, the living room gathers them, and the bedroom lets everyone rest. Fragrance works best when it follows what each room is for.
 

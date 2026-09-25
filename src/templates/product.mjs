@@ -53,7 +53,7 @@ export function productPage(ctx, p) {
         <button class="btn btn--ghost btn--block" type="button" data-wish="${p.id}" aria-pressed="false">${icon('heart')} Save to wishlist</button></div>`;
 
   const storeAvail = stores
-    .map((s) => `<li style="display:flex;justify-content:space-between;padding:6px 0"><a class="textlink" href="/stores/${s.slug}/">${escapeHtml(s.name)}</a><span class="muted">Check with store</span></li>`)
+    .map((s) => `<li style="display:flex;justify-content:space-between;gap:12px;padding:6px 0"><a class="textlink" href="/stores/${s.slug}/">${escapeHtml(s.name)}</a><a class="muted" href="tel:${(s.phone || '').replace(/\s/g, '')}">Call to check</a></li>`)
     .join('');
 
   const accordion = `<div class="accordion">
@@ -74,16 +74,16 @@ export function productPage(ctx, p) {
   <div class="pdp" data-product='${escapeHtml(JSON.stringify({ id: p.id, name: p.name, price: p.price.amount, category: cat?.name || p.category }))}'>
     ${gallery}
     <div class="buybox">
-      <div><a class="buybox__brand" href="/shop/">${escapeHtml(p.brand)}</a><h1 style="margin-top:8px">${escapeHtml(p.name)}</h1></div>
+      <div><span class="card__type">${escapeHtml(p.productType)}</span><br><a class="buybox__brand" href="/shop/?brand=${encodeURIComponent(p.brand)}">${escapeHtml(p.brand)}</a><h1 style="margin-top:8px">${escapeHtml(p.name)}</h1></div>
       <div class="buybox__price">${priceHTML(p)}</div>
       <p class="buybox__stock stock-${stock.key}" data-stock="${p.id}">${stock.label}</p>
       ${variants}
       ${buy}
       <div class="assurance">
-        <div>${icon('truck')} Delivery across Nigeria · Lagos &amp; Abuja express</div>
-        <div>${icon('store')} Collect in store in Lagos or Abuja</div>
-        <div>${icon('lock')} Secure payment</div>
+        ${ctx.site.promises.value.slice(0, 2).map(([, t, d]) => `<div>${icon(t.startsWith('Swift S') ? 'truck' : 'lock')} ${escapeHtml(t)} · ${escapeHtml(d)}</div>`).join('')}
+        <div>${icon('store')} Collect in store in Lekki, Lagos or Garki, Abuja</div>
       </div>
+      ${p.dataNote ? approval(p.dataNote) : ''}
       ${accordion}
       <button class="link" type="button" data-share style="justify-self:start">${icon('share')} Share</button>
     </div>

@@ -1,4 +1,5 @@
 import { productCardHTML } from '../../shared/card.mjs';
+import { stockState } from '../../shared/product.mjs';
 import { item, track } from '../analytics.js';
 import { api } from '../api.js';
 import { paintWish } from '../render.js';
@@ -11,6 +12,22 @@ export async function init() {
   const { byId } = await S.catalogue();
   const p = byId.get(meta.id);
   if (p) track('view_item', { currency: 'NGN', value: p.price.amount, items: [item(p)] });
+
+  // Pages are static; apply live stock from Admin without waiting for a republish.
+  if (p) {
+    const st = stockState(p);
+    const label = document.querySelector(`.buybox__stock[data-stock="${CSS.escape(p.id)}"]`);
+    if (label) { label.textContent = st.label; label.className = `buybox__stock stock-${st.key}`; }
+    const qtyInput = document.querySelector('[data-qty-input]');
+    if (qtyInput && p.stock?.quantity != null) qtyInput.max = String(Math.min(10, p.stock.quantity));
+    const actions = document.querySelector('.buy-actions');
+    if (!st.orderable && actions) {
+      document.querySelector('[data-buy-now]')?.remove();
+      document.querySelector('[data-sticky-buy]')?.remove();
+      actions.outerHTML = `<div class="stack"><p class="alert">This product is currently out of stock.</p>
+        <form class="form" data-back-in-stock="${p.id}" novalidate><div class="field"><label for="bis-email">Email me when it's back</label><div class="promo"><input id="bis-email" type="email" name="email" required autocomplete="email" placeholder="Email address"><button class="btn" type="submit">Notify me</button></div></div></form></div>`;
+    }
+  }
 
   // Recently viewed (excluding the current product)
   const recent = S.getRecent().filter((id) => id !== meta.id).map((id) => byId.get(id)).filter(Boolean).slice(0, 4);

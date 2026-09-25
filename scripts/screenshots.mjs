@@ -26,13 +26,14 @@ async function scrollThrough(page) {
 const SHOTS = [
   { id: 'home', title: 'Homepage', path: '/', full: true },
   { id: 'shop', title: 'Shop — all', path: '/shop/', full: true },
-  { id: 'category', title: 'Category — Home Fragrance', path: '/shop/home-fragrance/', full: true },
-  { id: 'filters', title: 'Filters (mobile bottom sheet)', path: '/shop/?category=body-care', act: async (p, vp) => { if (vp.mobile) await p.click('[data-filters-open]'); } },
-  { id: 'search', title: 'Predictive search (typo: "difuser")', path: '/', act: async (p) => { await p.click('[data-open="search"]'); await p.fill('[data-search-input]', 'difuser'); await p.waitForTimeout(400); } },
-  { id: 'search-results', title: 'Search results page', path: '/search/?q=oil', full: true },
-  { id: 'pdp', title: 'Product detail', path: '/products/stoneglow-reed-diffuser/', full: true },
-  { id: 'pdp-oos', title: 'Product — out of stock / back in stock', path: '/products/car-diffuser/' },
-  { id: 'bag-drawer', title: 'Bag drawer', path: '/products/refill-oil/', act: async (p) => { await p.locator('.buy-actions [data-add]').click(); await p.waitForTimeout(700); } },
+  { id: 'category', title: 'Category — Room & Home Fragrance', path: '/shop/room-home-fragrance/', full: true },
+  { id: 'filters', title: 'Filters (mobile bottom sheet)', path: '/shop/?brand=Bath%20%26%20Body%20Works', act: async (p, vp) => { if (vp.mobile) await p.click('[data-filters-open]'); } },
+  { id: 'search', title: 'Predictive search (typo: "vanila")', path: '/', act: async (p) => { await p.click('[data-open="search"]'); await p.fill('[data-search-input]', 'vanila'); await p.waitForTimeout(400); } },
+  { id: 'search-results', title: 'Search results page', path: '/search/?q=wallflowers', full: true },
+  { id: 'pdp', title: 'Product detail', path: '/products/midnight-vanilla-room-spray/', full: true },
+  { id: 'pdp-2', title: 'Product detail — Wallflowers refill', path: '/products/watermelon-lemonade-wallflower-plug-in-refill/' },
+  { id: 'category-empty', title: 'Category — Hair Care (coming soon online)', path: '/shop/hair-care/' },
+  { id: 'bag-drawer', title: 'Bag drawer', path: '/products/love-stoned-room-spray/', act: async (p) => { await p.locator('.buy-actions [data-add]').click(); await p.waitForTimeout(700); } },
   { id: 'bag', title: 'Bag page', path: '/bag/', full: true, seedBag: true },
   { id: 'wishlist', title: 'Wishlist', path: '/wishlist/', full: true, seedWish: true },
   { id: 'checkout-contact', title: 'Checkout — contact', path: '/checkout/', seedBag: true },
@@ -55,7 +56,7 @@ const SHOTS = [
   { id: 'services', title: 'Fragrance as a Service', path: '/fragrance-as-a-service/', full: true },
   { id: 'journal', title: 'Journal', path: '/journal/', full: true },
   { id: 'article', title: 'Journal article', path: '/journal/choosing-fragrance-by-room/', full: true },
-  { id: 'group', title: 'CNM Group — Energy · Retail · Impact', path: '/cnm-group/', full: true },
+  { id: 'group', title: 'CNM Group — Retail · Energy · Impact', path: '/cnm-group/', full: true },
   { id: 'mobile-nav', title: 'Mobile navigation', path: '/', mobileOnly: true, act: async (p) => { await p.click('.menu-toggle'); await p.waitForTimeout(600); } },
   { id: 'loader', title: 'Loading state — butterfly loader', path: '/styleguide/', act: async (p) => { await p.click('[data-demo-loader]'); await p.waitForTimeout(900); } },
   { id: 'styleguide', title: 'Design system', path: '/styleguide/', full: true },
@@ -72,7 +73,7 @@ const api = await (await browser.newContext()).request;
 const email = `review${Date.now()}@example.com`;
 const reg = await api.post(`${BASE}/api/auth/register`, { headers: H, data: { email, password: 'review-password', firstName: 'Amara', lastName: 'Okafor' } });
 const cookie = reg.headers()['set-cookie'].split(';')[0];
-const order = await (await api.post(`${BASE}/api/checkout`, { headers: { ...H, Cookie: cookie }, data: { items: [{ id: 'stoneglow-reed-diffuser', qty: 1 }, { id: 'refill-oil', qty: 2 }], contact: { email, phone: '+2348012345678', firstName: 'Amara', lastName: 'Okafor' }, delivery: { method: 'lagos-standard', address: { line1: '1 Bourdillon Road', city: 'Ikoyi', state: 'Lagos' } } } })).json();
+const order = await (await api.post(`${BASE}/api/checkout`, { headers: { ...H, Cookie: cookie }, data: { items: [{ id: 'midnight-vanilla-room-spray', qty: 1 }, { id: 'sweet-pea-wallflower-plug-in-refill', qty: 2 }], contact: { email, phone: '+2348012345678', firstName: 'Amara', lastName: 'Okafor' }, delivery: { method: 'lagos-standard', address: { line1: '1 Bourdillon Road', city: 'Ikoyi', state: 'Lagos' } } } })).json();
 await api.post(`${BASE}/api/payments/simulate`, { headers: H, data: { number: order.order.number, accessToken: order.order.accessToken, outcome: 'success' } });
 
 const results = [];
@@ -83,8 +84,8 @@ for (const vp of VIEWPORTS) {
     await ctx.addInitScript(({ bag, wish }) => {
       try {
         localStorage.setItem('cnm.consent', 'denied');
-        if (bag) localStorage.setItem('cnm.bag', JSON.stringify([{ id: 'stoneglow-reed-diffuser', qty: 1 }, { id: 'refill-oil', qty: 2 }]));
-        if (wish) localStorage.setItem('cnm.wish', JSON.stringify(['smart-scent-machine', 'body-butter', 'car-diffuser']));
+        if (bag) localStorage.setItem('cnm.bag', JSON.stringify([{ id: 'midnight-vanilla-room-spray', qty: 1 }, { id: 'sweet-pea-wallflower-plug-in-refill', qty: 2 }]));
+        if (wish) localStorage.setItem('cnm.wish', JSON.stringify(['that-paris-hotel-room-spray', 'wallflower-socket-gray-wallflower-plug-in', 'white-jasmine-odour-eliminator']));
       } catch { /* ignore */ }
     }, { bag: !!s.seedBag, wish: !!s.seedWish });
     if (s.auth) {
@@ -120,8 +121,8 @@ await browser.close();
 // Review board
 const groups = SHOTS.map((s) => ({ s, shots: results.filter((r) => r.id === s.id) }));
 await writeFile(path.join(OUT, 'index.html'), `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CNM Visual Review</title>
-<style>:root{--g:#153f32;--c:#f5f1e8;--ink:#111;--line:#e4dfd4}body{margin:0;font-family:-apple-system,Helvetica,Arial,sans-serif;background:var(--c);color:var(--ink)}header{background:var(--g);color:var(--c);padding:32px 24px}h1{margin:0;font-family:Georgia,serif;font-weight:400;font-size:40px}header p{opacity:.8;max-width:760px}nav{display:flex;flex-wrap:wrap;gap:6px;padding:16px 24px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2}nav a{font-size:12px;padding:6px 10px;border:1px solid var(--line);color:inherit;text-decoration:none}section{padding:32px 24px;border-bottom:1px solid var(--line)}h2{font-family:Georgia,serif;font-weight:400;font-size:28px;margin:0 0 16px}.row{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,1fr);gap:24px;align-items:start}figure{margin:0;background:#fff;border:1px solid var(--line)}figure img{width:100%;height:auto;display:block;max-height:1600px;object-fit:cover;object-position:top}figcaption{font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--line)}@media(max-width:800px){.row{grid-template-columns:1fr}}</style></head>
-<body><header><h1>CNM Essentials — visual review board</h1><p>Staging build · ${new Date().toISOString().slice(0, 10)} · ${results.length} screenshots across desktop (1440px) and mobile (390px). Product imagery, logo and copy marked "Needs CNM approval" are placeholders awaiting CNM's original assets.</p></header>
+<style>:root{--g:#23221e;--c:#f6f5f0;--ink:#111;--line:#e4dfd4}body{margin:0;font-family:-apple-system,Helvetica,Arial,sans-serif;background:var(--c);color:var(--ink)}header{background:var(--g);color:var(--c);padding:32px 24px}h1{margin:0;font-family:Georgia,serif;font-weight:400;font-size:40px}header p{opacity:.8;max-width:760px}nav{display:flex;flex-wrap:wrap;gap:6px;padding:16px 24px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2}nav a{font-size:12px;padding:6px 10px;border:1px solid var(--line);color:inherit;text-decoration:none}section{padding:32px 24px;border-bottom:1px solid var(--line)}h2{font-family:Georgia,serif;font-weight:400;font-size:28px;margin:0 0 16px}.row{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,1fr);gap:24px;align-items:start}figure{margin:0;background:#fff;border:1px solid var(--line)}figure img{width:100%;height:auto;display:block;max-height:1600px;object-fit:cover;object-position:top}figcaption{font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--line)}@media(max-width:800px){.row{grid-template-columns:1fr}}</style></head>
+<body><header><h1>CNM Essentials — visual review board</h1><p>Staging build · ${new Date().toISOString().slice(0, 10)} · ${results.length} screenshots across desktop (1440px) and mobile (390px). Logo, products, prices and imagery are taken from cnmessentials.com and cnm-group.net. Items marked "Needs CNM approval" are still awaiting confirmation.</p></header>
 <nav>${groups.map(({ s }) => `<a href="#${s.id}">${s.title}</a>`).join('')}</nav>
 ${groups.map(({ s, shots }) => `<section id="${s.id}"><h2>${s.title}</h2><div class="row">${['desktop', 'mobile'].map((k) => shots.find((x) => x.vp === k)).filter(Boolean).map((x) => `<figure><figcaption>${x.vp}</figcaption><a href="${x.file}"><img src="${x.file}" alt="${s.title} — ${x.vp}" loading="lazy"></a></figure>`).join('')}</div></section>`).join('')}
 </body></html>`);

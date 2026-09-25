@@ -4,7 +4,7 @@ import { buildIndex, highlight, search } from '../shared/search.mjs';
 import { track } from './analytics.js';
 
 const RECENT_KEY = 'cnm.searches';
-export const POPULAR = ['Diffuser oil', 'Reed diffuser', 'Scent machine', 'Refill oil', 'Body butter', 'Car diffuser'];
+export const POPULAR = ['Room spray', 'Wallflowers refill', 'Victoria\'s Secret', 'Bath & Body Works', 'Vanilla', 'Odour eliminator'];
 const TYPE_LABEL = { product: 'Product', category: 'Category', collection: 'Collection', article: 'Journal', service: 'Service', store: 'Store' };
 
 let indexPromise;

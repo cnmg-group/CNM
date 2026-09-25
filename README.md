@@ -2,7 +2,7 @@
 
 Editorial brand site, luxury e-commerce, customer accounts, admin/operations, APIs and iOS/Android app for **CNM Essentials**, the retail division of CNM Group (Energy · Retail · Impact).
 
-> **Staging build.** Product names come from CNM's Netlify prototype. Prices, stock, imagery and unverified copy are clearly marked **Demo** or **Needs CNM approval**; nothing has been invented. Import CNM's original logo and catalogue with `scripts/import-catalogue.mjs` (see `PROGRESS.md`).
+> **Staging build.** The original CNM logo, the 20 products, prices, photography, campaign banners, store addresses and copy come from cnmessentials.com and cnm-group.net. Anything not yet confirmed (stock, delivery fees, founder story, opening hours) is marked **Needs CNM approval**; nothing has been invented. Import the rest of the catalogue with `scripts/import-catalogue.mjs` (see `PROGRESS.md`).
 
 ## Quick start
 ```bash
@@ -26,7 +26,7 @@ Local admin: http://localhost:8888/admin/ (`admin@cnm.local` / `cnm-local-admin`
 
 ## Tests
 ```bash
-npm test                                   # 18 unit + API integration tests
+npm test                                   # 19 unit + API integration tests
 CHROME_PATH=/path/to/chrome npm run test:e2e   # 23 Playwright E2E tests (desktop + mobile)
 cd mobile && npx jest && npx tsc --noEmit  # 58 mobile tests + typecheck
 ```

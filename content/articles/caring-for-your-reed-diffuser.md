@@ -6,7 +6,7 @@ excerpt: Simple habits that keep a reed diffuser performing, from placement to w
 date: 2026-08-18
 author: CNM Essentials Editorial
 status: DRAFT_NEEDS_CNM_APPROVAL
-related: [stoneglow-reed-diffuser, refill-oil]
+related: []
 ---
 A reed diffuser is the quietest way to scent a room, and it needs very little attention. A few habits keep it working well.
 

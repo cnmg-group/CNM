@@ -19,14 +19,14 @@ function group(title, name, entries, labelFor, open = true) {
 
 function cardWithFacets(p, i, list) {
   const s = stockState(p);
-  const facets = `data-f-category="${p.category}" data-f-collection="${(p.collections || []).join(' ')}" data-f-type="${escapeHtml(p.productType)}" data-f-scent="${escapeHtml(p.scentFamily || '')}" data-f-price="${p.price.amount ?? ''}" data-f-stock="${s.key}" data-f-new="${p.isNew ? 1 : 0}" data-f-best="${p.isBestSeller ? 1 : 0}" data-f-name="${escapeHtml(p.name)}" data-f-order="${i}"`;
+  const facets = `data-f-category="${p.category}" data-f-collection="${(p.collections || []).join(' ')}" data-f-type="${escapeHtml(p.productType)}" data-f-brand="${escapeHtml(p.brand)}" data-f-scent="${escapeHtml(p.scentFamily || '')}" data-f-price="${p.price.amount ?? ''}" data-f-stock="${s.key}" data-f-new="${p.isNew ? 1 : 0}" data-f-best="${p.isBestSeller ? 1 : 0}" data-f-name="${escapeHtml(p.name)}" data-f-order="${i}"`;
   return productCardHTML(p, { position: i + 1, list, eager: i < 4 }).replace('<article class="card"', `<article class="card" ${facets}`);
 }
 
 /**
  * Product listing page with client-side filtering (no reloads; state mirrored in the URL).
  */
-export function listingPage(ctx, { title, intro, introStatus, products, trail, list, showCategoryFacet = true, tabs = true, current, extra = '' }) {
+export function listingPage(ctx, { title, intro, introStatus, products, trail, list, showCategoryFacet = true, tabs = true, current, extra = '', extraHead = '' }) {
   const { html: crumbs, ld } = breadcrumbs(ctx, trail);
   const catName = (slug) => ctx.categories.find((c) => c.slug === slug)?.name || slug;
   const colName = (slug) => ctx.collections.find((c) => c.slug === slug)?.name || slug;
@@ -36,6 +36,7 @@ export function listingPage(ctx, { title, intro, introStatus, products, trail, l
 
   const filters = [
     showCategoryFacet ? group('Category', 'category', facetCounts(products, 'category'), catName) : '',
+    group('Brand', 'brand', facetCounts(products, 'brand'), (v) => v),
     group('Collection', 'collection', facetCounts(products, 'collections'), colName),
     group('Product type', 'type', facetCounts(products, 'productType'), (v) => v),
     group('Scent family', 'scent', facetCounts(products, 'scentFamily'), (v) => v),
@@ -44,14 +45,14 @@ export function listingPage(ctx, { title, intro, introStatus, products, trail, l
       <label class="field"><span class="field-label">Max (₦)</span><input type="number" inputmode="numeric" name="max" min="0" placeholder="${max}"></label></div></div></details>`,
     `<details class="filter-group" open><summary>Availability</summary><div class="opts">
       <label class="check"><input type="checkbox" name="instock" value="1"> In stock only</label>
-      <label class="check"><input type="checkbox" name="new" value="1"> New arrivals</label>
-      <label class="check"><input type="checkbox" name="best" value="1"> Best sellers</label></div></details>`,
+      ${products.some((p) => p.isNew) ? '<label class="check"><input type="checkbox" name="new" value="1"> New arrivals</label>' : ''}
+      ${products.some((p) => p.isBestSeller) ? '<label class="check"><input type="checkbox" name="best" value="1"> Best sellers</label>' : ''}</div></details>`,
   ].join('');
 
   const catTabs = tabs
-    ? `<nav class="cat-tabs" aria-label="Categories"><a class="chip" href="/shop/"${current === 'all' ? ' aria-current="page"' : ''}>All</a><a class="chip" href="/shop/new-in/"${current === 'new-in' ? ' aria-current="page"' : ''}>New in</a>${ctx.categories
+    ? `<nav class="cat-tabs" aria-label="Categories"><a class="chip" href="/shop/"${current === 'all' ? ' aria-current="page"' : ''}>All</a>${ctx.categories
         .map((c) => `<a class="chip" href="/shop/${c.slug}/"${current === c.slug ? ' aria-current="page"' : ''}>${escapeHtml(c.name)}</a>`)
-        .join('')}<a class="chip" href="/collections/stoneglow/"${current === 'stoneglow' ? ' aria-current="page"' : ''}>Stoneglow</a></nav>`
+        .join('')}</nav>`
     : '';
 
   const body = `<div class="container">
@@ -59,7 +60,8 @@ export function listingPage(ctx, { title, intro, introStatus, products, trail, l
   <header class="plp-head">
     <h1 class="h1">${escapeHtml(title)}</h1>
     ${intro ? `<p class="lead">${escapeHtml(intro)}</p>` : ''}
-    ${introStatus === 'NEEDS_CNM_APPROVAL' ? `<div style="max-width:560px">${approval('Category introduction copy.')}</div>` : ''}
+    ${introStatus === 'NEEDS_CNM_APPROVAL' && !intro ? `<div style="max-width:560px">${approval('Category introduction copy.')}</div>` : ''}
+    ${extraHead || ''}
   </header>
   ${catTabs}
   ${extra}
@@ -81,7 +83,7 @@ export function listingPage(ctx, { title, intro, introStatus, products, trail, l
       ${products.length
         ? `<div class="grid-products grid-products--3" data-grid data-impressions="${escapeHtml(list)}">${products.map((p, i) => cardWithFacets(p, i, list)).join('')}</div>`
         : ''}
-      <div class="empty-state" data-empty ${products.length ? 'hidden' : ''}><p class="h3">No products match these filters.</p><p class="muted">Try removing a filter, or explore everything we make.</p><button class="btn btn--ghost" type="button" data-filters-clear>Clear filters</button></div>
+      <div class="empty-state" data-empty ${products.length ? 'hidden' : ''}>${products.length ? '<p class="h3">No products match these filters.</p><p class="muted">Try removing a filter, or explore everything we stock.</p><button class="btn btn--ghost" type="button" data-filters-clear>Clear filters</button>' : `<p class="h3">Coming soon online.</p><p class="muted">Visit us in Lagos or Abuja, or explore the rest of the shop.</p><div class="hero__cta" style="justify-content:center"><a class="btn" href="/shop/">Shop all</a><a class="btn btn--ghost" href="/stores/">Find a store</a></div>`}</div>
     </div>
   </div>
 </div>`;

@@ -22,38 +22,39 @@ test('home renders editorial story and navigates to shop', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
-  await expect(page.locator('h1')).toContainText('Scent your');
-  await page.locator('.hero__cta a', { hasText: 'Shop new in' }).click();
-  await expect(page).toHaveURL(/\/shop\/new-in\/$/);
-  await expect(page.locator('[data-product-card]:visible')).toHaveCount(2);
+  await expect(page.locator('h1')).toContainText('Refresh Your Space.');
+  await expect(page.locator('.logo img').first()).toHaveAttribute('src', '/assets/brand/cnm-logo.png');
+  await page.locator('.hero__cta a', { hasText: 'Shop now' }).click();
+  await expect(page).toHaveURL(/\/shop\/$/);
+  await expect(page.locator('[data-grid] [data-product-card]:visible')).toHaveCount(20);
   expect(errors).toEqual([]);
 });
 
 test('predictive search tolerates typos and opens a product', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Search' }).first().click();
-  await page.fill('[data-search-input]', 'stonglow');
-  const hit = page.locator('[data-search-results] a', { hasText: 'Stoneglow Reed Diffuser' }).first();
+  await page.fill('[data-search-input]', 'midnigt vanila');
+  const hit = page.locator('[data-search-results] a', { hasText: 'Midnight Vanilla' }).first();
   await expect(hit).toBeVisible();
   await hit.click();
-  await expect(page.locator('h1')).toHaveText('Stoneglow Reed Diffuser');
+  await expect(page.locator('h1')).toHaveText('Midnight Vanilla');
 });
 
 test('filters update instantly and are reflected in the URL', async ({ page, isMobile }) => {
   await page.goto('/shop/');
   if (isMobile) await page.click('[data-filters-open]');
-  await page.locator('label.check', { hasText: 'Body Care' }).first().click();
-  await expect(page.locator('[data-grid] [data-product-card]:visible')).toHaveCount(2);
-  await expect(page).toHaveURL(/category=body-care/);
+  await page.locator('label.check', { hasText: 'Bath & Body Works' }).first().click();
+  await expect(page.locator('[data-grid] [data-product-card]:visible')).toHaveCount(11);
+  await expect(page).toHaveURL(/brand=Bath/);
   if (isMobile) await page.locator('.sheet-foot [data-filters-close]').click();
   await page.selectOption('[data-sort]', 'price-desc');
-  await expect(page.locator('[data-grid] [data-product-card]:visible').first()).toContainText('Body Butter');
+  await expect(page.locator('[data-grid] [data-product-card]:visible').first()).toContainText('Wallflower Socket Gray');
   await page.reload();
-  await expect(page.locator('[data-grid] [data-product-card]:visible')).toHaveCount(2);
+  await expect(page.locator('[data-grid] [data-product-card]:visible')).toHaveCount(11);
 });
 
 test('wishlist persists and moves to bag', async ({ page }) => {
-  await page.goto('/products/refill-oil/');
+  await page.goto('/products/midnight-vanilla-room-spray/');
   await page.locator('.buy-actions [data-wish]').click();
   await expect(page.locator('.buy-actions [data-wish]')).toHaveAttribute('aria-pressed', 'true');
   await page.goto('/wishlist/');
@@ -63,25 +64,28 @@ test('wishlist persists and moves to bag', async ({ page }) => {
   await expect(page.locator('[data-bag-count]').first()).toHaveText('1');
 });
 
-test('bag: quantity, promo, remove; out-of-stock cannot be added', async ({ page }) => {
-  await page.goto('/products/car-diffuser/');
+test('bag: quantity, promo, remove; out-of-stock cannot be added', async ({ page, request }) => {
+  const h = { 'X-CNM-Request': '1' };
+  await request.post('/api/admin/login', { headers: h, data: { email: 'admin@cnm.local', password: 'cnm-local-admin' } });
+  await request.put('/api/admin/inventory', { headers: h, data: { products: { 'crushed-room-spray': { stock: 0 } } } });
+  await page.goto('/products/crushed-room-spray/');
   await expect(page.locator('.buy-actions')).toHaveCount(0);
   await expect(page.locator('[data-back-in-stock]')).toBeVisible();
-  await page.goto('/products/body-wash/');
+  await page.goto('/products/petalrich-room-spray/');
   await page.locator('.buy-actions [data-add]').click();
   await expect(page.locator('#bag-drawer')).toBeVisible();
   await page.goto('/bag/');
-  await page.click('[data-line-inc="body-wash"]');
-  await expect(page.locator('[data-totals]')).toContainText('₦29,000');
+  await page.click('[data-line-inc="petalrich-room-spray"]');
+  await expect(page.locator('[data-totals]')).toContainText('₦35,700');
   await page.fill('#promo', 'staging10');
   await page.click('[data-promo-form] button');
   await expect(page.locator('[data-promo-msg]')).toContainText('10% off');
-  await page.click('[data-line-remove="body-wash"]');
+  await page.click('[data-line-remove="petalrich-room-spray"]');
   await expect(page.getByText('Your bag is empty.').first()).toBeVisible();
 });
 
 test('guest checkout: payment failure, retry, confirmation and order tracking', async ({ page }) => {
-  await page.goto('/products/signature-diffuser-oil/');
+  await page.goto('/products/white-tea-and-sage-room-spray/');
   await page.locator('.buy-actions [data-add]').click();
   await page.goto('/checkout/');
   await fillCheckout(page, unique());
@@ -106,7 +110,7 @@ test('account: register, checkout signed in, see order history, preferences', as
   await page.click('[data-register-form] button[type="submit"]');
   await expect(page).toHaveURL(/\/account\/$/);
   await expect(page.locator('[data-account-panel] h1')).toContainText('Welcome, Tolu');
-  await page.goto('/products/refill-oil/');
+  await page.goto('/products/love-stoned-room-spray/');
   await page.locator('.buy-actions [data-add]').click();
   await page.goto('/checkout/');
   await expect(page.locator('#c-email')).toHaveValue(email);
@@ -142,7 +146,7 @@ test('fragrance as a service enquiry is captured', async ({ page }) => {
 });
 
 test('butterfly loader: hidden when fast, shown only during genuine latency', async ({ page }) => {
-  await page.goto('/products/refill-oil/');
+  await page.goto('/products/rose-bohemian-room-spray/');
   await page.locator('.buy-actions [data-add]').click();
   await page.goto('/checkout/');
   await fillCheckout(page, unique());
@@ -156,7 +160,7 @@ test('butterfly loader: hidden when fast, shown only during genuine latency', as
 
 test('admin: sign in, dashboard, move an order to processing', async ({ page, request }) => {
   const h = { 'X-CNM-Request': '1' };
-  const r = await (await request.post('/api/checkout', { headers: h, data: { items: [{ id: 'refill-oil', qty: 1 }], contact: { email: 'adm@example.com', phone: '+2348000000000', firstName: 'A', lastName: 'D' }, delivery: { method: 'nationwide', address: { line1: '2 Road', city: 'Enugu', state: 'Enugu' } } } })).json();
+  const r = await (await request.post('/api/checkout', { headers: h, data: { items: [{ id: 'sweet-pea-wallflower-plug-in-refill', qty: 1 }], contact: { email: 'adm@example.com', phone: '+2348000000000', firstName: 'A', lastName: 'D' }, delivery: { method: 'nationwide', address: { line1: '2 Road', city: 'Enugu', state: 'Enugu' } } } })).json();
   await request.post('/api/payments/simulate', { headers: h, data: { number: r.order.number, accessToken: r.order.accessToken, outcome: 'success' } });
   await page.goto('/admin/');
   await page.fill('#ae', 'admin@cnm.local');
@@ -171,13 +175,14 @@ test('admin: sign in, dashboard, move an order to processing', async ({ page, re
 });
 
 test('SEO: canonical, structured data, noindex on staging, sitemap', async ({ page, request }) => {
-  await page.goto('/products/stoneglow-reed-diffuser/');
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/products\/stoneglow-reed-diffuser\/$/);
+  await page.goto('/products/midnight-vanilla-room-spray/');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/products\/midnight-vanilla-room-spray\/$/);
   const ld = await page.locator('script[type="application/ld+json"]').allTextContents();
   const types = ld.map((s) => JSON.parse(s)['@type']);
   expect(types).toEqual(expect.arrayContaining(['BreadcrumbList', 'Product']));
   const product = ld.map((s) => JSON.parse(s)).find((x) => x['@type'] === 'Product');
-  expect(product.offers).toBeUndefined(); // demo prices are never advertised
+  expect(product.offers.price).toBe(17850); // real prices from cnmessentials.com
+  expect(product.brand.name).toBe("Victoria's Secret");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
   const sm = await (await request.get('/sitemap.xml')).text();
   expect(sm).toContain('/stores/lagos/');

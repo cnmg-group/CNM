@@ -1,8 +1,52 @@
 [
-  { "slug": "home-fragrance", "name": "Home Fragrance", "intro": "Fragrance for the rooms you live in.", "introStatus": "NEEDS_CNM_APPROVAL", "order": 1 },
-  { "slug": "diffuser-oils", "name": "Diffuser Oils", "intro": "Oils for CNM diffusers and scent machines.", "introStatus": "NEEDS_CNM_APPROVAL", "order": 2 },
-  { "slug": "refill-oils", "name": "Refill Oils", "intro": "Refills for the scents you already love.", "introStatus": "NEEDS_CNM_APPROVAL", "order": 3 },
-  { "slug": "smart-scent-machines", "name": "Smart Scent Machines", "intro": "Scenting technology for homes and commercial spaces.", "introStatus": "NEEDS_CNM_APPROVAL", "order": 4 },
-  { "slug": "body-care", "name": "Body Care", "intro": "Rituals for skin and body.", "introStatus": "NEEDS_CNM_APPROVAL", "order": 5 },
-  { "slug": "car-fragrance", "name": "Car Fragrance", "intro": "Carry your scent on the road.", "introStatus": "NEEDS_CNM_APPROVAL", "order": 6 }
+  {
+    "slug": "room-home-fragrance",
+    "name": "Room & Home Fragrance",
+    "intro": null,
+    "introStatus": "NEEDS_CNM_APPROVAL",
+    "order": 1,
+    "banner": "/assets/campaign/room-home-fragrance.jpg",
+    "showWhenEmpty": true,
+    "status": "FROM_CNM_LIVE_SITE"
+  },
+  {
+    "slug": "diffusers-refills",
+    "name": "Diffusers & Refills",
+    "intro": null,
+    "introStatus": "NEEDS_CNM_APPROVAL",
+    "order": 2,
+    "banner": "/assets/campaign/diffusers-refills.jpg",
+    "showWhenEmpty": true,
+    "status": "FROM_CNM_LIVE_SITE"
+  },
+  {
+    "slug": "body-care",
+    "name": "Body Care",
+    "intro": null,
+    "introStatus": "NEEDS_CNM_APPROVAL",
+    "order": 3,
+    "banner": "/assets/campaign/body-care.jpg",
+    "showWhenEmpty": true,
+    "status": "FROM_CNM_LIVE_SITE"
+  },
+  {
+    "slug": "hair-care",
+    "name": "Hair Care",
+    "intro": null,
+    "introStatus": "NEEDS_CNM_APPROVAL",
+    "order": 4,
+    "banner": "/assets/campaign/hair-care.jpg",
+    "showWhenEmpty": true,
+    "status": "FROM_CNM_LIVE_SITE"
+  },
+  {
+    "slug": "beverages",
+    "name": "Beverages",
+    "intro": null,
+    "introStatus": "NEEDS_CNM_APPROVAL",
+    "order": 5,
+    "banner": null,
+    "showWhenEmpty": false,
+    "status": "FROM_CNM_LIVE_SITE"
+  }
 ]

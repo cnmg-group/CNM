@@ -6,7 +6,7 @@ excerpt: Guests remember a lobby, a boutique or an event by how it made them fee
 date: 2026-07-30
 author: CNM Essentials Editorial
 status: DRAFT_NEEDS_CNM_APPROVAL
-related: [smart-scent-machine, signature-diffuser-oil]
+related: [wallflower-socket-gray-wallflower-plug-in, warm-ocean-breeze-wallflower-plug-in-refill]
 ---
 Lighting, sound and materials all shape how a space feels. Scent is the least visible of these, and often the one people remember longest.
 

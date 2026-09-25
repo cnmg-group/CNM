@@ -20,7 +20,7 @@ No rankings are promised. This plan builds the strongest legitimate foundation f
 Each product needs a unique title and description (never templated boilerplate), an SEO title of 70 characters or fewer and a meta description of 160 or fewer (Admin → Products), original imagery with alt text, correct availability and price, and a GTIN where one exists.
 
 ## Category SEO rules
-Build landing pages only for genuine commercial intent: Home Fragrance, Diffuser Oils, Refill Oils, Smart Scent Machines, Body Care, Car Fragrance and Stoneglow. Each has a unique intro, which CNM must supply. Do not create thin keyword pages.
+Build landing pages only for genuine commercial intent: Room & Home Fragrance, Diffusers & Refills, Body Care and Hair Care (plus brand views: Victoria's Secret, Bath & Body Works, Febreze). Each has a unique intro, which CNM must supply. Do not create thin keyword pages.
 
 ## Local SEO
 - Store pages `/stores/lagos/` and `/stores/abuja/` must show NAP (name, address, phone), hours, map, directions, services and original photography.

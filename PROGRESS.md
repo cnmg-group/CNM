@@ -4,28 +4,49 @@ Status key: **DONE** · **IN PROGRESS** · **BLOCKED** · **NEEDS CNM APPROVAL**
 
 _Last updated: 2026-09-25_
 
-## Blockers (need action from CNM)
+## Source of truth now in the build
+
+CNM supplied screenshots of **cnmessentials.com** (home, shop, about) and **cnm-group.net** (about, companies, contact). From them the build now uses:
+
+| Item | Status | Source |
+| --- | --- | --- |
+| Original CNM Essentials logo (header, footer, admin, favicon, structured data) | **DONE** | Cropped from cnm-group.net; not redrawn. Replace with the master vector file for maximum sharpness. |
+| CNM Group logo, CNM Spectra, CNMWorX and CNM Foundation logos | **DONE** | cnm-group.net |
+| 20 products: names, product types, brands, prices (incl. kobo), photos | **DONE** | cnmessentials.com/shop |
+| Categories: Room & Home Fragrance, Diffusers & Refills, Body Care, Hair Care (+ Beverages, hidden until stocked) | **DONE** | cnmessentials.com |
+| Campaign banners (Room & Home Fragrance, Diffusers & Refills, Body Care, Hair Care, Vitamin C Brightening Body Wash) | **DONE** | cnmessentials.com home |
+| Store interior photograph | **DONE** | cnmessentials.com About. Which store it shows **NEEDS CNM APPROVAL**. |
+| Store addresses, phone, email | **DONE** | cnmessentials.com footer. LocalBusiness schema is now published. |
+| Hero, shop, about, newsletter copy and service promises | **DONE** | cnmessentials.com |
+| Brand description, core activities, key products, Lease-to-Own Programme | **DONE** | cnm-group.net → CNM Essentials |
+| CNM Group structure: Retail (Essentials, Spectra) · Energy (CNMWorX) · Impact (Foundation) | **DONE** | cnm-group.net |
+| Brand palette (charcoal #23221e, sage #d3dbce, yellow #fbcc39) | **DONE** | Sampled from the original logo |
+
+## Still needed from CNM
 
 | Item | Status | What's needed |
 | --- | --- | --- |
-| Audit of cnm-group.net, cnmessentials.com, Instagram and socials | **BLOCKED** | The build environment's network policy denies these hosts. Allow `cnmessentials.com`, `www.cnm-group.net` and `cdn.shopify.com` (if on Shopify) in the environment's network settings, **or** upload the assets. |
-| Original CNM logo | **BLOCKED** | Supply the file, or run `node scripts/import-catalogue.mjs --logo <url-or-file>`. It is picked up automatically on every page, in the admin and emails. It is never redrawn. |
-| Original products, prices, variants and photography | **BLOCKED** | Run `node scripts/import-catalogue.mjs --shopify https://cnmessentials.com` (or `--woo` / `--csv export.csv`). Until then, the 8 product names from CNM's Netlify prototype are shown with **demo** prices and stock, and illustrated placeholders. |
-| Founder, company history, timeline, store addresses, hours, phones | **NEEDS CNM APPROVAL** | Enter via Admin → Stores and `content/story.json`. See `docs/CONTENT-APPROVAL.md`. |
-| Payment provider and merchant account | **NEEDS CNM APPROVAL** | Paystack is integrated; add `PAYSTACK_SECRET_KEY`. |
-| Delivery fees, regions, returns policy, VAT treatment | **NEEDS CNM APPROVAL** | `content/commerce.json`. |
-| Apple and Google developer accounts, bundle ID `com.cnmessentials.app` | **NEEDS CNM APPROVAL** | See `mobile/README.md`. |
+| Remaining catalogue (only page 1 of /shop was supplied), product descriptions, sizes, how-to-use | **NEEDS CNM APPROVAL** | Run `node scripts/import-catalogue.mjs --shopify/--woo/--csv` once the store export or network access is available, or send the remaining pages. |
+| Stock levels | **NEEDS CNM APPROVAL** | Not shown on the live site. Set them in Admin → Products & inventory. |
+| "Sun Kissed Vanilla": the live site says Bath & Body Works but the photo shows a Febreze pack | **NEEDS CNM APPROVAL** | Confirm the brand. |
+| Body Care, Hair Care and CNM's own products (Vitamin C Brightening Body Wash, Rosemary hair & scalp oil) | **NEEDS CNM APPROVAL** | Prices and product pages; the category pages currently say "coming soon online". |
+| Opening hours, map coordinates and photos for each store | **NEEDS CNM APPROVAL** | Admin → Stores |
+| Founder name, portrait and personal story; dated milestones | **NEEDS CNM APPROVAL** | `content/story.json` |
+| Instagram and WhatsApp links | **NEEDS CNM APPROVAL** | Icons exist on the live site; URLs not visible in the screenshots |
+| Delivery fees, returns policy, VAT treatment, payment provider (the live site lists Visa, Mastercard and PayPal) | **NEEDS CNM APPROVAL** | `content/commerce.json`; Paystack is integrated and ready |
+| Master logo files (SVG) | **NEEDS CNM APPROVAL** | For print-sharp rendering and app icons |
+| Apple and Google developer accounts | **NEEDS CNM APPROVAL** | `mobile/README.md` |
 
 ## Workstreams
 
 | Phase | Item | Status |
 | --- | --- | --- |
 | Research | Brief analysis, UX references (Apple storytelling, Farfetch commerce) | DONE |
-| Audit | Existing CNM assets (sites, social, photography) | **BLOCKED** (network) |
+| Audit | Existing CNM assets from the supplied screenshots of cnmessentials.com and cnm-group.net | DONE (social media still to audit) |
 | Architecture | Static-first Netlify site + Functions + Blobs; headless-ready commerce layer | DONE (`docs/ARCHITECTURE.md`) |
 | Design system | Tokens, type, grid, buttons, forms, cards, motion, approval slots (`/styleguide/`) | DONE |
-| Landing | Cinematic home: hero → new in → home fragrance → oils → smart scent → body → featured → story → FaaS → stores → journal → newsletter | DONE (copy **NEEDS CNM APPROVAL**) |
-| Commerce | Shop all, New in, Best sellers, 6 category pages, Stoneglow collection, Gifts | DONE |
+| Landing | Home: hero (live-site copy) → shop by category (CNM campaign banners) → room sprays → diffusers & refills → brands → Lease-to-Own → featured → about → promises → stores → journal → newsletter | DONE |
+| Commerce | Shop now (20 real products), 4 CNM category pages with campaign banners, brand filter, gifts | DONE |
 | Commerce | Product cards (hover alternate image, wishlist, quick add, badges, stock) | DONE |
 | Commerce | Instant filters with URL state; mobile bottom sheet; sorting | DONE |
 | Commerce | Predictive search (typo-tolerant, recent/popular, zero-result recommendations) | DONE |
@@ -35,7 +56,7 @@ _Last updated: 2026-09-25_
 | Commerce | Checkout Contact → Delivery → Payment → Review → Confirmation; Paystack + staging simulator; failure/retry | DONE |
 | Commerce | Order numbers, confirmation email, order history, tracking status | DONE |
 | Account | Register, sign in, email-code (OTP) sign-in, reset, profile, addresses, orders, preferences, sign out everywhere | DONE |
-| Content | Our Story, Stores + store pages, Fragrance as a Service + enquiry, Journal + articles, CNM Group hub (Energy · Retail · Impact) | DONE (content **NEEDS CNM APPROVAL**) |
+| Content | Our Story (brand and group copy, mission, vision, values), Stores (real NAP), For Business / Lease-to-Own + enquiry, Journal, CNM Group hub (Retail · Energy · Impact with all four companies) | DONE (founder and hours **NEEDS CNM APPROVAL**) |
 | Mobile | Expo iOS + Android app (tabs, shop, search, PDP, wishlist, bag, checkout, account, push, deep links, biometrics) | DONE (typecheck + 58 tests; not device-tested) |
 | Mobile | App Store and Play Store submission | **NEEDS CNM APPROVAL** (accounts) |
 | Admin | Dashboard, orders, customers, inventory/pricing, discounts, content/merchandising, stores, SEO/redirects, enquiries, subscribers, media, analytics, users/roles, audit log, publish | DONE |
@@ -46,7 +67,7 @@ _Last updated: 2026-09-25_
 | Performance | Static HTML, 6 KB main JS, code-split pages, self-hosted fonts, immutable caching, lazy images, skeletons, delayed loader | DONE |
 | Accessibility | Skip link, focus states, focus-trapped dialogs, labels, ARIA, reduced motion, keyboard search | DONE |
 | Security | Signed HttpOnly sessions, CSRF, rate limits, validation, server-side pricing, RBAC, webhook HMAC, CSP/HSTS | DONE |
-| Testing | 18 unit/integration tests, 23 Playwright E2E tests (desktop + mobile) | DONE (all passing) |
+| Testing | 19 unit/integration tests, 23 Playwright E2E tests (desktop + mobile) | DONE (all passing) |
 | Staging | Netlify config; staging is noindexed with a staging banner and payment simulator | DONE (deploy needs Netlify access, see `docs/DEPLOYMENT.md`) |
-| Visual QA | 67 screenshots, desktop + mobile, `docs/visual-review/index.html` | DONE (re-run after real assets are imported) |
+| Visual QA | 69 screenshots, desktop + mobile, `docs/visual-review/index.html` | DONE (with real CNM assets) |
 | Production | Connect cnmessentials.com | Waiting for final CNM approval |

@@ -157,7 +157,7 @@ export default handler(async (req, context) => {
         for (const p of baseProducts) {
           const x = b.products?.[p.id];
           if (!x) { if (cur.products[p.id]) next.products[p.id] = cur.products[p.id]; continue; }
-          const num = (n, name) => (n === '' || n == null ? undefined : Number.isFinite(Number(n)) && Number(n) >= 0 ? Math.round(Number(n)) : fail(422, 'invalid', `${name} for ${p.name} is invalid.`));
+          const num = (n, name) => (n === '' || n == null ? undefined : Number.isFinite(Number(n)) && Number(n) >= 0 ? Math.round(Number(n) * 100) / 100 : fail(422, 'invalid', `${name} for ${p.name} is invalid.`));
           next.products[p.id] = {
             price: num(x.price, 'Price'), compareAt: num(x.compareAt, 'Compare-at price'), stock: num(x.stock, 'Stock'),
             available: x.available !== false, priceApproved: !!x.priceApproved,

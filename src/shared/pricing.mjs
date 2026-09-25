@@ -1,3 +1,5 @@
+const r2 = (n) => Math.round(n * 100) / 100; // money is Naira with kobo precision
+
 // Order pricing. The server is authoritative; the browser uses the same code only for instant estimates.
 
 /**
@@ -28,10 +30,10 @@ export function computeQuote({ items, products, commerce, promoCode, deliveryMet
     let qty = Math.min(requested, maxQty);
     if (stock != null && qty > stock) { qty = stock; errors.push({ id, code: 'qty_reduced', message: `Only ${stock} of ${p.name} available.` }); }
     const unit = p.price.amount;
-    lines.push({ id, name: p.name, slug: p.slug, qty, unitPrice: unit, lineTotal: unit * qty });
+    lines.push({ id, name: p.name, slug: p.slug, qty, unitPrice: unit, lineTotal: r2(unit * qty) });
   }
 
-  const subtotal = lines.reduce((s, l) => s + l.lineTotal, 0);
+  const subtotal = r2(lines.reduce((s, l) => s + l.lineTotal, 0));
 
   let discount = 0;
   let promo = null;
@@ -41,22 +43,22 @@ export function computeQuote({ items, products, commerce, promoCode, deliveryMet
     if (!d) promo = { code, valid: false, message: 'This code is not valid.' };
     else if (subtotal < (d.minSubtotal || 0)) promo = { code, valid: false, message: `Spend ${d.minSubtotal} or more to use this code.` };
     else {
-      discount = d.type === 'percent' ? Math.round((subtotal * d.value) / 100) : Math.min(d.value, subtotal);
+      discount = d.type === 'percent' ? r2((subtotal * d.value) / 100) : Math.min(d.value, subtotal);
       promo = { code, valid: true, message: d.type === 'percent' ? `${d.value}% off applied.` : 'Discount applied.' };
     }
   }
 
-  const afterDiscount = subtotal - discount;
+  const afterDiscount = r2(subtotal - discount);
   const methods = (commerce.deliveryMethods || []).map((m) => ({
     id: m.id, label: m.label, eta: m.eta, regions: m.regions,
     fee: m.freeOver != null && afterDiscount >= m.freeOver ? 0 : m.fee,
   }));
   const method = methods.find((m) => m.id === deliveryMethod) || null;
   const delivery = lines.length && method ? method.fee : 0;
-  const total = afterDiscount + delivery;
+  const total = r2(afterDiscount + delivery);
   const rate = commerce.vatRate?.value ?? 0;
-  const vat = commerce.pricesIncludeVat?.value ? Math.round(total - total / (1 + rate)) : Math.round(total * rate);
-  const grand = commerce.pricesIncludeVat?.value ? total : total + vat;
+  const vat = commerce.pricesIncludeVat?.value ? r2(total - total / (1 + rate)) : r2(total * rate);
+  const grand = commerce.pricesIncludeVat?.value ? total : r2(total + vat);
 
   return {
     currency: commerce.currency || 'NGN', lines, subtotal, discount, delivery, vat,

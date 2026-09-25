@@ -9,45 +9,57 @@ const art = (name, extra = '') => `<img src="/assets/art/${name}.svg" alt="" loa
 /* ---------------- Our story ---------------- */
 export function storyPage(ctx) {
   const s = ctx.story;
+  const { site } = ctx;
+  const g = site.group;
+  const { html, ld } = breadcrumbs(ctx, [{ name: 'Our story', path: '/our-story/' }]);
   const body = `
 <section class="hero" style="min-height:88svh" aria-labelledby="story-h">
-  <div class="hero__media" aria-hidden="true"><div class="hero__atmos"></div></div>
-  <div class="container hero__inner"><span class="label hero__eyebrow">Our story</span><h1 id="story-h" class="h1" style="max-width:18ch">${escapeHtml(s.headline.value)}</h1></div>
+  <div class="hero__media" aria-hidden="true"><img src="${s.image.src}" alt="" style="width:100%;height:100%;object-fit:cover;opacity:.45"></div>
+  <div class="container hero__inner"><span class="label hero__eyebrow">About CNM Essentials</span><h1 id="story-h" class="display" style="max-width:12ch">${escapeHtml(s.headline.value)}</h1>
+    <div class="stat-row" style="margin-top:32px">${s.stats.value.map(([n, l]) => `<div><strong>${escapeHtml(n)}</strong><span class="label">${escapeHtml(l)}</span></div>`).join('')}</div></div>
 </section>
-<section class="section"><div class="container container--narrow stack">
-  <span class="label muted">Where we began</span>
-  ${s.intro.value ? `<div class="prose"><p>${escapeHtml(s.intro.value)}</p></div>` : approval('Official CNM company story.', 'CNM to supply its history in its own words. This page will not be filled with invented marketing copy.')}
+<div class="container">${html}</div>
+<section class="section"><div class="container" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:clamp(32px,6vw,96px);align-items:center">
+  <div class="stack"><span class="label muted">Lifestyle &amp; wellness</span><h2 class="h1">CNM Essentials</h2><p class="h3" style="color:var(--gold-ink)">${escapeHtml(site.groupTagline.value)}</p></div>
+  <div class="prose"><p>${escapeHtml(s.intro.value)}</p><p><strong>${escapeHtml(site.motto.value)}</strong></p></div>
 </div></section>
-<section class="split section--cream" aria-labelledby="founder-h">
-  <div class="split__media">${s.founder.portrait ? `<img src="${s.founder.portrait}" alt="${escapeHtml(s.founder.name || 'Founder')}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">` : `${art('tile-stone')}<div style="position:absolute;inset:auto 24px 24px">${approval('Original founder photograph.')}</div>`}</div>
+<section class="section section--cream"><div class="container">
+  <div class="cards-2">
+    <div class="box"><span class="label">Core activities</span><ul>${site.coreActivities.value.map((x) => `<li style="padding:6px 0;display:flex;gap:10px">${icon('check')} ${escapeHtml(x)}</li>`).join('')}</ul></div>
+    <div class="box"><span class="label">Key products</span><ul>${site.keyProducts.value.map((x) => `<li style="padding:6px 0;display:flex;gap:10px">${icon('check')} ${escapeHtml(x)}</li>`).join('')}</ul></div>
+  </div>
+  <div class="box" style="margin-top:16px"><span class="label">Key value proposition</span><p class="h3" style="font-family:var(--serif);font-weight:400;font-size:1.75rem;line-height:1.25">${escapeHtml(s.philosophy.brand)}</p></div>
+</div></section>
+<section class="split" aria-labelledby="founder-h">
+  <div class="split__media">${s.founder.portrait ? `<img src="${s.founder.portrait}" alt="${escapeHtml(s.founder.name || 'Founder')}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">` : `<img src="/assets/brand/cnm-logo.png" alt="CNM Essentials logo" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#23221e;padding:12%">`}</div>
   <div class="split__copy">
-    <span class="label muted">Founder</span>
-    <h2 id="founder-h" class="h2">${escapeHtml(s.founder.name || 'Founder name')}</h2>
-    ${s.founder.quote ? `<blockquote class="h3" style="font-family:var(--serif);font-size:2rem;margin:0">“${escapeHtml(s.founder.quote)}”</blockquote>` : approval('Founder name, title, philosophy and quote.')}
+    <span class="label muted">Founder-led</span>
+    <h2 id="founder-h" class="h2">${escapeHtml(s.founder.name || 'Part of CNM Group')}</h2>
+    <p class="lead">${escapeHtml(s.roots.value)}</p>
+    ${s.founder.quote ? `<blockquote class="h3" style="font-family:var(--serif);font-size:2rem;margin:0">“${escapeHtml(s.founder.quote)}”</blockquote>` : approval('Founder name, portrait and personal story.', 'Supply the original founder photograph and CNM-approved words.')}
   </div>
 </section>
+<section class="section section--green"><div class="container">
+  <div class="cards-2" style="gap:48px">
+    <div class="stack"><span class="label">Our mission</span><h2 class="h2">Why we exist</h2><p class="lead">${escapeHtml(s.mission.value)}</p></div>
+    <div class="stack"><span class="label">Our vision</span><h2 class="h2">Where we're headed</h2><p class="lead">${escapeHtml(s.vision.value)}</p></div>
+  </div>
+</div></section>
 <section class="section"><div class="container">
-  <div class="section-head"><div><span class="label muted">Philosophy</span><h2 class="h2">What we believe</h2></div></div>
-  <div class="cards-2"><div class="box"><span class="label">Brand philosophy</span>${s.philosophy.brand ? `<p>${escapeHtml(s.philosophy.brand)}</p>` : approval('Brand philosophy.')}</div><div class="box"><span class="label">Founder philosophy</span>${s.philosophy.founder ? `<p>${escapeHtml(s.philosophy.founder)}</p>` : approval('Founder philosophy.')}</div></div>
+  <div class="section-head"><div><span class="label muted">Core values</span><h2 class="h2">The principles that define us</h2></div></div>
+  <div class="values">${s.values.value.map(([t, d]) => `<div><p class="h3">${escapeHtml(t)}</p><p class="muted" style="margin:0">${escapeHtml(d)}</p></div>`).join('')}</div>
+  <p class="muted" style="margin-top:24px;font-size:.8125rem">Mission, vision and values of CNM Group (<a class="textlink" href="/cnm-group/">about the group</a>). ${s.timeline.length ? '' : 'A dated CNM Essentials timeline is pending CNM approval.'}</p>
 </div></section>
-<section class="section section--green"><div class="container container--narrow center stack">
-  <span class="label">Nigerian roots</span>
-  <p class="h2">${escapeHtml(s.roots.value)}</p>
-</div></section>
-<section class="section"><div class="container container--narrow">
-  <div class="section-head"><div><span class="label muted">Milestones</span><h2 class="h2">Timeline</h2></div></div>
-  ${s.timeline.length ? `<ol class="timeline">${s.timeline.map((t) => `<li><span class="label">${escapeHtml(t.year)}</span><p class="h3">${escapeHtml(t.title)}</p><p class="muted">${escapeHtml(t.text || '')}</p></li>`).join('')}</ol>` : approval('Company timeline and growth milestones.', 'Supply dated milestones; none will be invented.')}
-</div></section>`;
-  const { html, ld } = breadcrumbs(ctx, [{ name: 'Our story', path: '/our-story/' }]);
-  return { body: body.replace('<section class="section">', `<div class="container">${html}</div><section class="section">`), jsonld: [ld] };
+<section class="section section--cream section--tight"><div class="container center stack"><p class="h2" style="font-family:var(--serif)">${escapeHtml(g.motto)}</p><a class="link" href="/cnm-group/" style="justify-self:center">Discover CNM Group ${icon('arrow')}</a></div></section>`;
+  return { body, jsonld: [ld, { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'About CNM Essentials', url: `${ctx.siteUrl}/our-story/` }] };
 }
 
 /* ---------------- Stores ---------------- */
 export function storesIndex(ctx) {
   const { html, ld } = breadcrumbs(ctx, [{ name: 'Stores', path: '/stores/' }]);
   const body = `<div class="container">${html}
-  <header class="plp-head"><span class="label muted">Visit CNM</span><h1 class="display" style="font-size:clamp(3rem,8vw,7rem)">Our stores</h1><p class="lead">Experience our fragrances in person, collect online orders and book a consultation.</p></header>
-  <div class="store-cards" style="padding-bottom:96px">${ctx.stores.map((s, i) => `<a class="store-card" href="/stores/${s.slug}/"><div style="position:absolute;inset:0">${art(i ? 'tile-stone' : 'tile-cream')}</div><div style="position:relative" class="stack"><p class="store-card__city">${escapeHtml(s.city)}</p><p>${s.address ? escapeHtml(s.address) : '<span class="muted">Address pending CNM approval</span>'}</p><span class="link">Store details ${icon('arrow')}</span></div></a>`).join('')}</div>
+  <header class="plp-head"><span class="label muted">Visit CNM</span><h1 class="display" style="font-size:clamp(3rem,8vw,7rem)">Our stores</h1><p class="lead">Experience our fragrances in person, collect online orders and ask about our Lease-to-Own commercial diffusers.</p></header>
+  <div class="store-cards" style="padding-bottom:96px">${ctx.stores.map((s) => `<a class="store-card" href="/stores/${s.slug}/" style="background:var(--ink);color:#fff">${s.images?.[0] ? `<img src="${s.images[0].src}" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5">` : ''}<div style="position:relative" class="stack"><p class="store-card__city">${escapeHtml(s.city)}</p><p>${escapeHtml(s.address)}${s.region === 'FCT' ? ', FCT' : `, ${escapeHtml(s.region)} State`}</p><p>${escapeHtml(s.phone || '')}</p><span class="link">Store details ${icon('arrow')}</span></div></a>`).join('')}</div>
 </div>`;
   return { body, jsonld: [ld] };
 }
@@ -58,17 +70,18 @@ export function storePage(ctx, s) {
   const mapQ = encodeURIComponent(s.address ? `${s.address}, ${s.city}` : s.mapQuery);
   const body = `<div class="container">${html}</div>
 <section class="store-hero" aria-labelledby="store-h">
-  <div class="store-hero__media">${s.images?.[0] ? `<img src="${s.images[0].src}" alt="${escapeHtml(s.images[0].alt)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">` : `${art('tile-green')}<div style="position:absolute;inset:auto 24px 24px">${approval('Original store photography.')}</div>`}</div>
+  <div class="store-hero__media">${s.images?.[0] ? `<img src="${s.images[0].src}" alt="${escapeHtml(s.images[0].alt)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">${s.images[0].note ? `<div style="position:absolute;inset:auto 24px 24px">${approval(s.images[0].note)}</div>` : ''}` : `<img src="/assets/brand/cnm-logo.png" alt="" style="width:50%;max-width:280px"><div style="position:absolute;inset:auto 24px 24px">${approval(`Original ${s.city} store photography.`)}</div>`}</div>
   <div class="store-hero__copy">
     <span class="label muted">CNM Essentials</span>
     <h1 id="store-h" class="display" style="font-size:clamp(3.5rem,8vw,7rem)">${escapeHtml(s.city)}</h1>
     <div class="info-list">
-      <div>${icon('pin')}<div><strong>Address</strong><br>${s.address ? `${escapeHtml(s.address)}, ${escapeHtml(s.city)}` : '<span class="muted">Address pending CNM approval</span>'}</div></div>
+      <div>${icon('pin')}<div><strong>Address</strong><br>${s.address ? `${escapeHtml(s.address)}, ${escapeHtml(s.region === 'FCT' ? 'FCT' : `${s.region} State`)}` : '<span class="muted">Address pending CNM approval</span>'}</div></div>
       <div>${icon('clock')}<div><strong>Opening hours</strong><br>${hours}</div></div>
       <div>${icon('phone')}<div><strong>Contact</strong><br>${s.phone ? `<a class="textlink" href="tel:${escapeHtml(s.phone)}">${escapeHtml(s.phone)}</a>` : '<span class="muted">Phone pending CNM approval</span>'}</div></div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn" href="https://www.google.com/maps/dir/?api=1&destination=${mapQ}" target="_blank" rel="noopener" data-track="store_directions" data-store="${s.slug}">Get directions</a>${s.phone ? `<a class="btn btn--ghost" href="tel:${escapeHtml(s.phone)}">Call store</a>` : ''}</div>
     ${s.verified ? '' : approval('Store details (NAP) must match the Google Business Profile exactly.', 'LocalBusiness structured data is withheld until verified.')}
+    ${s.hours ? '' : approval('Opening hours.', 'Add in Admin → Stores; they also feed the LocalBusiness structured data.')}
   </div>
 </section>
 <section class="section"><div class="container">
@@ -79,14 +92,14 @@ export function storePage(ctx, s) {
 </div></section>
 <section class="section section--cream section--tight"><div class="container">
   <div class="section-head"><div><span class="label muted">In store</span><h2 class="h2">Discover in ${escapeHtml(s.city)}</h2></div><a class="link" href="/shop/">Shop online ${icon('arrow')}</a></div>
-  <div class="grid-products">${ctx.products.slice(0, 4).map((p, i) => productCardHTML(p, { position: i + 1, list: `store_${s.slug}` })).join('')}</div>
+  <div class="grid-products">${ctx.products.filter((_, i) => i % 5 === 0).slice(0, 4).map((p, i) => productCardHTML(p, { position: i + 1, list: `store_${s.slug}` })).join('')}</div>
 </div></section>`;
 
   const jsonld = [ld];
   if (s.verified && s.address) {
     jsonld.push({
       '@context': 'https://schema.org', '@type': 'Store', name: s.name, url: `${ctx.siteUrl}/stores/${s.slug}/`,
-      address: { '@type': 'PostalAddress', streetAddress: s.address, addressLocality: s.city, addressRegion: s.region, postalCode: s.postalCode, addressCountry: s.country },
+      address: { '@type': 'PostalAddress', streetAddress: s.address, addressLocality: s.city === 'Lagos' ? 'Lekki, Lagos' : 'Garki, Abuja', addressRegion: s.region, postalCode: s.postalCode, addressCountry: s.country },
       ...(s.geo ? { geo: { '@type': 'GeoCoordinates', latitude: s.geo.lat, longitude: s.geo.lng } } : {}),
       ...(s.phone ? { telephone: s.phone } : {}),
       ...(s.hours ? { openingHours: s.hours.map((h) => `${h.schema} ${h.open}-${h.close}`) } : {}),
@@ -103,9 +116,13 @@ export function servicesPage(ctx) {
   const body = `
 <section class="hero" style="min-height:92svh" aria-labelledby="svc-h">
   <div class="hero__media" aria-hidden="true"><div class="hero__atmos"></div></div>
-  <div class="container hero__inner"><span class="label hero__eyebrow">Fragrance as a Service</span><h1 id="svc-h" class="display" style="max-width:12ch">${escapeHtml(sv.headline.value)}</h1><p class="lead">${escapeHtml(sv.lead.value)}</p><div class="hero__cta"><a class="btn btn--light" href="#enquire">Start an enquiry</a></div></div>
+  <div class="container hero__inner"><span class="label hero__eyebrow">For business · Fragrance as a Service</span><h1 id="svc-h" class="display" style="max-width:12ch">${escapeHtml(sv.programme.value.name)}</h1><p class="lead">${escapeHtml(sv.programme.value.text)}, in Lagos and Abuja.</p><div class="hero__cta"><a class="btn btn--light" href="#enquire">Start an enquiry</a></div></div>
 </section>
 <div class="container">${html}</div>
+<section class="section section--cream section--tight"><div class="container cards-2">
+  <div class="box"><span class="label">What we offer</span><ul>${ctx.site.keyProducts.value.map((x) => `<li style="padding:6px 0;display:flex;gap:10px">${icon('check')} ${escapeHtml(x)}</li>`).join('')}</ul></div>
+  <div class="box"><span class="label">Lease-to-Own</span><p>${escapeHtml(sv.programme.value.text)}. Terms, pricing and machine specifications are shared on enquiry.</p>${approval('Programme terms and machine specifications.')}</div>
+</div></section>
 <section class="section"><div class="container">
   <div class="section-head"><div><span class="label muted">Who we scent for</span><h2 class="h2">Spaces &amp; occasions</h2></div></div>
   <div class="sector-grid">${sv.sectors.map((x, i) => `<div><span class="label muted">${String(i + 1).padStart(2, '0')}</span><div><p class="h3">${escapeHtml(x.name)}</p>${x.status === 'NEEDS_CNM_APPROVAL' ? '<span class="demo-tag" style="margin:8px 0 0">Confirm offered</span>' : ''}</div></div>`).join('')}</div>
@@ -185,17 +202,26 @@ ${related.length ? `<section class="section section--cream section--tight"><div 
 
 /* ---------------- CNM Group hub ---------------- */
 export function groupPage(ctx) {
-  const d = ctx.site.group.divisions;
-  const body = `<section class="section section--tight"><div class="container center stack">
-  <span class="label muted">CNM Group</span><h1 class="display" style="font-size:clamp(3rem,8vw,7rem)">Energy · Retail · Impact</h1>
-  <p class="lead">Preview of how CNM Group routes to its divisions. On <a class="textlink" href="${ctx.site.groupUrl}" rel="noopener">cnm-group.net</a>, the Retail link should point to this store.</p>
-</div></section>
-<div class="divisions">${d.map((x) => {
-    const href = x.url || '#';
-    const tag = x.url ? 'a' : 'div';
-    return `<${tag} class="division"${x.url ? ` href="${href}" data-track="group_division" data-division="${x.key}"` : ''}><span class="label">${escapeHtml(x.name)}</span><div class="stack"><p class="display">${escapeHtml(x.name.replace('CNM ', ''))}</p>${x.summary ? `<p class="lead" style="color:inherit">${escapeHtml(x.summary)}</p>` : approval(`${x.name} description and destination URL.`)}${x.url ? `<span class="link">Enter ${escapeHtml(x.key === 'retail' ? 'CNM Essentials' : x.name)} ${icon('arrow')}</span>` : ''}</div></${tag}>`;
-  }).join('')}</div>`;
-  return { body, jsonld: [] };
+  const g = ctx.site.group;
+  const body = `<section class="hero" style="min-height:72svh;background:#1d2b4a" aria-labelledby="grp-h">
+  <div class="container hero__inner hero__inner--split">
+    <div><img src="${g.logo}" alt="CNM Group — Driven by excellence. Defined by trust." width="480" height="480" style="width:120px;margin-bottom:24px"><span class="label hero__eyebrow">About CNM Group</span><h1 id="grp-h" class="h1" style="max-width:16ch">${escapeHtml(g.headline)}</h1><p class="lead">${escapeHtml(g.intro)}</p>
+      <div class="hero__cta"><a class="btn btn--light" href="#divisions">Explore our companies</a><a class="btn btn--ghost-light" href="${g.url}" rel="noopener">cnm-group.net</a></div></div>
+    <div class="stat-row">${g.stats.map(([n, l]) => `<div><strong>${escapeHtml(n)}</strong><span class="label">${escapeHtml(l)}</span></div>`).join('')}</div>
+  </div>
+</section>
+<section class="section section--tight"><div class="container center stack"><p class="lead" style="margin-inline:auto">${escapeHtml(g.about)}</p><p class="h2" style="font-family:var(--serif)">${escapeHtml(g.motto)}</p></div></section>
+<div class="divisions" id="divisions">${g.divisions.map((d) => `<section class="division" aria-labelledby="div-${d.key}">
+  <div class="stack"><span class="label">${escapeHtml(d.name)}</span><p class="display" id="div-${d.key}">${escapeHtml(d.name)}</p><p class="muted">${escapeHtml(d.summary)}</p></div>
+  <div>${d.companies.map((c) => `<a class="company" href="${c.url}"${c.internal ? '' : ' rel="noopener"'} data-track="group_division" data-division="${d.key}"><img src="${c.logo}" alt="${escapeHtml(c.name)} logo" loading="lazy"><div><strong>${escapeHtml(c.name)}</strong><p class="muted" style="margin:4px 0">${escapeHtml(c.tagline)}</p>${c.text ? `<p style="font-size:.875rem;margin:0">${escapeHtml(c.text)}</p>` : ''}<span class="link" style="margin-top:8px">${c.internal ? 'Enter the store' : 'Visit'} ${icon('arrow')}</span></div></a>`).join('')}</div>
+</section>`).join('')}</div>
+<section class="section section--cream section--tight"><div class="container center stack">
+  <span class="label muted">Contact CNM Group</span>
+  <p><a class="textlink" href="mailto:${g.contact.email}">${escapeHtml(g.contact.email)}</a> · <a class="textlink" href="tel:${g.contact.phone.replace(/\s/g, '')}">${escapeHtml(g.contact.phone)}</a></p>
+  <p class="muted">${escapeHtml(g.contact.address)}</p>
+  <p class="muted" style="font-size:.75rem">On cnm-group.net, the Retail division's CNM Essentials "Visit Site" link should point to this store.</p>
+</div></section>`;
+  return { body, jsonld: [{ '@context': 'https://schema.org', '@type': 'Organization', name: 'CNM Group', url: g.url, logo: `${ctx.siteUrl}${g.logo}`, slogan: g.motto, subOrganization: g.divisions.flatMap((d) => d.companies.map((c) => ({ '@type': 'Organization', name: c.name }))) }] };
 }
 
 /* ---------------- Info pages ---------------- */
@@ -219,7 +245,7 @@ export function notFoundPage(ctx) {
 
 /* ---------------- Design system / QA ---------------- */
 export function styleguidePage(ctx) {
-  const swatches = [['--green', '#153f32'], ['--green-deep', '#0c261e'], ['--green-soft', '#2a5a4a'], ['--cream', '#f5f1e8'], ['--sand', '#ebe5d8'], ['--stone', '#d9d2c3'], ['--ink', '#111111'], ['--mute', '#6d6b66']];
+  const swatches = [['--gold', '#fbcc39'], ['--sage', '#d3dbce'], ['--green (charcoal)', '#23221e'], ['--green-deep', '#121110'], ['--green-soft', '#4a4843'], ['--cream', '#f6f5f0'], ['--sand', '#e9ece4'], ['--stone', '#d3dbce'], ['--ink', '#111111'], ['--mute', '#6d6b66']];
   return `<div class="container" style="padding-block:48px 96px">
   <span class="label muted">Staging · internal</span><h1 class="h1" style="margin:12px 0 48px">CNM design system</h1>
   <section class="stack" style="margin-bottom:64px"><h2 class="label">Colour</h2><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px">${swatches.map(([n, v]) => `<div><div style="height:96px;background:${v};border:1px solid var(--line)"></div><p style="font-size:.8125rem;margin-top:8px">${n}<br><span class="muted">${v}</span></p></div>`).join('')}</div></section>
