@@ -18,7 +18,7 @@ function MenuRow({ label, icon, onPress, external }: { label: string; icon: Comp
       onPress={onPress}
       accessibilityRole={external ? 'link' : 'button'}
       accessibilityLabel={label}
-      style={({ pressed }) => [styles.row, pressed && { backgroundColor: colors.cream }]}
+      style={({ pressed }) => [styles.row, pressed && { backgroundColor: colors.offWhite }]}
     >
       <Feather name={icon} size={18} color={colors.ink} />
       <Text style={[type.body, { flex: 1, marginLeft: space.md }]}>{label}</Text>

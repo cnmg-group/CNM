@@ -1,13 +1,13 @@
 [
   {
-    "id": "signature-diffuser-oil",
-    "slug": "signature-diffuser-oil",
-    "name": "Signature Diffuser Oil",
-    "brand": "CNM Essentials",
-    "category": "diffuser-oils",
+    "id": "midnight-vanilla-room-spray",
+    "slug": "midnight-vanilla-room-spray",
+    "name": "Midnight Vanilla",
+    "brand": "Victoria's Secret",
+    "category": "room-home-fragrance",
     "collections": [],
-    "productType": "Diffuser oil",
-    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
+    "productType": "Room Spray",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
     "description": null,
     "scentFamily": null,
     "scentNotes": null,
@@ -18,118 +18,32 @@
     "faqs": [],
     "variants": [],
     "price": {
-      "amount": 28000,
+      "amount": 17850,
       "compareAt": null,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
     },
     "stock": {
-      "quantity": 24,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
     },
-    "images": [],
-    "video": null,
-    "badges": [],
-    "isNew": true,
-    "isBestSeller": false,
-    "flagsStatus": "NEEDS_CNM_APPROVAL",
-    "related": [
-      "refill-oil",
-      "smart-scent-machine"
+    "images": [
+      {
+        "src": "/assets/products/midnight-vanilla-room-spray.png",
+        "alt": "Victoria's Secret Midnight Vanilla room spray"
+      }
     ],
-    "seo": {
-      "title": null,
-      "description": null
-    },
-    "gtin": null,
-    "mpn": null,
-    "contentStatus": "NEEDS_CNM_APPROVAL"
-  },
-  {
-    "id": "smart-scent-machine",
-    "slug": "smart-scent-machine",
-    "name": "Smart Scent Machine",
-    "brand": "CNM Essentials",
-    "category": "smart-scent-machines",
-    "collections": [],
-    "productType": "Scent machine",
-    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
-    "description": null,
-    "scentFamily": null,
-    "scentNotes": null,
-    "ingredients": null,
-    "howToUse": null,
-    "size": null,
-    "care": null,
-    "faqs": [],
-    "variants": [],
-    "price": {
-      "amount": 185000,
-      "compareAt": null,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
-    },
-    "stock": {
-      "quantity": 6,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
-    },
-    "images": [],
-    "video": null,
-    "badges": [],
-    "isNew": true,
-    "isBestSeller": false,
-    "flagsStatus": "NEEDS_CNM_APPROVAL",
-    "related": [
-      "signature-diffuser-oil",
-      "refill-oil"
-    ],
-    "seo": {
-      "title": null,
-      "description": null
-    },
-    "gtin": null,
-    "mpn": null,
-    "contentStatus": "NEEDS_CNM_APPROVAL"
-  },
-  {
-    "id": "body-butter",
-    "slug": "body-butter",
-    "name": "Body Butter",
-    "brand": "CNM Essentials",
-    "category": "body-care",
-    "collections": [],
-    "productType": "Body butter",
-    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
-    "description": null,
-    "scentFamily": null,
-    "scentNotes": null,
-    "ingredients": null,
-    "howToUse": null,
-    "size": null,
-    "care": null,
-    "faqs": [],
-    "variants": [],
-    "price": {
-      "amount": 18500,
-      "compareAt": null,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
-    },
-    "stock": {
-      "quantity": 30,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
-    },
-    "images": [],
     "video": null,
     "badges": [],
     "isNew": false,
     "isBestSeller": false,
     "flagsStatus": "NEEDS_CNM_APPROVAL",
     "related": [
-      "body-wash"
+      "love-stoned-room-spray",
+      "petalrich-room-spray",
+      "that-paris-hotel-room-spray",
+      "rose-bohemian-room-spray"
     ],
     "seo": {
       "title": null,
@@ -137,66 +51,18 @@
     },
     "gtin": null,
     "mpn": null,
-    "contentStatus": "NEEDS_CNM_APPROVAL"
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 1
   },
   {
-    "id": "stoneglow-reed-diffuser",
-    "slug": "stoneglow-reed-diffuser",
-    "name": "Stoneglow Reed Diffuser",
-    "brand": "CNM Essentials",
-    "category": "home-fragrance",
-    "collections": [
-      "stoneglow"
-    ],
-    "productType": "Reed diffuser",
-    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
-    "description": null,
-    "scentFamily": null,
-    "scentNotes": null,
-    "ingredients": null,
-    "howToUse": null,
-    "size": null,
-    "care": null,
-    "faqs": [],
-    "variants": [],
-    "price": {
-      "amount": 42000,
-      "compareAt": null,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
-    },
-    "stock": {
-      "quantity": 12,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
-    },
-    "images": [],
-    "video": null,
-    "badges": [],
-    "isNew": false,
-    "isBestSeller": true,
-    "flagsStatus": "NEEDS_CNM_APPROVAL",
-    "related": [
-      "home-fragrance",
-      "signature-diffuser-oil"
-    ],
-    "seo": {
-      "title": null,
-      "description": null
-    },
-    "gtin": null,
-    "mpn": null,
-    "contentStatus": "NEEDS_CNM_APPROVAL"
-  },
-  {
-    "id": "car-diffuser",
-    "slug": "car-diffuser",
-    "name": "Car Diffuser",
-    "brand": "CNM Essentials",
-    "category": "car-fragrance",
+    "id": "love-stoned-room-spray",
+    "slug": "love-stoned-room-spray",
+    "name": "Love Stoned",
+    "brand": "Victoria's Secret",
+    "category": "room-home-fragrance",
     "collections": [],
-    "productType": "Car diffuser",
-    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
+    "productType": "Room Spray",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
     "description": null,
     "scentFamily": null,
     "scentNotes": null,
@@ -207,24 +73,32 @@
     "faqs": [],
     "variants": [],
     "price": {
-      "amount": 15000,
+      "amount": 17850,
       "compareAt": null,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
     },
     "stock": {
-      "quantity": 0,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
     },
-    "images": [],
+    "images": [
+      {
+        "src": "/assets/products/love-stoned-room-spray.png",
+        "alt": "Victoria's Secret Love Stoned room spray"
+      }
+    ],
     "video": null,
     "badges": [],
     "isNew": false,
     "isBestSeller": false,
     "flagsStatus": "NEEDS_CNM_APPROVAL",
     "related": [
-      "signature-diffuser-oil"
+      "midnight-vanilla-room-spray",
+      "petalrich-room-spray",
+      "that-paris-hotel-room-spray",
+      "rose-bohemian-room-spray"
     ],
     "seo": {
       "title": null,
@@ -232,17 +106,18 @@
     },
     "gtin": null,
     "mpn": null,
-    "contentStatus": "NEEDS_CNM_APPROVAL"
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 2
   },
   {
-    "id": "body-wash",
-    "slug": "body-wash",
-    "name": "Body Wash",
-    "brand": "CNM Essentials",
-    "category": "body-care",
+    "id": "petalrich-room-spray",
+    "slug": "petalrich-room-spray",
+    "name": "Petalrich",
+    "brand": "Victoria's Secret",
+    "category": "room-home-fragrance",
     "collections": [],
-    "productType": "Body wash",
-    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
+    "productType": "Room Spray",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
     "description": null,
     "scentFamily": null,
     "scentNotes": null,
@@ -253,24 +128,32 @@
     "faqs": [],
     "variants": [],
     "price": {
-      "amount": 14500,
+      "amount": 17850,
       "compareAt": null,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
     },
     "stock": {
-      "quantity": 40,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
     },
-    "images": [],
+    "images": [
+      {
+        "src": "/assets/products/petalrich-room-spray.png",
+        "alt": "Victoria's Secret Petalrich room spray"
+      }
+    ],
     "video": null,
     "badges": [],
     "isNew": false,
     "isBestSeller": false,
     "flagsStatus": "NEEDS_CNM_APPROVAL",
     "related": [
-      "body-butter"
+      "midnight-vanilla-room-spray",
+      "love-stoned-room-spray",
+      "that-paris-hotel-room-spray",
+      "rose-bohemian-room-spray"
     ],
     "seo": {
       "title": null,
@@ -278,17 +161,18 @@
     },
     "gtin": null,
     "mpn": null,
-    "contentStatus": "NEEDS_CNM_APPROVAL"
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 3
   },
   {
-    "id": "refill-oil",
-    "slug": "refill-oil",
-    "name": "Refill Oil",
-    "brand": "CNM Essentials",
-    "category": "refill-oils",
+    "id": "that-paris-hotel-room-spray",
+    "slug": "that-paris-hotel-room-spray",
+    "name": "That Paris Hotel",
+    "brand": "Victoria's Secret",
+    "category": "room-home-fragrance",
     "collections": [],
-    "productType": "Refill oil",
-    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
+    "productType": "Room Spray",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
     "description": null,
     "scentFamily": null,
     "scentNotes": null,
@@ -299,71 +183,32 @@
     "faqs": [],
     "variants": [],
     "price": {
-      "amount": 22000,
+      "amount": 17850,
       "compareAt": null,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
     },
     "stock": {
-      "quantity": 50,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
     },
-    "images": [],
-    "video": null,
-    "badges": [],
-    "isNew": false,
-    "isBestSeller": true,
-    "flagsStatus": "NEEDS_CNM_APPROVAL",
-    "related": [
-      "signature-diffuser-oil",
-      "smart-scent-machine"
+    "images": [
+      {
+        "src": "/assets/products/that-paris-hotel-room-spray.png",
+        "alt": "Victoria's Secret That Paris Hotel room spray"
+      }
     ],
-    "seo": {
-      "title": null,
-      "description": null
-    },
-    "gtin": null,
-    "mpn": null,
-    "contentStatus": "NEEDS_CNM_APPROVAL"
-  },
-  {
-    "id": "home-fragrance",
-    "slug": "home-fragrance",
-    "name": "Home Fragrance",
-    "brand": "CNM Essentials",
-    "category": "home-fragrance",
-    "collections": [],
-    "productType": "Home fragrance",
-    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
-    "description": null,
-    "scentFamily": null,
-    "scentNotes": null,
-    "ingredients": null,
-    "howToUse": null,
-    "size": null,
-    "care": null,
-    "faqs": [],
-    "variants": [],
-    "price": {
-      "amount": 25000,
-      "compareAt": null,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
-    },
-    "stock": {
-      "quantity": 3,
-      "status": "NEEDS_CNM_APPROVAL",
-      "demo": true
-    },
-    "images": [],
     "video": null,
     "badges": [],
     "isNew": false,
     "isBestSeller": false,
     "flagsStatus": "NEEDS_CNM_APPROVAL",
     "related": [
-      "stoneglow-reed-diffuser"
+      "midnight-vanilla-room-spray",
+      "love-stoned-room-spray",
+      "petalrich-room-spray",
+      "rose-bohemian-room-spray"
     ],
     "seo": {
       "title": null,
@@ -371,6 +216,872 @@
     },
     "gtin": null,
     "mpn": null,
-    "contentStatus": "NEEDS_CNM_APPROVAL"
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 4
+  },
+  {
+    "id": "rose-bohemian-room-spray",
+    "slug": "rose-bohemian-room-spray",
+    "name": "Rose Bohemian",
+    "brand": "Victoria's Secret",
+    "category": "room-home-fragrance",
+    "collections": [],
+    "productType": "Room Spray",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 17850,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/rose-bohemian-room-spray.png",
+        "alt": "Victoria's Secret Rose Bohemian room spray"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "midnight-vanilla-room-spray",
+      "love-stoned-room-spray",
+      "petalrich-room-spray",
+      "that-paris-hotel-room-spray"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 5
+  },
+  {
+    "id": "crushed-room-spray",
+    "slug": "crushed-room-spray",
+    "name": "Crushed",
+    "brand": "Victoria's Secret",
+    "category": "room-home-fragrance",
+    "collections": [],
+    "productType": "Room Spray",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 17850,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/crushed-room-spray.png",
+        "alt": "Victoria's Secret Crushed room spray"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "midnight-vanilla-room-spray",
+      "love-stoned-room-spray",
+      "petalrich-room-spray",
+      "that-paris-hotel-room-spray"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 6
+  },
+  {
+    "id": "all-dressed-up-room-spray",
+    "slug": "all-dressed-up-room-spray",
+    "name": "All Dressed Up",
+    "brand": "Victoria's Secret",
+    "category": "room-home-fragrance",
+    "collections": [],
+    "productType": "Room Spray",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 17850,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/all-dressed-up-room-spray.png",
+        "alt": "Victoria's Secret All Dressed Up room spray"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "midnight-vanilla-room-spray",
+      "love-stoned-room-spray",
+      "petalrich-room-spray",
+      "that-paris-hotel-room-spray"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 7
+  },
+  {
+    "id": "nurses-day-off-wallflower-refill",
+    "slug": "nurses-day-off-wallflower-refill",
+    "name": "Nurses Day Off",
+    "brand": "Bath & Body Works",
+    "category": "diffusers-refills",
+    "collections": [],
+    "productType": "Wallflower Refill",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 14888.75,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/nurses-day-off-wallflower-refill.png",
+        "alt": "Bath & Body Works Nurses Day Off wallflower refill"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 8
+  },
+  {
+    "id": "pumpkin-bonfire-room-spray",
+    "slug": "pumpkin-bonfire-room-spray",
+    "name": "Pumpkin Bonfire",
+    "brand": "Bath & Body Works",
+    "category": "room-home-fragrance",
+    "collections": [],
+    "productType": "Room Spray",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 16125,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/pumpkin-bonfire-room-spray.png",
+        "alt": "Bath & Body Works Pumpkin Bonfire room spray"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "midnight-vanilla-room-spray",
+      "love-stoned-room-spray",
+      "petalrich-room-spray",
+      "that-paris-hotel-room-spray"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 9
+  },
+  {
+    "id": "wallflower-socket-gray-wallflower-plug-in",
+    "slug": "wallflower-socket-gray-wallflower-plug-in",
+    "name": "Wallflower Socket Gray",
+    "brand": "Bath & Body Works",
+    "category": "diffusers-refills",
+    "collections": [],
+    "productType": "Wallflower Plug-In",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 31121.25,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/wallflower-socket-gray-wallflower-plug-in.png",
+        "alt": "Bath & Body Works Wallflower Socket Gray wallflower plug-in"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 10
+  },
+  {
+    "id": "warm-ocean-breeze-wallflower-plug-in-refill",
+    "slug": "warm-ocean-breeze-wallflower-plug-in-refill",
+    "name": "Warm Ocean Breeze",
+    "brand": "Bath & Body Works",
+    "category": "diffusers-refills",
+    "collections": [],
+    "productType": "Wallflower Plug-In Refill",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 14888.8,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/warm-ocean-breeze-wallflower-plug-in-refill.png",
+        "alt": "Bath & Body Works Warm Ocean Breeze wallflower plug-in refill"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "watermelon-lemonade-wallflower-plug-in-refill",
+      "sun-kissed-santa-wallflower-plug-in-refill",
+      "sweet-pea-wallflower-plug-in-refill",
+      "the-perfect-christmas-wallflower-plug-in-refill"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 11
+  },
+  {
+    "id": "watermelon-lemonade-wallflower-plug-in-refill",
+    "slug": "watermelon-lemonade-wallflower-plug-in-refill",
+    "name": "Watermelon Lemonade",
+    "brand": "Bath & Body Works",
+    "category": "diffusers-refills",
+    "collections": [],
+    "productType": "Wallflower Plug-In Refill",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 14888.75,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/watermelon-lemonade-wallflower-plug-in-refill.png",
+        "alt": "Bath & Body Works Watermelon Lemonade wallflower plug-in refill"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "warm-ocean-breeze-wallflower-plug-in-refill",
+      "sun-kissed-santa-wallflower-plug-in-refill",
+      "sweet-pea-wallflower-plug-in-refill",
+      "the-perfect-christmas-wallflower-plug-in-refill"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 12
+  },
+  {
+    "id": "white-jasmine-odour-eliminator",
+    "slug": "white-jasmine-odour-eliminator",
+    "name": "White Jasmine",
+    "brand": "Febreze",
+    "category": "room-home-fragrance",
+    "collections": [],
+    "productType": "Odour Eliminator",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 9621.25,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/white-jasmine-odour-eliminator.png",
+        "alt": "Febreze White Jasmine odour eliminator"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "sugarplum-delight-odour-eliminator",
+      "sun-kissed-vanilla-odour-eliminator"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 13
+  },
+  {
+    "id": "white-tea-and-sage-room-spray",
+    "slug": "white-tea-and-sage-room-spray",
+    "name": "White Tea & Sage",
+    "brand": "Bath & Body Works",
+    "category": "room-home-fragrance",
+    "collections": [],
+    "productType": "Room Spray",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 16125,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/white-tea-and-sage-room-spray.png",
+        "alt": "Bath & Body Works White Tea & Sage room spray"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "midnight-vanilla-room-spray",
+      "love-stoned-room-spray",
+      "petalrich-room-spray",
+      "that-paris-hotel-room-spray"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 14
+  },
+  {
+    "id": "sugarplum-delight-odour-eliminator",
+    "slug": "sugarplum-delight-odour-eliminator",
+    "name": "Sugarplum Delight",
+    "brand": "Febreze",
+    "category": "room-home-fragrance",
+    "collections": [],
+    "productType": "Odour Eliminator",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 9621.25,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/sugarplum-delight-odour-eliminator.png",
+        "alt": "Febreze Sugarplum Delight odour eliminator"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "white-jasmine-odour-eliminator",
+      "sun-kissed-vanilla-odour-eliminator"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 15
+  },
+  {
+    "id": "sun-kissed-santa-wallflower-plug-in-refill",
+    "slug": "sun-kissed-santa-wallflower-plug-in-refill",
+    "name": "Sun Kissed Santa",
+    "brand": "Bath & Body Works",
+    "category": "diffusers-refills",
+    "collections": [],
+    "productType": "Wallflower Plug-In Refill",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 14888.8,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/sun-kissed-santa-wallflower-plug-in-refill.png",
+        "alt": "Bath & Body Works Sun Kissed Santa wallflower plug-in refill"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "warm-ocean-breeze-wallflower-plug-in-refill",
+      "watermelon-lemonade-wallflower-plug-in-refill",
+      "sweet-pea-wallflower-plug-in-refill",
+      "the-perfect-christmas-wallflower-plug-in-refill"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 16
+  },
+  {
+    "id": "sun-kissed-vanilla-odour-eliminator",
+    "slug": "sun-kissed-vanilla-odour-eliminator",
+    "name": "Sun Kissed Vanilla",
+    "brand": "Bath & Body Works",
+    "category": "room-home-fragrance",
+    "collections": [],
+    "productType": "Odour Eliminator",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 9621.25,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/sun-kissed-vanilla-odour-eliminator.png",
+        "alt": "Bath & Body Works Sun Kissed Vanilla odour eliminator"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "white-jasmine-odour-eliminator",
+      "sugarplum-delight-odour-eliminator"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 17,
+    "dataNote": "Live site lists the brand as Bath & Body Works but the pack pictured is Febreze — CNM to confirm."
+  },
+  {
+    "id": "sweet-pea-wallflower-plug-in-refill",
+    "slug": "sweet-pea-wallflower-plug-in-refill",
+    "name": "Sweet Pea",
+    "brand": "Bath & Body Works",
+    "category": "diffusers-refills",
+    "collections": [],
+    "productType": "Wallflower Plug-In Refill",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 14888.8,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/sweet-pea-wallflower-plug-in-refill.png",
+        "alt": "Bath & Body Works Sweet Pea wallflower plug-in refill"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "warm-ocean-breeze-wallflower-plug-in-refill",
+      "watermelon-lemonade-wallflower-plug-in-refill",
+      "sun-kissed-santa-wallflower-plug-in-refill",
+      "the-perfect-christmas-wallflower-plug-in-refill"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 18
+  },
+  {
+    "id": "the-perfect-christmas-wallflower-plug-in-refill",
+    "slug": "the-perfect-christmas-wallflower-plug-in-refill",
+    "name": "The Perfect Christmas",
+    "brand": "Bath & Body Works",
+    "category": "diffusers-refills",
+    "collections": [],
+    "productType": "Wallflower Plug-In Refill",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 14888.75,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/the-perfect-christmas-wallflower-plug-in-refill.png",
+        "alt": "Bath & Body Works The Perfect Christmas wallflower plug-in refill"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "warm-ocean-breeze-wallflower-plug-in-refill",
+      "watermelon-lemonade-wallflower-plug-in-refill",
+      "sun-kissed-santa-wallflower-plug-in-refill",
+      "sweet-pea-wallflower-plug-in-refill"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 19
+  },
+  {
+    "id": "the-perfect-christmas-room-spray",
+    "slug": "the-perfect-christmas-room-spray",
+    "name": "The Perfect Christmas",
+    "brand": "Bath & Body Works",
+    "category": "room-home-fragrance",
+    "collections": [],
+    "productType": "Room Spray",
+    "nameStatus": "FROM_CNM_LIVE_SITE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 16125,
+      "compareAt": null,
+      "status": "FROM_CNM_LIVE_SITE",
+      "demo": false
+    },
+    "stock": {
+      "quantity": null,
+      "status": "NOT_SHOWN_ON_LIVE_SITE",
+      "demo": false
+    },
+    "images": [
+      {
+        "src": "/assets/products/the-perfect-christmas-room-spray.png",
+        "alt": "Bath & Body Works The Perfect Christmas room spray"
+      }
+    ],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "midnight-vanilla-room-spray",
+      "love-stoned-room-spray",
+      "petalrich-room-spray",
+      "that-paris-hotel-room-spray"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "FROM_CNM_LIVE_SITE",
+    "sourceOrder": 20
   }
 ]

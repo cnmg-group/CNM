@@ -14,6 +14,7 @@ export const SORT_OPTIONS: { key: SortKey; label: string }[] = [
 
 export interface Filters {
   categories: string[];
+  brands: string[];
   collections: string[];
   minPrice: number | null;
   maxPrice: number | null;
@@ -24,6 +25,7 @@ export interface Filters {
 
 export const EMPTY_FILTERS: Filters = {
   categories: [],
+  brands: [],
   collections: [],
   minPrice: null,
   maxPrice: null,
@@ -35,6 +37,7 @@ export const EMPTY_FILTERS: Filters = {
 export function activeFilterCount(f: Filters): number {
   return (
     f.categories.length +
+    f.brands.length +
     f.collections.length +
     (f.minPrice != null || f.maxPrice != null ? 1 : 0) +
     (f.inStockOnly ? 1 : 0) +
@@ -45,9 +48,11 @@ export function activeFilterCount(f: Filters): number {
 
 export function matchesFilters(p: Product, f: Filters): boolean {
   if (f.categories.length && !f.categories.includes(p.category)) return false;
+  if (f.brands.length && !f.brands.includes(p.brand)) return false;
   if (f.collections.length && !p.collections.some((c) => f.collections.includes(c))) return false;
   if (f.minPrice != null && p.price.amount < f.minPrice) return false;
   if (f.maxPrice != null && p.price.amount > f.maxPrice) return false;
+  // "Available" includes unconfirmed stock — those items are orderable.
   if (f.inStockOnly && stockState(p) === 'out_of_stock') return false;
   if (f.newOnly && !p.isNew) return false;
   if (f.bestSellersOnly && !p.isBestSeller) return false;
@@ -59,7 +64,8 @@ export function matchesFilters(p: Product, f: Filters): boolean {
  * sinks out-of-stock items to the end.
  */
 export function sortProducts(products: Product[], sort: SortKey): Product[] {
-  const indexed = products.map((p, i) => ({ p, i }));
+  // Featured = CNM's own order (sourceOrder from the live site), else file order.
+  const indexed = products.map((p, i) => ({ p, i: p.sourceOrder ?? i }));
   const oos = (p: Product) => (stockState(p) === 'out_of_stock' ? 1 : 0);
   indexed.sort((a, b) => {
     switch (sort) {

@@ -7,8 +7,8 @@
     "icon": "./assets/images/icon.png",
     "scheme": "cnm",
     "userInterfaceStyle": "light",
-    "backgroundColor": "#f5f1e8",
-    "primaryColor": "#153f32",
+    "backgroundColor": "#23221e",
+    "primaryColor": "#23221e",
     "ios": {
       "bundleIdentifier": "com.cnmessentials.app",
       "buildNumber": "1",
@@ -26,7 +26,7 @@
       "package": "com.cnmessentials.app",
       "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#153f32",
+        "backgroundColor": "#23221e",
         "foregroundImage": "./assets/images/adaptive-icon.png"
       },
       "predictiveBackGestureEnabled": false,
@@ -62,9 +62,9 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#f5f1e8",
+          "backgroundColor": "#23221e",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 120
+          "imageWidth": 160
         }
       ],
       [
@@ -76,7 +76,7 @@
       [
         "expo-notifications",
         {
-          "color": "#153f32"
+          "color": "#23221e"
         }
       ]
     ],

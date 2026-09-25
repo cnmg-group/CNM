@@ -21,7 +21,8 @@ export interface Price {
 }
 
 export interface Stock {
-  quantity: number;
+  /** null = not published by CNM → orderable, shown as "Availability to be confirmed". */
+  quantity: number | null;
   status?: ContentStatus;
   demo?: boolean;
 }
@@ -52,6 +53,7 @@ export interface Product {
   isNew: boolean;
   isBestSeller: boolean;
   related: string[];
+  sourceOrder?: number;
   url?: string;
   contentStatus?: ContentStatus;
 }
@@ -62,6 +64,10 @@ export interface Category {
   intro: string | null;
   introStatus?: ContentStatus;
   order?: number;
+  /** Campaign image path on the website (resolve against the API base). */
+  banner?: string | null;
+  /** Show the category even with no products ("Coming soon online"). */
+  showWhenEmpty?: boolean;
 }
 
 export interface Collection {
@@ -96,7 +102,9 @@ export interface Store {
   region: string;
   address: string | null;
   phone: string | null;
+  email?: string | null;
   hours: string | null;
+  mapQuery?: string | null;
   services: string[];
   verified: boolean;
 }

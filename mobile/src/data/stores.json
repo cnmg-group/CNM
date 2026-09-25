@@ -1,18 +1,56 @@
 [
   {
-    "slug": "lagos", "city": "Lagos", "name": "CNM Essentials Lagos", "region": "Lagos", "country": "NG",
-    "cityStatus": "PROVIDED_BY_CNM_BRIEF",
-    "address": null, "postalCode": null, "geo": null, "phone": null, "email": null,
-    "hours": null, "services": ["In-store shopping", "Collect in store", "Fragrance as a Service consultations"],
-    "servicesStatus": "NEEDS_CNM_APPROVAL", "images": [], "mapQuery": "CNM Essentials Lagos",
-    "verified": false, "status": "NEEDS_CNM_APPROVAL"
+    "slug": "lagos",
+    "city": "Lagos",
+    "name": "CNM Essentials Lagos",
+    "region": "Lagos",
+    "country": "NG",
+    "cityStatus": "FROM_CNM_LIVE_SITE",
+    "address": "Shop S14, Crown Crystal Mall, Plot 36 Providence Street, Marwa, Lekki",
+    "postalCode": null,
+    "geo": null,
+    "phone": "+234 807 340 3568",
+    "email": "cnmessentials@cnm-group.net",
+    "hours": null,
+    "services": [
+      "In-store shopping",
+      "Collect in store",
+      "Lease-to-Own commercial diffusers"
+    ],
+    "servicesStatus": "NEEDS_CNM_APPROVAL",
+    "images": [
+      {
+        "src": "/assets/stores/cnm-essentials-store-interior.jpg",
+        "alt": "Inside a CNM Essentials store: fragrance shelves and gift baskets",
+        "note": "Store not identified in source \u2014 confirm which location this photo shows."
+      }
+    ],
+    "mapQuery": "Crown Crystal Mall, Providence Street, Lekki, Lagos",
+    "verified": true,
+    "status": "FROM_CNM_LIVE_SITE"
   },
   {
-    "slug": "abuja", "city": "Abuja", "name": "CNM Essentials Abuja", "region": "FCT", "country": "NG",
-    "cityStatus": "PROVIDED_BY_CNM_BRIEF",
-    "address": null, "postalCode": null, "geo": null, "phone": null, "email": null,
-    "hours": null, "services": ["In-store shopping", "Collect in store", "Fragrance as a Service consultations"],
-    "servicesStatus": "NEEDS_CNM_APPROVAL", "images": [], "mapQuery": "CNM Essentials Abuja",
-    "verified": false, "status": "NEEDS_CNM_APPROVAL"
+    "slug": "abuja",
+    "city": "Abuja",
+    "name": "CNM Essentials Abuja",
+    "region": "FCT",
+    "country": "NG",
+    "cityStatus": "FROM_CNM_LIVE_SITE",
+    "address": "Shop TF-B18, Mall of Dubai, Plot 158 Gimbiya Street, Garki Area 11",
+    "postalCode": null,
+    "geo": null,
+    "phone": "+234 807 340 3568",
+    "email": "cnmessentials@cnm-group.net",
+    "hours": null,
+    "services": [
+      "In-store shopping",
+      "Collect in store",
+      "Lease-to-Own commercial diffusers"
+    ],
+    "servicesStatus": "NEEDS_CNM_APPROVAL",
+    "images": [],
+    "mapQuery": "Mall of Dubai, Gimbiya Street, Garki, Abuja",
+    "verified": true,
+    "status": "FROM_CNM_LIVE_SITE"
   }
 ]

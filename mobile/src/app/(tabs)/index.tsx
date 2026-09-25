@@ -23,11 +23,11 @@ export default function HomeScreen() {
     <ScrollView
       style={styles.page}
       contentContainerStyle={{ paddingBottom: space.xxxl }}
-      refreshControl={<RefreshControl refreshing={refreshing && !loading} onRefresh={refresh} tintColor={colors.green} />}
+      refreshControl={<RefreshControl refreshing={refreshing && !loading} onRefresh={refresh} tintColor={colors.charcoal} />}
     >
       {/* Editorial hero — copy from content/site.json (status NEEDS_CNM_APPROVAL). */}
       <View style={styles.hero}>
-        <Label style={{ color: colors.green, marginBottom: space.md }}>{siteJson.tagline.value ?? 'CNM Essentials'}</Label>
+        <Label style={{ color: colors.charcoal, marginBottom: space.md }}>{siteJson.tagline.value ?? 'CNM Essentials'}</Label>
         <Display>{siteJson.heroHeadline.value}</Display>
         {siteJson.heroLead.value ? <Body style={styles.heroLead}>{siteJson.heroLead.value}</Body> : null}
         <View style={styles.heroCtas}>
@@ -44,7 +44,7 @@ export default function HomeScreen() {
             onPress={() => router.push(`/shop/${c.slug}`)}
             accessibilityRole="link"
             accessibilityLabel={c.name}
-            style={({ pressed }) => [styles.catRow, pressed && { backgroundColor: colors.cream }]}
+            style={({ pressed }) => [styles.catRow, pressed && { backgroundColor: colors.offWhite }]}
           >
             <H2 style={{ flex: 1, fontSize: 24 }}>{c.name}</H2>
             <Feather name="arrow-right" size={18} color={colors.ink} />
@@ -70,9 +70,9 @@ export default function HomeScreen() {
 
       {/* Fragrance as a Service teaser — copy from content/services.json. */}
       <View style={styles.faas}>
-        <Label style={{ color: colors.cream, marginBottom: space.md }}>Fragrance as a Service</Label>
+        <Label style={{ color: colors.offWhite, marginBottom: space.md }}>Fragrance as a Service</Label>
         <Display style={{ color: colors.white, fontSize: 38, lineHeight: 42 }}>{servicesJson.headline.value}</Display>
-        {servicesJson.lead.value ? <Body style={{ color: colors.cream, marginTop: space.md }}>{servicesJson.lead.value}</Body> : null}
+        {servicesJson.lead.value ? <Body style={{ color: colors.offWhite, marginTop: space.md }}>{servicesJson.lead.value}</Body> : null}
         <Button
           title="Enquire"
           variant="secondary"
@@ -90,7 +90,7 @@ export default function HomeScreen() {
             onPress={() => openWebPage(`/stores/${s.slug}/`)}
             accessibilityRole="link"
             accessibilityLabel={`${s.name}. Store details`}
-            style={({ pressed }) => [styles.storeRow, pressed && { backgroundColor: colors.cream }]}
+            style={({ pressed }) => [styles.storeRow, pressed && { backgroundColor: colors.offWhite }]}
           >
             <View style={{ flex: 1 }}>
               <H2 style={{ fontSize: 24 }}>{s.city}</H2>
@@ -106,7 +106,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.white },
-  hero: { backgroundColor: colors.cream, paddingHorizontal: space.md, paddingTop: space.xxl, paddingBottom: space.xl },
+  hero: { backgroundColor: colors.offWhite, paddingHorizontal: space.md, paddingTop: space.xxl, paddingBottom: space.xl },
   heroLead: { marginTop: space.md, color: colors.inkSoft, fontSize: 17, lineHeight: 25 },
   heroCtas: { flexDirection: 'row', gap: space.sm, marginTop: space.xl },
   section: { paddingHorizontal: space.md, paddingTop: space.xxl },
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     borderTopWidth: hairline,
     borderColor: colors.hairline,
   },
-  faas: { backgroundColor: colors.green, marginTop: space.xxl, paddingHorizontal: space.md, paddingVertical: space.xxl },
+  faas: { backgroundColor: colors.charcoal, marginTop: space.xxl, paddingHorizontal: space.md, paddingVertical: space.xxl },
   storeRow: {
     minHeight: 72,
     flexDirection: 'row',

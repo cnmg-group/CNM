@@ -6,7 +6,7 @@ import { FlatList, Pressable, ScrollView, StyleSheet, Text, TextInput, View } fr
 import { ProductCard, ProductGrid } from '@/components/product-card';
 import { Body, Chip, H2, IconButton, Label, Small, TextLink } from '@/components/ui';
 import { track } from '@/lib/analytics';
-import { categoryName } from '@/lib/catalogue';
+import { brands, categoryName, productSubtitle, visibleCategories } from '@/lib/catalogue';
 import { didYouMean, productDocs, pushRecent, search, suggestionDocs, type Suggestion } from '@/lib/search';
 import { KEYS, readJSON, writeJSON } from '@/lib/storage';
 import { useCatalogue } from '@/state/catalogue';
@@ -51,10 +51,14 @@ export default function SearchScreen() {
     return [...best, ...fresh].slice(0, 6);
   }, [catalogue.products]);
 
-  const popular = useMemo(
-    () => [...catalogue.categories.map((c) => c.name), ...catalogue.collections.map((c) => c.name)].slice(0, 8),
-    [catalogue.categories, catalogue.collections],
-  );
+  // Derived from the catalogue itself (no invented popularity data): product types, brands, categories.
+  const popular = useMemo(() => {
+    const types = catalogue.products.map((p) => p.productType).filter((t): t is string => !!t);
+    const cats = visibleCategories(catalogue)
+      .filter((c) => catalogue.products.some((p) => p.category === c.slug))
+      .map((c) => c.name);
+    return Array.from(new Set([...types, ...brands(catalogue), ...cats])).slice(0, 10);
+  }, [catalogue]);
 
   const runSearch = (q: string) => {
     const term = q.trim();
@@ -76,6 +80,7 @@ export default function SearchScreen() {
     track('search', { search_term: text.trim(), selected: s.kind });
     if (s.kind === 'product') router.push(`/products/${s.item.slug}`);
     else if (s.kind === 'category') router.push(`/shop/${s.item.slug}`);
+    else if (s.kind === 'brand') router.push({ pathname: '/shop', params: { brand: s.item.name } });
     else router.push(`/collections/${s.item.slug}`);
   };
 
@@ -159,7 +164,7 @@ export default function SearchScreen() {
         <FlatList
           data={suggestions}
           keyboardShouldPersistTaps="handled"
-          keyExtractor={(s) => `${s.kind}:${s.kind === 'product' ? s.item.id : s.item.slug}`}
+          keyExtractor={(s) => `${s.kind}:${s.kind === 'product' ? s.item.id : s.kind === 'brand' ? s.item.name : s.item.slug}`}
           ListHeaderComponent={
             <Pressable onPress={() => runSearch(text)} style={styles.suggestion} accessibilityRole="button" accessibilityLabel={`Search for ${text}`}>
               <Feather name="search" size={16} color={colors.ink} />
@@ -170,14 +175,20 @@ export default function SearchScreen() {
           renderItem={({ item }) => (
             <Pressable
               onPress={() => openSuggestion(item)}
-              style={({ pressed }) => [styles.suggestion, pressed && { backgroundColor: colors.cream }]}
+              style={({ pressed }) => [styles.suggestion, pressed && { backgroundColor: colors.offWhite }]}
               accessibilityRole="link"
-              accessibilityLabel={item.kind === 'product' ? `${item.item.name}, product` : `${item.item.name}, ${item.kind}`}
+              accessibilityLabel={item.kind === 'product' ? `${item.item.name}, ${productSubtitle(item.item)}` : `${item.item.name}, ${item.kind}`}
             >
               <View style={{ flex: 1 }}>
                 <Text style={type.body}>{item.item.name}</Text>
                 <Label style={{ color: colors.muted, fontSize: 10 }}>
-                  {item.kind === 'product' ? categoryName(catalogue, item.item.category) : item.kind === 'category' ? 'Category' : 'Collection'}
+                  {item.kind === 'product'
+                    ? productSubtitle(item.item) || categoryName(catalogue, item.item.category)
+                    : item.kind === 'category'
+                      ? 'Category'
+                      : item.kind === 'brand'
+                        ? 'Brand'
+                        : 'Collection'}
                 </Label>
               </View>
               <Feather name="arrow-up-left" size={16} color={colors.muted} />

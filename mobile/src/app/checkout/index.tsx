@@ -62,8 +62,8 @@ function Stepper({ step }: { step: Step }) {
   return (
     <View style={styles.stepper} accessibilityRole="progressbar" accessibilityLabel={idx >= 0 ? `Step ${idx + 1} of ${STEPS.length}: ${STEPS[idx].label}` : undefined}>
       {STEPS.map((s, i) => (
-        <View key={s.key} style={[styles.stepItem, i <= idx && { borderColor: colors.green }]}>
-          <Label style={{ fontSize: 9, color: i <= idx ? colors.green : colors.muted }}>{s.label}</Label>
+        <View key={s.key} style={[styles.stepItem, i <= idx && { borderColor: colors.charcoal }]}>
+          <Label style={{ fontSize: 9, color: i <= idx ? colors.charcoal : colors.muted }}>{s.label}</Label>
         </View>
       ))}
     </View>
@@ -436,7 +436,7 @@ export default function CheckoutScreen() {
 
       {step === 'confirmation' && checkout ? (
         <View style={{ paddingTop: space.xl }}>
-          <Label style={{ color: colors.green }}>Order confirmed</Label>
+          <Label style={{ color: colors.charcoal }}>Order confirmed</Label>
           <H1 style={{ marginTop: space.sm }}>Thank you, {contact.firstName}.</H1>
           <Body style={{ marginTop: space.sm, color: colors.inkSoft }}>
             Your order {checkout.order.number} is confirmed. We’ve sent a receipt to {contact.email}.
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
   stepper: { flexDirection: 'row', gap: 4, marginBottom: space.lg },
   stepItem: { flex: 1, borderTopWidth: 2, borderColor: colors.hairline, paddingTop: space.xs },
   stepTitle: { marginBottom: space.md },
-  signinHint: { flexDirection: 'row', alignItems: 'center', marginBottom: space.md, backgroundColor: colors.cream, paddingHorizontal: space.md },
+  signinHint: { flexDirection: 'row', alignItems: 'center', marginBottom: space.md, backgroundColor: colors.offWhite, paddingHorizontal: space.md },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
     marginBottom: space.xs,
   },
   radio: { width: 18, height: 18, borderRadius: 9, borderWidth: 1, borderColor: colors.ink, marginRight: space.md },
-  radioOn: { borderWidth: 6, borderColor: colors.green },
+  radioOn: { borderWidth: 6, borderColor: colors.charcoal },
   nav: { flexDirection: 'row', gap: space.sm, marginTop: space.lg },
   panel: { borderWidth: hairline, borderColor: colors.hairline, borderRadius: radius, padding: space.md },
   reviewBlock: { borderBottomWidth: hairline, borderColor: colors.hairline, paddingBottom: space.md, marginBottom: space.md },

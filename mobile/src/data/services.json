@@ -1,28 +1,97 @@
 {
-  "headline": { "value": "Make the room remember you.", "status": "NEEDS_CNM_APPROVAL", "source": "Netlify prototype supplied by CNM" },
-  "lead": { "value": "Events, hospitality, commercial spaces and tailored scent experiences.", "status": "NEEDS_CNM_APPROVAL", "source": "Netlify prototype supplied by CNM" },
+  "headline": {
+    "value": "Scent your business.",
+    "status": "NEEDS_CNM_APPROVAL"
+  },
+  "lead": {
+    "value": "Lease-to-Own Programme \u2014 commercial diffuser solutions for businesses, in Lagos and Abuja.",
+    "status": "FROM_CNM_GROUP_SITE"
+  },
   "sectors": [
-    { "key": "events", "name": "Events", "status": "PROVIDED_BY_CNM_PROTOTYPE" },
-    { "key": "weddings", "name": "Weddings", "status": "NEEDS_CNM_APPROVAL" },
-    { "key": "corporate", "name": "Corporate events", "status": "NEEDS_CNM_APPROVAL" },
-    { "key": "hospitality", "name": "Hospitality", "status": "PROVIDED_BY_CNM_PROTOTYPE" },
-    { "key": "retail", "name": "Retail spaces", "status": "PROVIDED_BY_CNM_PROTOTYPE" },
-    { "key": "offices", "name": "Offices", "status": "NEEDS_CNM_APPROVAL" },
-    { "key": "activations", "name": "Brand activations", "status": "NEEDS_CNM_APPROVAL" },
-    { "key": "machines", "name": "Scent-machine solutions", "status": "NEEDS_CNM_APPROVAL" }
+    {
+      "key": "events",
+      "name": "Events",
+      "status": "PROVIDED_BY_CNM_PROTOTYPE"
+    },
+    {
+      "key": "weddings",
+      "name": "Weddings",
+      "status": "NEEDS_CNM_APPROVAL"
+    },
+    {
+      "key": "corporate",
+      "name": "Corporate events",
+      "status": "NEEDS_CNM_APPROVAL"
+    },
+    {
+      "key": "hospitality",
+      "name": "Hospitality",
+      "status": "PROVIDED_BY_CNM_PROTOTYPE"
+    },
+    {
+      "key": "retail",
+      "name": "Retail spaces",
+      "status": "PROVIDED_BY_CNM_PROTOTYPE"
+    },
+    {
+      "key": "offices",
+      "name": "Offices",
+      "status": "NEEDS_CNM_APPROVAL"
+    },
+    {
+      "key": "activations",
+      "name": "Brand activations",
+      "status": "NEEDS_CNM_APPROVAL"
+    },
+    {
+      "key": "machines",
+      "name": "Scent-machine solutions",
+      "status": "NEEDS_CNM_APPROVAL"
+    }
   ],
   "process": [
-    { "step": "Enquire", "text": "Tell us about the space or occasion." },
-    { "step": "Consult", "text": "We discuss the atmosphere you want to create." },
-    { "step": "Scent", "text": "We propose a scent and delivery approach." },
-    { "step": "Maintain", "text": "Ongoing refills and servicing where agreed." }
+    {
+      "step": "Enquire",
+      "text": "Tell us about the space or occasion."
+    },
+    {
+      "step": "Consult",
+      "text": "We discuss the atmosphere you want to create."
+    },
+    {
+      "step": "Scent",
+      "text": "We propose a scent and delivery approach."
+    },
+    {
+      "step": "Maintain",
+      "text": "Ongoing refills and servicing where agreed."
+    }
   ],
   "processStatus": "NEEDS_CNM_APPROVAL",
   "caseStudies": [],
   "gallery": [],
   "faqs": [
-    { "q": "What spaces do you scent?", "a": null, "status": "NEEDS_CNM_APPROVAL" },
-    { "q": "Do you offer ongoing maintenance?", "a": null, "status": "NEEDS_CNM_APPROVAL" },
-    { "q": "How far in advance should we book for an event?", "a": null, "status": "NEEDS_CNM_APPROVAL" }
-  ]
+    {
+      "q": "What spaces do you scent?",
+      "a": null,
+      "status": "NEEDS_CNM_APPROVAL"
+    },
+    {
+      "q": "Do you offer ongoing maintenance?",
+      "a": null,
+      "status": "NEEDS_CNM_APPROVAL"
+    },
+    {
+      "q": "How far in advance should we book for an event?",
+      "a": null,
+      "status": "NEEDS_CNM_APPROVAL"
+    }
+  ],
+  "programme": {
+    "value": {
+      "name": "Lease-to-Own Programme",
+      "text": "Commercial diffuser solutions for businesses"
+    },
+    "status": "FROM_CNM_GROUP_SITE"
+  }
 }

@@ -27,13 +27,13 @@ interface Props {
  * droplet, then part again. Rendered ONLY when a request is still pending
  * after ~250ms. With Reduce Motion on, it shows a static butterfly that fades in.
  */
-export function ButterflyLoader({ pending, label = 'Loading', size = 36, color = colors.green, style, immediate }: Props) {
+export function ButterflyLoader({ pending, label = 'Loading', size = 36, color = colors.charcoal, style, immediate }: Props) {
   const visible = useDelayedFlag(pending, immediate ? 0 : 250);
   if (!visible) return null;
   return <ButterflyMark label={label} size={size} color={color} style={style} />;
 }
 
-export function ButterflyMark({ label, size = 36, color = colors.green, style }: { label?: string; size?: number; color?: string; style?: StyleProp<ViewStyle> }) {
+export function ButterflyMark({ label, size = 36, color = colors.charcoal, style }: { label?: string; size?: number; color?: string; style?: StyleProp<ViewStyle> }) {
   const reduceMotion = useReduceMotion();
   const t = useRef(new Animated.Value(0)).current;
   const fade = useRef(new Animated.Value(0)).current;

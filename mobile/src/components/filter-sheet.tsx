@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { sortedCategories } from '@/lib/catalogue';
+import { brands, visibleCategories } from '@/lib/catalogue';
 import { applyFilters, EMPTY_FILTERS, priceBands, SORT_OPTIONS, type Filters, type SortKey } from '@/lib/filters';
 import type { Catalogue } from '@/lib/types';
 import { space } from '@/theme';
@@ -34,6 +34,7 @@ export function FilterSheet({
   }, [visible, value]);
 
   const bands = useMemo(() => priceBands(catalogue.products), [catalogue.products]);
+  const brandList = useMemo(() => brands(catalogue), [catalogue]);
   const resultCount = useMemo(() => applyFilters(catalogue.products, draft, sort).length, [catalogue.products, draft, sort]);
   const set = (patch: Partial<Filters>) => setDraft((d) => ({ ...d, ...patch }));
 
@@ -59,10 +60,21 @@ export function FilterSheet({
     >
       <Label style={styles.group}>Category</Label>
       <View style={styles.wrap}>
-        {sortedCategories(catalogue).map((c) => (
+        {visibleCategories(catalogue).map((c) => (
           <Chip key={c.slug} label={c.name} selected={draft.categories.includes(c.slug)} onPress={() => set({ categories: toggleIn(draft.categories, c.slug) })} />
         ))}
       </View>
+
+      {brandList.length > 1 ? (
+        <>
+          <Label style={styles.group}>Brand</Label>
+          <View style={styles.wrap}>
+            {brandList.map((b) => (
+              <Chip key={b} label={b} selected={draft.brands.includes(b)} onPress={() => set({ brands: toggleIn(draft.brands, b) })} />
+            ))}
+          </View>
+        </>
+      ) : null}
 
       {catalogue.collections.length ? (
         <>
@@ -95,9 +107,11 @@ export function FilterSheet({
       ) : null}
 
       <Label style={styles.group}>Refine</Label>
-      <ToggleRow label="In stock only" value={draft.inStockOnly} onValueChange={(v) => set({ inStockOnly: v })} />
-      <ToggleRow label="New in" value={draft.newOnly} onValueChange={(v) => set({ newOnly: v })} />
-      <ToggleRow label="Best sellers" value={draft.bestSellersOnly} onValueChange={(v) => set({ bestSellersOnly: v })} />
+      <ToggleRow label="Available to order" description="Hides items marked out of stock" value={draft.inStockOnly} onValueChange={(v) => set({ inStockOnly: v })} />
+      {catalogue.products.some((p) => p.isNew) ? <ToggleRow label="New in" value={draft.newOnly} onValueChange={(v) => set({ newOnly: v })} /> : null}
+      {catalogue.products.some((p) => p.isBestSeller) ? (
+        <ToggleRow label="Best sellers" value={draft.bestSellersOnly} onValueChange={(v) => set({ bestSellersOnly: v })} />
+      ) : null}
     </BottomSheet>
   );
 }

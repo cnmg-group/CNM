@@ -1,6 +1,6 @@
-import { Image, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Image, StyleSheet, Text, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 
-import { absoluteUrl, productImages, stockState } from '@/lib/catalogue';
+import { absoluteUrl, productImages, productSubtitle, stockState } from '@/lib/catalogue';
 import { API_BASE_URL } from '@/lib/config';
 import { formatNaira } from '@/lib/format';
 import type { Product } from '@/lib/types';
@@ -8,7 +8,7 @@ import { colors, fonts, hairline, radius, space, type } from '@/theme';
 
 import { Label, Small } from './ui';
 
-/** Photography placeholder — never a stock or AI image. */
+/** Shown only when a product has no image — never a stock or AI image. */
 export function ImagePlaceholder({ style, compact }: { style?: StyleProp<ViewStyle>; compact?: boolean }) {
   return (
     <View
@@ -34,10 +34,13 @@ export function ProductImage({ product, index = 0, style, compact }: { product: 
   if (!img) return <ImagePlaceholder style={style} compact={compact} />;
   return (
     <View style={[styles.imageWrap, style]}>
+      {/* Packshots are served by the website; `contain` keeps the whole bottle in frame. */}
       <Image
         source={{ uri: absoluteUrl(API_BASE_URL, img.src) }}
-        style={StyleSheet.absoluteFill}
-        resizeMode="cover"
+        style={styles.image}
+        resizeMode="contain"
+        accessible
+        accessibilityRole="image"
         accessibilityLabel={img.alt || product.name}
       />
     </View>
@@ -74,15 +77,27 @@ export function PriceTag({ product, large }: { product: Product; large?: boolean
 
 export function StockLabel({ product }: { product: Product }) {
   const state = stockState(product);
-  if (state === 'in_stock') return <Small style={{ color: colors.green }}>In stock</Small>;
+  if (state === 'in_stock') return <Small style={{ color: colors.charcoal }}>In stock</Small>;
   if (state === 'low_stock') return <Small style={{ color: colors.ink }}>Low stock</Small>;
+  if (state === 'unconfirmed') return <Small style={{ color: colors.muted }}>Availability to be confirmed</Small>;
   return <Small style={{ color: colors.muted }}>Out of stock</Small>;
+}
+
+/** Brand + product type, e.g. "VICTORIA'S SECRET · ROOM SPRAY". */
+export function ProductSubtitle({ product, style }: { product: Product; style?: StyleProp<TextStyle> }) {
+  const text = productSubtitle(product);
+  if (!text) return null;
+  return (
+    <Label style={[{ color: colors.muted, fontSize: 10 }, style]} numberOfLines={2}>
+      {text}
+    </Label>
+  );
 }
 
 export function ProductFlags({ product }: { product: Product }) {
   const flags = [product.isNew && 'New', product.isBestSeller && 'Best seller'].filter(Boolean) as string[];
   if (!flags.length) return null;
-  return <Label style={{ color: colors.green, marginBottom: 4 }}>{flags.join(' · ')}</Label>;
+  return <Label style={{ color: colors.charcoal, marginBottom: 4 }}>{flags.join(' · ')}</Label>;
 }
 
 /** Shown in place of any product fact CNM has not yet supplied. Never filled with invented copy. */
@@ -96,13 +111,13 @@ export function AwaitingApproval({ what }: { what?: string }) {
 
 const styles = StyleSheet.create({
   placeholder: {
-    backgroundColor: colors.cream,
+    backgroundColor: colors.offWhite,
     alignItems: 'center',
     justifyContent: 'center',
     aspectRatio: 4 / 5,
     padding: space.md,
   },
-  placeholderMark: { fontFamily: fonts.sansMedium, fontSize: 13, letterSpacing: 4, color: colors.green },
+  placeholderMark: { fontFamily: fonts.sansMedium, fontSize: 13, letterSpacing: 4, color: colors.charcoal },
   placeholderNote: {
     fontFamily: fonts.sans,
     fontSize: 9,
@@ -112,7 +127,8 @@ const styles = StyleSheet.create({
     marginTop: space.xs,
     textAlign: 'center',
   },
-  imageWrap: { aspectRatio: 4 / 5, backgroundColor: colors.cream, overflow: 'hidden' },
+  imageWrap: { aspectRatio: 4 / 5, backgroundColor: colors.white, overflow: 'hidden' },
+  image: { position: 'absolute', top: '6%', bottom: '6%', left: '6%', right: '6%' },
   priceRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: space.xs },
   strike: { textDecorationLine: 'line-through', color: colors.muted },
   demo: { borderWidth: hairline, borderColor: colors.hairline, borderRadius: radius, paddingHorizontal: 5, paddingVertical: 1 },

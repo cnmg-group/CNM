@@ -1,36 +1,228 @@
 {
   "_note": "Single source of truth for brand-level facts. Any value under `approval` with status NEEDS_CNM_APPROVAL must be confirmed by CNM before production launch.",
   "name": "CNM Essentials",
-  "legalName": { "value": null, "status": "NEEDS_CNM_APPROVAL" },
+  "legalName": {
+    "value": null,
+    "status": "NEEDS_CNM_APPROVAL"
+  },
   "productionUrl": "https://cnmessentials.com",
   "groupUrl": "https://www.cnm-group.net",
-  "tagline": { "value": "The art of atmosphere", "status": "NEEDS_CNM_APPROVAL", "source": "Netlify prototype supplied by CNM" },
-  "heroHeadline": { "value": "Scent your space.", "status": "NEEDS_CNM_APPROVAL", "source": "Netlify prototype supplied by CNM" },
-  "heroLead": { "value": "Home fragrance, body care and intelligent scenting.", "status": "NEEDS_CNM_APPROVAL", "source": "Adapted from Netlify prototype" },
+  "tagline": {
+    "value": "Welcome to CNM Essentials",
+    "status": "FROM_CNM_LIVE_SITE"
+  },
+  "heroHeadline": {
+    "value": "Refresh Your Space. Indulge Your Senses.",
+    "status": "FROM_CNM_LIVE_SITE"
+  },
+  "heroLead": {
+    "value": "Bring home signature scents that create comfort, class, and lasting impressions",
+    "status": "FROM_CNM_LIVE_SITE"
+  },
   "country": "NG",
   "currency": "NGN",
   "locale": "en-NG",
   "contact": {
-    "email": { "value": null, "status": "NEEDS_CNM_APPROVAL" },
-    "phone": { "value": null, "status": "NEEDS_CNM_APPROVAL" },
-    "whatsapp": { "value": null, "status": "NEEDS_CNM_APPROVAL" }
+    "email": {
+      "value": "cnmessentials@cnm-group.net",
+      "status": "FROM_CNM_LIVE_SITE"
+    },
+    "phone": {
+      "value": "+234 807 340 3568",
+      "status": "FROM_CNM_LIVE_SITE"
+    },
+    "whatsapp": {
+      "value": null,
+      "status": "NEEDS_CNM_APPROVAL",
+      "note": "WhatsApp icon exists on the live site; number/link to confirm."
+    }
   },
   "social": [
-    { "network": "Instagram", "url": null, "status": "NEEDS_CNM_APPROVAL" },
-    { "network": "TikTok", "url": null, "status": "NEEDS_CNM_APPROVAL" },
-    { "network": "Facebook", "url": null, "status": "NEEDS_CNM_APPROVAL" }
+    {
+      "network": "Instagram",
+      "url": null,
+      "status": "NEEDS_CNM_APPROVAL",
+      "note": "Icon on live site; handle to confirm."
+    },
+    {
+      "network": "WhatsApp",
+      "url": null,
+      "status": "NEEDS_CNM_APPROVAL"
+    }
   ],
   "logo": {
-    "file": "/assets/brand/cnm-logo.svg",
-    "status": "BLOCKED",
-    "note": "The ORIGINAL CNM logo file must be supplied by CNM and placed at public/assets/brand/cnm-logo.svg (or .png, update `file`). Until then a clearly labelled placeholder wordmark is rendered. The logo is never redrawn."
+    "file": "/assets/brand/cnm-logo.png",
+    "status": "FROM_CNM_GROUP_SITE",
+    "note": "Cropped from the CNM Essentials logo shown on cnm-group.net (original artwork, not redrawn). Replace with the master vector file for maximum sharpness."
   },
   "group": {
-    "_note": "CNM Group divisions as described by CNM: Energy, Retail, Impact. Retail routes to this e-commerce site.",
+    "name": "CNM Group",
+    "logo": "/assets/brand/cnm-group-logo.png",
+    "url": "https://www.cnm-group.net",
+    "status": "FROM_CNM_GROUP_SITE",
+    "headline": "Creating Sustainable Businesses That Transcend Industries",
+    "intro": "CNM Group is a diversified conglomerate built on the vision of creating sustainable businesses across industries. What began as a single vision has grown into a portfolio of companies spanning lifestyle, engineering, and social impact.",
+    "motto": "Driven by Excellence. Defined by Trust.",
+    "about": "CNM Group is a privately held, founder-led conglomerate headquartered in Lagos, Nigeria, with operations spanning Abuja and the United States.",
+    "stats": [
+      [
+        "16",
+        "Years of experience"
+      ],
+      [
+        "4",
+        "Business entities"
+      ],
+      [
+        "3",
+        "Divisions"
+      ],
+      [
+        "2",
+        "Countries"
+      ]
+    ],
+    "contact": {
+      "email": "info@cnm-group.net",
+      "phone": "+234 901 544 5554",
+      "address": "Crown Crystal Mall Shop S14, Plot 36, Providence Street, Marwa, Lekki-Lagos State."
+    },
     "divisions": [
-      { "key": "energy", "name": "CNM Energy", "summary": null, "url": null, "status": "NEEDS_CNM_APPROVAL" },
-      { "key": "retail", "name": "CNM Retail", "summary": "Home fragrance, body care and intelligent scenting through CNM Essentials.", "url": "/", "status": "NEEDS_CNM_APPROVAL" },
-      { "key": "impact", "name": "CNM Impact", "summary": null, "url": null, "status": "NEEDS_CNM_APPROVAL" }
+      {
+        "key": "retail",
+        "name": "Retail",
+        "summary": "Lifestyle, wellness & consumer experience",
+        "companies": [
+          {
+            "name": "CNM Essentials",
+            "tagline": "Pure. Natural. Purposeful.",
+            "logo": "/assets/brand/cnm-logo.png",
+            "url": "/",
+            "internal": true
+          },
+          {
+            "name": "CNM Spectra",
+            "tagline": "See clearly. Look extraordinary.",
+            "logo": "/assets/brand/cnm-spectra-logo.jpg",
+            "url": "https://www.cnm-group.net",
+            "text": "A premium eyewear brand offering prescription frames, sunglasses, contact lenses and accessories."
+          }
+        ]
+      },
+      {
+        "key": "energy",
+        "name": "Energy",
+        "summary": "Engineering, automation & industrial services",
+        "companies": [
+          {
+            "name": "CNMWorX Limited",
+            "tagline": "Engineering the future, one project at a time.",
+            "logo": "/assets/brand/cnmworx-logo.jpg",
+            "url": "https://www.cnm-group.net",
+            "text": "ISO 9001:2015-certified engineering and technical services: industrial and process automation, instrumentation, power electronics and ICT."
+          }
+        ]
+      },
+      {
+        "key": "impact",
+        "name": "Impact",
+        "summary": "Community transformation & social development",
+        "companies": [
+          {
+            "name": "CNM Foundation",
+            "tagline": "Zero percent of zero is zero — so we give everything.",
+            "logo": "/assets/brand/cnm-foundation-logo.jpg",
+            "url": "https://www.cnm-group.net",
+            "text": "Education, women's economic empowerment, youth development and community health across Nigeria and the African diaspora."
+          }
+        ]
+      }
     ]
+  },
+  "motto": {
+    "value": "Creating serenity, pioneering comfort.",
+    "status": "FROM_CNM_LIVE_SITE"
+  },
+  "logoLine": {
+    "value": "crafting serenity, pioneering comfort",
+    "status": "FROM_CNM_LIVE_SITE"
+  },
+  "groupTagline": {
+    "value": "Pure. Natural. Purposeful.",
+    "status": "FROM_CNM_GROUP_SITE"
+  },
+  "shopIntro": {
+    "value": "Shop luxury diffusers, candles, and home scents designed to leave every room unforgettable.",
+    "status": "FROM_CNM_LIVE_SITE"
+  },
+  "aboutHeadline": {
+    "value": "Where Luxury Meets Atmosphere.",
+    "status": "FROM_CNM_LIVE_SITE"
+  },
+  "description": {
+    "value": "A premium lifestyle brand offering luxury fragrances, home décor, and body care products crafted for the intentional woman and the discerning home. CNM Essentials is the fragrance and lifestyle destination for those who believe that how you live at home reflects who you are in the world.",
+    "status": "FROM_CNM_GROUP_SITE"
+  },
+  "valueProposition": {
+    "value": "Purpose-crafted luxury for modern living — combining natural ingredients, artisanal quality, and a deep sense of intentionality that transforms everyday rituals into meaningful experiences.",
+    "status": "FROM_CNM_GROUP_SITE"
+  },
+  "coreActivities": {
+    "value": [
+      "Luxury fragrance curation",
+      "Home décor & ambiance",
+      "Body care & wellness",
+      "Commercial diffuser leasing"
+    ],
+    "status": "FROM_CNM_GROUP_SITE"
+  },
+  "keyProducts": {
+    "value": [
+      "Industrial Diffuser series",
+      "Wellbeing Essential Oils",
+      "Body butters & hair oils",
+      "Candles, mists & humidifiers"
+    ],
+    "status": "FROM_CNM_GROUP_SITE"
+  },
+  "promises": {
+    "value": [
+      [
+        "truck",
+        "Swift Shipping",
+        "On each order"
+      ],
+      [
+        "lock",
+        "Secure Payment",
+        "100% protected"
+      ],
+      [
+        "sparkle",
+        "Premium Quality",
+        "Handcrafted with care"
+      ],
+      [
+        "headset",
+        "Swift Support",
+        "Always here to help"
+      ]
+    ],
+    "status": "FROM_CNM_LIVE_SITE"
+  },
+  "newsletter": {
+    "value": {
+      "title": "Stay in the Loop",
+      "text": "Subscribe for exclusive offers, new arrivals, and fragrance tips delivered to your inbox."
+    },
+    "status": "FROM_CNM_LIVE_SITE"
+  },
+  "acceptedPayments": {
+    "value": [
+      "Visa",
+      "Mastercard",
+      "PayPal"
+    ],
+    "status": "FROM_CNM_LIVE_SITE"
   }
 }

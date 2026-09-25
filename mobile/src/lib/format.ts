@@ -1,12 +1,21 @@
-/** Money is whole Naira integers (see docs/API.md). */
+/** Round to kobo (2 dp) without float drift, e.g. 0.1 + 0.2 → 0.3. */
+export function roundKobo(amount: number): number {
+  return Math.round((amount + Number.EPSILON) * 100) / 100;
+}
+
+/**
+ * Naira with thousands separators. Whole amounts show no decimals (₦17,850);
+ * amounts with kobo always show two (₦14,888.75, ₦14,888.80).
+ */
 export function formatNaira(amount: number | null | undefined): string {
   if (amount == null || Number.isNaN(amount)) return '—';
-  const rounded = Math.round(amount);
-  const sign = rounded < 0 ? '-' : '';
-  const digits = Math.abs(rounded)
+  const kobo = Math.round(Math.abs(amount) * 100);
+  const sign = amount < 0 && kobo > 0 ? '-' : '';
+  const whole = Math.floor(kobo / 100)
     .toString()
     .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  return `${sign}₦${digits}`;
+  const fraction = kobo % 100;
+  return `${sign}₦${whole}${fraction ? '.' + String(fraction).padStart(2, '0') : ''}`;
 }
 
 export function formatDate(iso: string | null | undefined): string {

@@ -34,7 +34,7 @@ function OrderList() {
           onPress={() => router.push(`/account/orders/${o.number}`)}
           accessibilityRole="button"
           accessibilityLabel={`Order ${o.number}, ${orderStatusLabel(o.status)}, ${formatNaira(o.total)}`}
-          style={({ pressed }) => [styles.row, pressed && { backgroundColor: colors.cream }]}
+          style={({ pressed }) => [styles.row, pressed && { backgroundColor: colors.offWhite }]}
         >
           <View style={{ flex: 1 }}>
             <Label>{o.number}</Label>

@@ -1,4 +1,5 @@
 import { findProduct, stockState } from './catalogue';
+import { roundKobo } from './format';
 import type { BagLine, Catalogue, Commerce, DeliveryMethod, Product } from './types';
 
 export interface BagState {
@@ -21,10 +22,14 @@ export function clampQty(qty: number, max: number): number {
   return Math.max(0, Math.min(Math.floor(qty), Math.max(0, max)));
 }
 
-/** Per-line ceiling: the lower of commerce.maxQtyPerLine and available stock. */
+/**
+ * Per-line ceiling: the lower of commerce.maxQtyPerLine and known stock.
+ * Unknown stock (null) is orderable up to maxQtyPerLine; CNM confirms availability.
+ */
 export function maxQtyFor(product: Product | undefined, commerce: Pick<Commerce, 'maxQtyPerLine'>): number {
   if (!product || stockState(product) === 'out_of_stock') return 0;
-  return Math.min(commerce.maxQtyPerLine, product.stock.quantity);
+  const qty = product.stock.quantity;
+  return qty == null ? commerce.maxQtyPerLine : Math.min(commerce.maxQtyPerLine, qty);
 }
 
 export function bagReducer(state: BagState, action: BagAction): BagState {
@@ -82,10 +87,13 @@ export function estimateTotals(
   commerce: Pick<Commerce, 'pricesIncludeVat' | 'vatRate'>,
   delivery?: DeliveryMethod | null,
 ): LocalTotals {
-  const subtotal = lines.reduce((sum, l) => {
-    const p = findProduct(catalogue, l.id);
-    return p ? sum + p.price.amount * l.qty : sum;
-  }, 0);
+  // Prices can carry kobo (e.g. ₦14,888.75); round at each step to avoid float drift.
+  const subtotal = roundKobo(
+    lines.reduce((sum, l) => {
+      const p = findProduct(catalogue, l.id);
+      return p ? sum + roundKobo(p.price.amount * l.qty) : sum;
+    }, 0),
+  );
   const discount = 0;
   const deliveryFee = !delivery
     ? 0
@@ -93,15 +101,15 @@ export function estimateTotals(
       ? 0
       : delivery.fee;
   const rate = commerce.vatRate.value;
-  const net = subtotal - discount + deliveryFee;
+  const net = roundKobo(subtotal - discount + deliveryFee);
   let vat: number;
   let total: number;
   if (commerce.pricesIncludeVat.value) {
     total = net;
-    vat = Math.round(net - net / (1 + rate));
+    vat = roundKobo(net - net / (1 + rate));
   } else {
-    vat = Math.round(net * rate);
-    total = net + vat;
+    vat = roundKobo(net * rate);
+    total = roundKobo(net + vat);
   }
   return { subtotal, discount, delivery: deliveryFee, vat, total, estimated: true };
 }

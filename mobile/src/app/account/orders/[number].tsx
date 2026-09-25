@@ -38,7 +38,7 @@ function OrderDetail({ number }: { number: string }) {
       {stepIndex >= 0 ? (
         <View style={{ flexDirection: 'row', gap: 4, marginTop: space.md }} accessible accessibilityLabel={`Progress: ${orderStatusLabel(order.status)}`}>
           {TIMELINE.map((s, i) => (
-            <View key={s} style={{ flex: 1, height: 2, backgroundColor: i <= stepIndex ? colors.green : colors.hairline }} />
+            <View key={s} style={{ flex: 1, height: 2, backgroundColor: i <= stepIndex ? colors.charcoal : colors.hairline }} />
           ))}
         </View>
       ) : null}

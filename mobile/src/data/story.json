@@ -1,9 +1,83 @@
 {
-  "headline": { "value": "Everyday spaces should feel like somewhere you can truly rest.", "status": "NEEDS_CNM_APPROVAL", "source": "Netlify prototype supplied by CNM" },
-  "intro": { "value": null, "status": "NEEDS_CNM_APPROVAL", "note": "Official company story to be supplied by CNM. Do not rewrite into fictional marketing copy." },
-  "founder": { "name": null, "title": null, "portrait": null, "quote": null, "status": "NEEDS_CNM_APPROVAL" },
-  "philosophy": { "brand": null, "founder": null, "status": "NEEDS_CNM_APPROVAL" },
-  "roots": { "value": "A Nigerian brand, with stores in Lagos and Abuja.", "status": "NEEDS_CNM_APPROVAL", "source": "CNM build brief" },
+  "headline": {
+    "value": "Where Luxury Meets Atmosphere.",
+    "status": "FROM_CNM_LIVE_SITE"
+  },
+  "intro": {
+    "value": "A premium lifestyle brand offering luxury fragrances, home décor, and body care products crafted for the intentional woman and the discerning home. CNM Essentials is the fragrance and lifestyle destination for those who believe that how you live at home reflects who you are in the world.",
+    "status": "FROM_CNM_GROUP_SITE"
+  },
+  "founder": {
+    "name": null,
+    "title": null,
+    "portrait": null,
+    "quote": null,
+    "status": "NEEDS_CNM_APPROVAL"
+  },
+  "philosophy": {
+    "brand": "Purpose-crafted luxury for modern living — combining natural ingredients, artisanal quality, and a deep sense of intentionality that transforms everyday rituals into meaningful experiences.",
+    "founder": null,
+    "status": "FROM_CNM_GROUP_SITE"
+  },
+  "roots": {
+    "value": "Part of CNM Group — a privately held, founder-led conglomerate headquartered in Lagos, Nigeria, with operations spanning Abuja and the United States.",
+    "status": "FROM_CNM_GROUP_SITE"
+  },
   "timeline": [],
-  "timelineStatus": "NEEDS_CNM_APPROVAL"
+  "timelineStatus": "NEEDS_CNM_APPROVAL",
+  "stats": {
+    "value": [
+      [
+        "4",
+        "Curated collections"
+      ],
+      [
+        "100%",
+        "Premium sourced"
+      ]
+    ],
+    "status": "FROM_CNM_LIVE_SITE",
+    "note": "A third stat on the live About page is partly obscured in the screenshot ('… hands behind it') — confirm."
+  },
+  "mission": {
+    "value": "To build and grow businesses that consistently deliver outstanding value, improve everyday experiences, and earn the trust of customers and partners through quality, innovation, and responsible leadership.",
+    "status": "FROM_CNM_GROUP_SITE"
+  },
+  "vision": {
+    "value": "To become one of Africa's most respected diversified business groups, recognized globally for excellence, innovation, and sustainable growth.",
+    "status": "FROM_CNM_GROUP_SITE"
+  },
+  "values": {
+    "value": [
+      [
+        "Excellence",
+        "We deliver nothing less than the highest standard."
+      ],
+      [
+        "Integrity",
+        "Transparency and accountability define us."
+      ],
+      [
+        "Innovation",
+        "We create tailored, forward-thinking solutions."
+      ],
+      [
+        "Social Impact",
+        "We measure success by lives transformed."
+      ],
+      [
+        "People-Centricity",
+        "Our clients and communities come first."
+      ],
+      [
+        "Purpose",
+        "We are driven by meaning beyond profit."
+      ]
+    ],
+    "status": "FROM_CNM_GROUP_SITE"
+  },
+  "image": {
+    "src": "/assets/stores/cnm-essentials-store-interior.jpg",
+    "alt": "Inside a CNM Essentials store"
+  }
 }

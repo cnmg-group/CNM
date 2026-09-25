@@ -35,7 +35,7 @@ export async function enablePushNotifications(): Promise<PushRegistration> {
     await Notifications.setNotificationChannelAsync('default', {
       name: 'Order updates and news',
       importance: Notifications.AndroidImportance.DEFAULT,
-      lightColor: '#153f32',
+      lightColor: '#fbcc39',
     });
   }
   const existing = await Notifications.getPermissionsAsync();

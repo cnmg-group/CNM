@@ -1,17 +1,20 @@
 /** CNM Essentials design tokens. Editorial calm, hairlines, square corners. */
+/** Palette sampled from the original CNM Essentials logo. */
 export const colors = {
-  green: '#153f32',
-  greenPressed: '#0f2f25',
-  cream: '#f5f1e8',
-  creamDeep: '#ece6d8',
+  charcoal: '#23221e',
+  charcoalPressed: '#11110f',
+  charcoalSoft: '#3a3833',
+  sage: '#d3dbce',
+  yellow: '#fbcc39',
+  yellowPressed: '#e9b91f',
+  offWhite: '#f6f5f0',
   ink: '#111111',
   inkSoft: '#4a4a46',
-  muted: '#7a776f',
-  hairline: '#d9d3c5',
+  muted: '#77766f',
+  hairline: '#e3e5de',
   white: '#ffffff',
   danger: '#8a2a1f',
-  success: '#153f32',
-  overlay: 'rgba(17,17,17,0.35)',
+  overlay: 'rgba(17,17,17,0.4)',
 } as const;
 
 export const fonts = {

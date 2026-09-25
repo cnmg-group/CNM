@@ -1,60 +1,37 @@
-import { Image, StyleSheet, Text, View, type ImageSourcePropType, type StyleProp, type ViewStyle } from 'react-native';
-
-import { colors, fonts } from '@/theme';
+import { Image, type ImageStyle, type StyleProp } from 'react-native';
 
 /**
- * ORIGINAL CNM LOGO — BLOCKED, awaiting CNM.
+ * ORIGINAL CNM Essentials artwork, copied from the website
+ * (public/assets/brand/, cropped by the website team from the logo on
+ * cnm-group.net). Never redraw or recolour it.
+ * When CNM supplies master files, replace the PNGs in assets/brand/ at the same
+ * paths (keep the aspect ratios below in sync).
  *
- * The official logo file has not been supplied. It must never be redrawn or
- * approximated. When CNM provides it:
- *   1. Save it as  assets/brand/cnm-logo.png  (transparent PNG, @3x-ready, ~600px wide)
- *   2. Replace `null` below with:  require('../../assets/brand/cnm-logo.png')
- *   3. Set LOGO_ASPECT to the file's width / height.
- * Until then a plain typographic wordmark is shown (not a logo).
+ * - `full`: petal mark + "CNM ESSENTIALS" + strapline on charcoal (702×801)
+ * - `mark`: petal mark only, on charcoal (300×300)
  */
-const LOGO_SOURCE: ImageSourcePropType | null = null;
-const LOGO_ASPECT = 4;
+const SOURCES = {
+  full: { source: require('../../assets/brand/cnm-logo.png'), aspect: 702 / 801 },
+  mark: { source: require('../../assets/brand/cnm-mark.png'), aspect: 1 },
+} as const;
 
 interface Props {
+  variant?: keyof typeof SOURCES;
+  /** Rendered height in points; width follows the artwork's aspect ratio. */
   height?: number;
-  color?: string;
-  style?: StyleProp<ViewStyle>;
+  style?: StyleProp<ImageStyle>;
 }
 
-export function Logo({ height = 18, color = colors.ink, style }: Props) {
-  if (LOGO_SOURCE) {
-    return (
-      <Image
-        source={LOGO_SOURCE}
-        style={[{ height, width: height * LOGO_ASPECT, resizeMode: 'contain' }, style as never]}
-        accessibilityRole="image"
-        accessibilityLabel="CNM Essentials"
-      />
-    );
-  }
+export function Logo({ variant = 'mark', height = 32, style }: Props) {
+  const { source, aspect } = SOURCES[variant];
   return (
-    <View style={[styles.wrap, style]} accessible accessibilityRole="header" accessibilityLabel="CNM Essentials">
-      <Text style={[styles.word, { color, fontSize: height * 0.8, lineHeight: height }]} maxFontSizeMultiplier={1.2}>
-        CNM ESSENTIALS
-      </Text>
-      {__DEV__ ? (
-        <Text style={styles.flag} importantForAccessibility="no" accessibilityElementsHidden>
-          logo placeholder
-        </Text>
-      ) : null}
-    </View>
+    <Image
+      source={source}
+      style={[{ height, width: height * aspect, borderRadius: 2 }, style]}
+      resizeMode="contain"
+      accessible
+      accessibilityRole="image"
+      accessibilityLabel="CNM Essentials"
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: { alignItems: 'center' },
-  word: { fontFamily: fonts.sansMedium, letterSpacing: 4 },
-  flag: {
-    fontFamily: fonts.sans,
-    fontSize: 8,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    color: colors.danger,
-    marginTop: 1,
-  },
-});

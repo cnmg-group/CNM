@@ -79,5 +79,5 @@ const styles = StyleSheet.create({
   },
   text: { color: colors.white, fontFamily: fonts.sans, fontSize: 14, flex: 1, paddingVertical: space.sm },
   action: { minHeight: minTouch, justifyContent: 'center', paddingLeft: space.md },
-  actionText: { color: colors.cream, fontFamily: fonts.sansSemiBold, fontSize: 12, letterSpacing: 1.4, textTransform: 'uppercase' },
+  actionText: { color: colors.offWhite, fontFamily: fonts.sansSemiBold, fontSize: 12, letterSpacing: 1.4, textTransform: 'uppercase' },
 });

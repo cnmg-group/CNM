@@ -49,7 +49,8 @@ export function Label({ style, ...p }: TProps) {
 
 /* ---------- Buttons ---------- */
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+/** `accent` = brand yellow; use it for the primary CTA on charcoal backgrounds. */
+type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'ghost' | 'danger';
 
 interface ButtonProps extends Omit<PressableProps, 'style' | 'children'> {
   title: string;
@@ -62,7 +63,7 @@ interface ButtonProps extends Omit<PressableProps, 'style' | 'children'> {
 
 export function Button({ title, variant = 'primary', loading, disabled, icon, style, compact, ...rest }: ButtonProps) {
   const isDisabled = disabled || loading;
-  const fg = variant === 'primary' ? colors.white : variant === 'danger' ? colors.danger : colors.ink;
+  const fg = variant === 'primary' ? colors.white : variant === 'accent' ? colors.charcoal : variant === 'danger' ? colors.danger : colors.ink;
   return (
     <Pressable
       accessibilityRole="button"
@@ -72,10 +73,11 @@ export function Button({ title, variant = 'primary', loading, disabled, icon, st
       style={({ pressed }) => [
         styles.button,
         compact && styles.buttonCompact,
-        variant === 'primary' && { backgroundColor: pressed ? colors.greenPressed : colors.green, borderColor: colors.green },
-        variant === 'secondary' && { backgroundColor: pressed ? colors.cream : colors.white, borderColor: colors.ink },
-        variant === 'ghost' && { backgroundColor: pressed ? colors.cream : 'transparent', borderColor: 'transparent' },
-        variant === 'danger' && { backgroundColor: pressed ? colors.cream : colors.white, borderColor: colors.danger },
+        variant === 'primary' && { backgroundColor: pressed ? colors.charcoalPressed : colors.charcoal, borderColor: colors.charcoal },
+        variant === 'accent' && { backgroundColor: pressed ? colors.yellowPressed : colors.yellow, borderColor: colors.yellow },
+        variant === 'secondary' && { backgroundColor: pressed ? colors.offWhite : colors.white, borderColor: colors.ink },
+        variant === 'ghost' && { backgroundColor: pressed ? colors.offWhite : 'transparent', borderColor: 'transparent' },
+        variant === 'danger' && { backgroundColor: pressed ? colors.offWhite : colors.white, borderColor: colors.danger },
         isDisabled && { opacity: 0.45 },
         style,
       ]}
@@ -136,7 +138,7 @@ export function HeartButton({ active, onPress, label, style }: { active: boolean
       hitSlop={6}
       style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.5 }, style]}
     >
-      <Ionicons name={active ? 'heart' : 'heart-outline'} size={21} color={active ? colors.green : colors.ink} />
+      <Ionicons name={active ? 'heart' : 'heart-outline'} size={21} color={active ? colors.charcoal : colors.ink} />
     </Pressable>
   );
 }
@@ -150,7 +152,7 @@ export function Chip({ label, selected, onPress, count }: { label: string; selec
       accessibilityRole="button"
       accessibilityState={{ selected: !!selected }}
       accessibilityLabel={count != null ? `${label}, ${count}` : label}
-      style={({ pressed }) => [styles.chip, selected && styles.chipSelected, pressed && !selected && { backgroundColor: colors.cream }]}
+      style={({ pressed }) => [styles.chip, selected && styles.chipSelected, pressed && !selected && { backgroundColor: colors.offWhite }]}
     >
       <Text maxFontSizeMultiplier={1.6} style={[styles.chipText, selected && { color: colors.white }]}>
         {label}
@@ -243,7 +245,7 @@ export function ToggleRow({
         disabled={disabled}
         accessibilityLabel={label}
         accessibilityHint={description}
-        trackColor={{ true: colors.green, false: colors.hairline }}
+        trackColor={{ true: colors.charcoal, false: colors.hairline }}
         thumbColor={colors.white}
         ios_backgroundColor={colors.hairline}
       />
@@ -300,11 +302,11 @@ export const styles = StyleSheet.create({
     height: 16,
     paddingHorizontal: 3,
     borderRadius: 8,
-    backgroundColor: colors.green,
+    backgroundColor: colors.yellow,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  badgeText: { color: colors.white, fontFamily: fonts.sansSemiBold, fontSize: 9 },
+  badgeText: { color: colors.charcoal, fontFamily: fonts.sansSemiBold, fontSize: 9 },
   chip: {
     minHeight: minTouch - 8,
     marginVertical: 4,
@@ -316,7 +318,7 @@ export const styles = StyleSheet.create({
     marginRight: space.xs,
     backgroundColor: colors.white,
   },
-  chipSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
+  chipSelected: { backgroundColor: colors.charcoal, borderColor: colors.charcoal },
   chipText: { fontFamily: fonts.sansMedium, fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase', color: colors.ink },
   divider: { height: hairline, backgroundColor: colors.hairline },
   sectionHeader: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: space.md },

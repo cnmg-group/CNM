@@ -26,7 +26,7 @@ configureNotificationHandler();
 
 const navTheme = {
   ...DefaultTheme,
-  colors: { ...DefaultTheme.colors, primary: colors.green, background: colors.white, card: colors.white, text: colors.ink, border: colors.hairline },
+  colors: { ...DefaultTheme.colors, primary: colors.charcoal, background: colors.white, card: colors.white, text: colors.ink, border: colors.hairline },
 };
 
 export const unstable_settings = {

@@ -4,7 +4,7 @@ import { FlatList, Share, StyleSheet, useWindowDimensions, View } from 'react-na
 
 import { Accordion } from '@/components/accordion';
 import { PendingBlock } from '@/components/butterfly-loader';
-import { AwaitingApproval, PriceTag, ProductFlags, ProductImage, StockLabel } from '@/components/product-bits';
+import { AwaitingApproval, PriceTag, ProductFlags, ProductImage, ProductSubtitle, StockLabel } from '@/components/product-bits';
 import { ProductRail } from '@/components/product-card';
 import { QtyStepper } from '@/components/qty-stepper';
 import { Screen } from '@/components/screen';
@@ -78,7 +78,7 @@ function BackInStock({ product }: { product: Product }) {
   const [email, setEmail] = useState(user?.email ?? '');
   const [state, setState] = useState<'idle' | 'sending' | 'done'>('idle');
   const [error, setError] = useState<string | null>(null);
-  if (state === 'done') return <Small style={{ color: colors.green, marginTop: space.sm }}>We’ll email you when it’s back.</Small>;
+  if (state === 'done') return <Small style={{ color: colors.charcoal, marginTop: space.sm }}>We’ll email you when it’s back.</Small>;
   return (
     <View style={{ marginTop: space.md }}>
       <Field label="Email me when it’s back" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoComplete="email" error={error} />
@@ -184,8 +184,9 @@ export default function ProductScreen() {
         <View style={styles.titleRow}>
           <View style={{ flex: 1 }}>
             <ProductFlags product={product} />
-            <Label style={{ color: colors.muted, marginBottom: space.xs }}>{categoryName(catalogue, product.category)}</Label>
+            <ProductSubtitle product={product} style={{ fontSize: 11, marginBottom: space.xs }} />
             <H1>{product.name}</H1>
+            <Small style={{ marginTop: space.xxs }}>{categoryName(catalogue, product.category)}</Small>
           </View>
           <HeartButton active={saved} onPress={() => wishlist.toggle(product)} label={product.name} />
         </View>
@@ -213,6 +214,9 @@ export default function ProductScreen() {
         )}
         {inBag > 0 ? <Small style={{ marginTop: space.xs }}>{inBag} already in your bag.</Small> : null}
         {state === 'low_stock' ? <Small style={{ marginTop: space.xs }}>Only a few left.</Small> : null}
+        {state === 'unconfirmed' ? (
+          <Small style={{ marginTop: space.xs, color: colors.muted }}>CNM confirms availability after you order and will contact you if anything changes.</Small>
+        ) : null}
 
         <View style={styles.sections}>
           <Accordion title="Description" initiallyOpen>
@@ -249,6 +253,7 @@ export default function ProductScreen() {
                 <View key={s.slug}>
                   <Body>{s.name}</Body>
                   <Small>{s.address ?? 'Address awaiting CNM confirmation'}</Small>
+                  {s.phone ? <Small>{s.phone}</Small> : null}
                 </View>
               ))}
               <Small style={{ color: colors.muted }}>Live in-store stock isn’t available yet — please contact the store before visiting.</Small>

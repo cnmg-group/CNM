@@ -10,8 +10,8 @@ import { useCatalogue } from '@/state/catalogue';
 import { useWishlist } from '@/state/wishlist';
 import { colors, space, type } from '@/theme';
 
-import { PriceTag, ProductFlags, ProductImage, StockLabel } from './product-bits';
-import { HeartButton, Label } from './ui';
+import { PriceTag, ProductFlags, ProductImage, ProductSubtitle, StockLabel } from './product-bits';
+import { HeartButton } from './ui';
 
 export const ProductCard = memo(function ProductCard({ product, list, width }: { product: Product; list?: string; width?: number }) {
   const { catalogue } = useCatalogue();
@@ -25,19 +25,17 @@ export const ProductCard = memo(function ProductCard({ product, list, width }: {
           router.push(`/products/${product.slug}`);
         }}
         accessibilityRole="link"
-        accessibilityLabel={`${product.name}, ${categoryName(catalogue, product.category)}`}
+        accessibilityLabel={`${product.name}, ${[product.brand, product.productType ?? categoryName(catalogue, product.category)].filter(Boolean).join(', ')}`}
         accessibilityHint="Opens product details"
         style={({ pressed }) => pressed && { opacity: 0.85 }}
       >
-        <ProductImage product={product} compact={!!width && width < 160} />
+        <ProductImage product={product} compact={!!width && width < 160} style={styles.image} />
         <View style={styles.meta}>
           <ProductFlags product={product} />
+          <ProductSubtitle product={product} style={{ marginBottom: 2 }} />
           <Text style={[type.body, styles.name]} numberOfLines={2}>
             {product.name}
           </Text>
-          <Label style={styles.category} numberOfLines={1}>
-            {categoryName(catalogue, product.category)}
-          </Label>
           <PriceTag product={product} />
           <View style={{ marginTop: 2 }}>
             <StockLabel product={product} />
@@ -114,7 +112,7 @@ function SkeletonBlock({ style }: { style: object }) {
     loop.start();
     return () => loop.stop();
   }, [reduce, pulse]);
-  return <Animated.View style={[{ backgroundColor: colors.cream, opacity: pulse }, style]} />;
+  return <Animated.View style={[{ backgroundColor: colors.offWhite, opacity: pulse }, style]} />;
 }
 
 export function SkeletonGrid({ count = 6 }: { count?: number }) {
@@ -133,9 +131,9 @@ export function SkeletonGrid({ count = 6 }: { count?: number }) {
 
 const styles = StyleSheet.create({
   card: { marginBottom: space.lg },
+  image: { borderWidth: 1, borderColor: colors.hairline },
   meta: { paddingTop: space.sm, paddingRight: space.xs },
-  name: { fontSize: 15, marginBottom: 2 },
-  category: { color: colors.muted, fontSize: 10, marginBottom: space.xs },
+  name: { fontSize: 15, marginBottom: space.xs },
   heart: { position: 'absolute', top: 2, right: 2 },
   column: { gap: space.sm, paddingHorizontal: space.md },
   gridContent: { paddingBottom: space.xxl },

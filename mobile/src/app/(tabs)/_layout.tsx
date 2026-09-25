@@ -16,7 +16,7 @@ export default function TabLayout() {
         headerTitleStyle: { fontFamily: fonts.serif, fontSize: 22, color: colors.ink },
         headerStyle: { backgroundColor: colors.white },
         headerRight: () => <BagButton />,
-        tabBarActiveTintColor: colors.green,
+        tabBarActiveTintColor: colors.charcoal,
         tabBarInactiveTintColor: colors.muted,
         tabBarStyle: { borderTopColor: colors.hairline, borderTopWidth: 1, backgroundColor: colors.white },
         tabBarLabelStyle: { fontFamily: fonts.sansMedium, fontSize: 10, letterSpacing: 1, textTransform: 'uppercase' },
@@ -27,7 +27,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          headerTitle: () => <Logo height={16} />,
+          headerTitle: () => <Logo variant="mark" height={30} />,
           tabBarAccessibilityLabel: 'Home',
           tabBarIcon: ({ color }) => <Feather name="home" size={20} color={color} />,
         }}

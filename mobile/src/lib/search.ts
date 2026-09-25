@@ -139,11 +139,19 @@ export function productDocs(catalogue: Catalogue): SearchDoc<Product>[] {
 export type Suggestion =
   | { kind: 'category'; item: Category }
   | { kind: 'collection'; item: Collection }
+  | { kind: 'brand'; item: { name: string } }
   | { kind: 'product'; item: Product };
 
 export function suggestionDocs(catalogue: Catalogue): SearchDoc<Suggestion>[] {
+  const brandNames = Array.from(new Set(catalogue.products.map((p) => p.brand).filter(Boolean)));
+  const nonEmpty = new Set(catalogue.products.map((p) => p.category));
   return [
-    ...catalogue.categories.map((c) => ({
+    ...brandNames.map((name) => ({
+      item: { kind: 'brand', item: { name } } as Suggestion,
+      titleTokens: tokenize(name),
+      tokens: [],
+    })),
+    ...catalogue.categories.filter((c) => c.showWhenEmpty || nonEmpty.has(c.slug)).map((c) => ({
       item: { kind: 'category', item: c } as Suggestion,
       titleTokens: tokenize(c.name),
       tokens: [],

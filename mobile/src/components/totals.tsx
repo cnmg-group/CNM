@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 
 import { estimateTotals } from '@/lib/cart';
+import { findProduct } from '@/lib/catalogue';
 import { formatNaira } from '@/lib/format';
 import type { BagLine, DeliveryMethod, Quote } from '@/lib/types';
 import { useCatalogue } from '@/state/catalogue';
@@ -27,6 +28,7 @@ export function Totals({
   const t = quote ?? estimateTotals(lines, catalogue, commerce, delivery);
   const estimated = !quote;
   const includesVat = commerce.pricesIncludeVat.value;
+  const anyDemo = lines.some((l) => findProduct(catalogue, l.id)?.price.demo);
   return (
     <View accessibilityLabel="Order summary">
       <Row label="Subtotal" value={formatNaira(t.subtotal)} />
@@ -37,7 +39,7 @@ export function Totals({
       <Row label={estimated ? 'Estimated total' : 'Total'} value={formatNaira(t.total)} strong />
       <ButterflyLoader pending={loading} label="Updating totals" size={24} style={{ marginTop: space.xs }} />
       {estimated && !loading ? <Small style={{ color: colors.muted }}>Estimate — final totals are confirmed by CNM at checkout.</Small> : null}
-      <Small style={{ color: colors.muted, marginTop: space.xxs }}>Prices shown are staging demo values awaiting CNM approval.</Small>
+      {anyDemo ? <Small style={{ color: colors.muted, marginTop: space.xxs }}>Some prices are demo values awaiting CNM approval.</Small> : null}
     </View>
   );
 }

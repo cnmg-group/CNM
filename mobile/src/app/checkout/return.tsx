@@ -48,7 +48,7 @@ export default function PaymentReturnScreen() {
       <PendingBlock pending={pending} message="Confirming your payment…" />
       {!pending && result?.paid ? (
         <>
-          <Label style={{ color: colors.green }}>Payment received</Label>
+          <Label style={{ color: colors.charcoal }}>Payment received</Label>
           <H1 style={{ marginTop: space.sm }}>Thank you.</H1>
           <Body style={{ marginTop: space.sm }}>{result.order?.number ? `Order ${result.order.number} is confirmed.` : 'Your order is confirmed.'}</Body>
           <Button title="Continue shopping" onPress={() => router.replace('/')} style={{ marginTop: space.xl }} />

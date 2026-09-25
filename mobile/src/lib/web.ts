@@ -6,7 +6,7 @@ import { colors } from '@/theme';
 /** Opens a page of the CNM website (same origin as the API) in an in-app browser. */
 export function openWebPage(path: string) {
   return WebBrowser.openBrowserAsync(`${API_BASE_URL}${path}`, {
-    controlsColor: colors.green,
+    controlsColor: colors.charcoal,
     toolbarColor: colors.white,
     presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
   }).catch(() => null);

@@ -39,7 +39,7 @@ function AddressList() {
         <View key={a.id} style={styles.card}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Label style={{ flex: 1 }}>{a.label || 'Address'}</Label>
-            {a.isDefault ? <Label style={{ color: colors.green }}>Default</Label> : null}
+            {a.isDefault ? <Label style={{ color: colors.charcoal }}>Default</Label> : null}
           </View>
           <Body style={{ marginTop: space.xs }}>{`${a.firstName} ${a.lastName}`}</Body>
           <Small>{[a.line1, a.line2, a.city, a.state].filter(Boolean).join(', ')}</Small>
