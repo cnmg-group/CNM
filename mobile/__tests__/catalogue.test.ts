@@ -1,8 +1,10 @@
-import { bundledCatalogue, findProduct, isCatalogue, mergeLive, productImages, relatedProducts, stockState } from '@/lib/catalogue';
+import { absoluteUrl, bundledCatalogue, findProduct, isCatalogue, mergeLive, productImages, productSubtitle, relatedProducts, stockState } from '@/lib/catalogue';
 import { routeForUrl } from '@/lib/deeplinks';
-import { formatNaira } from '@/lib/format';
+import { formatNaira, roundKobo } from '@/lib/format';
 import { interpretPaymentResponse, referenceFromUrl } from '@/lib/payments';
 import { mergeWishlists, wishlistReducer } from '@/lib/wishlist';
+
+import { real } from './fixtures';
 
 jest.mock('expo-web-browser', () => ({ openAuthSessionAsync: jest.fn() }));
 jest.mock('expo-linking', () => ({ createURL: (p: string) => `cnm://${p}` }));
@@ -11,47 +13,63 @@ describe('catalogue', () => {
   it('bundled data is a valid catalogue', () => {
     expect(isCatalogue(bundledCatalogue)).toBe(true);
     expect(isCatalogue({ products: 'x' })).toBe(false);
+    expect(bundledCatalogue.products).toHaveLength(20);
   });
 
   it('merges live overrides without mutating', () => {
-    const merged = mergeLive(bundledCatalogue, { products: { 'body-wash': { price: 9999, stock: 0, available: false } } });
-    const p = findProduct(merged, 'body-wash')!;
-    expect(p.price.amount).toBe(9999);
-    expect(p.price.demo).toBe(true);
+    const merged = mergeLive(bundledCatalogue, { products: { 'midnight-vanilla-room-spray': { price: 18999.5, stock: 0, available: false } } });
+    const p = findProduct(merged, 'midnight-vanilla-room-spray')!;
+    expect(p.price.amount).toBe(18999.5);
     expect(stockState(p)).toBe('out_of_stock');
-    expect(findProduct(bundledCatalogue, 'body-wash')!.price.amount).toBe(14500);
+    expect(findProduct(bundledCatalogue, 'midnight-vanilla-room-spray')!.price.amount).toBe(17850);
+  });
+
+  it('live stock can set a known quantity on an unconfirmed product', () => {
+    const merged = mergeLive(bundledCatalogue, { products: { 'crushed-room-spray': { stock: 4 } } });
+    expect(stockState(findProduct(merged, 'crushed-room-spray')!)).toBe('low_stock');
   });
 
   it('stock states', () => {
-    expect(stockState(findProduct(bundledCatalogue, 'refill-oil')!)).toBe('in_stock');
-    expect(stockState(findProduct(bundledCatalogue, 'home-fragrance')!)).toBe('low_stock');
-    expect(stockState(findProduct(bundledCatalogue, 'car-diffuser')!)).toBe('out_of_stock');
+    expect(stockState(real('midnight-vanilla-room-spray'))).toBe('unconfirmed');
+    const base = real('petalrich-room-spray');
+    expect(stockState({ ...base, stock: { quantity: 40 } })).toBe('in_stock');
+    expect(stockState({ ...base, stock: { quantity: 2 } })).toBe('low_stock');
+    expect(stockState({ ...base, stock: { quantity: 0 } })).toBe('out_of_stock');
+    expect(stockState({ ...base, available: false })).toBe('out_of_stock');
   });
 
-  it('drops placeholder images', () => {
-    const p = { ...findProduct(bundledCatalogue, 'body-wash')!, images: [{ src: '/a.jpg', alt: 'a', placeholder: true }, '/b.jpg'] };
-    expect(productImages(p)).toEqual([{ src: '/b.jpg', alt: 'Body Wash' }]);
+  it('uses real images and drops placeholders', () => {
+    expect(productImages(real('midnight-vanilla-room-spray'))[0].src).toBe('/assets/products/midnight-vanilla-room-spray.png');
+    const p = { ...real('crushed-room-spray'), images: [{ src: '/a.jpg', alt: 'a', placeholder: true }, '/b.jpg'] };
+    expect(productImages(p)).toEqual([{ src: '/b.jpg', alt: 'Crushed' }]);
+    expect(absoluteUrl('https://x.netlify.app/', '/assets/p.png')).toBe('https://x.netlify.app/assets/p.png');
+    expect(absoluteUrl('https://x.app', 'https://cdn.example/p.png')).toBe('https://cdn.example/p.png');
   });
 
-  it('related only resolves real products', () => {
-    const p = findProduct(bundledCatalogue, 'stoneglow-reed-diffuser')!;
-    expect(relatedProducts(bundledCatalogue, p).map((x) => x.id)).toEqual(['home-fragrance', 'signature-diffuser-oil']);
+  it('subtitle combines brand and product type', () => {
+    expect(productSubtitle(real('midnight-vanilla-room-spray'))).toBe("Victoria's Secret · Room Spray");
   });
 
-  it('never invents product copy: bundled facts stay null', () => {
+  it('related resolves to real products only', () => {
+    const rel = relatedProducts(bundledCatalogue, real('white-jasmine-odour-eliminator')).map((x) => x.id);
+    expect(rel).toEqual(['sugarplum-delight-odour-eliminator', 'sun-kissed-vanilla-odour-eliminator']);
+    expect(relatedProducts(bundledCatalogue, { ...real('crushed-room-spray'), related: ['ghost'] })).toEqual([]);
+  });
+
+  it('never invents product copy: unsupplied facts stay null and prices are not demo', () => {
     for (const p of bundledCatalogue.products) {
-      expect(p.description).toBeNull();
       expect(p.ingredients).toBeNull();
+      expect(p.price.demo).toBe(false);
     }
   });
 });
 
 describe('deep links', () => {
   it.each([
-    ['https://cnmessentials.com/products/body-wash/', '/products/body-wash'],
-    ['https://www.cnmessentials.com/shop/body-care', '/shop/body-care'],
+    ['https://cnmessentials.com/products/sweet-pea-wallflower-plug-in-refill/', '/products/sweet-pea-wallflower-plug-in-refill'],
+    ['https://www.cnmessentials.com/shop/room-home-fragrance/', '/shop/room-home-fragrance'],
     ['cnm://account/orders/CNM-1001', '/account/orders/CNM-1001'],
-    ['/products/refill-oil?utm_source=push', '/products/refill-oil'],
+    ['/products/midnight-vanilla-room-spray?utm_source=push', '/products/midnight-vanilla-room-spray'],
     ['https://evil.example.com/products/x', null],
     ['https://cnmessentials.com/unknown/page', null],
   ])('%s → %s', (url, route) => {
@@ -84,9 +102,19 @@ describe('wishlist', () => {
 });
 
 describe('format', () => {
-  it('formats Naira', () => {
-    expect(formatNaira(185000)).toBe('₦185,000');
+  it('formats Naira with up to 2 decimals', () => {
+    expect(formatNaira(17850)).toBe('₦17,850');
+    expect(formatNaira(14888.75)).toBe('₦14,888.75');
+    expect(formatNaira(14888.8)).toBe('₦14,888.80');
+    expect(formatNaira(31121.25)).toBe('₦31,121.25');
+    expect(formatNaira(1234567.5)).toBe('₦1,234,567.50');
+    expect(formatNaira(-2500.5)).toBe('-₦2,500.50');
     expect(formatNaira(0)).toBe('₦0');
     expect(formatNaira(null)).toBe('—');
+  });
+
+  it('roundKobo avoids float drift', () => {
+    expect(roundKobo(0.1 + 0.2)).toBe(0.3);
+    expect(roundKobo(14888.8 * 3)).toBe(44666.4);
   });
 });
