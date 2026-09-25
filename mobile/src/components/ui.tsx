@@ -50,7 +50,7 @@ export function Label({ style, ...p }: TProps) {
 /* ---------- Buttons ---------- */
 
 /** `accent` = brand yellow; use it for the primary CTA on charcoal backgrounds. */
-type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'ghost' | 'danger';
+type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'outlineLight' | 'ghost' | 'danger';
 
 interface ButtonProps extends Omit<PressableProps, 'style' | 'children'> {
   title: string;
@@ -63,7 +63,7 @@ interface ButtonProps extends Omit<PressableProps, 'style' | 'children'> {
 
 export function Button({ title, variant = 'primary', loading, disabled, icon, style, compact, ...rest }: ButtonProps) {
   const isDisabled = disabled || loading;
-  const fg = variant === 'primary' ? colors.white : variant === 'accent' ? colors.charcoal : variant === 'danger' ? colors.danger : colors.ink;
+  const fg = variant === 'primary' || variant === 'outlineLight' ? colors.white : variant === 'accent' ? colors.charcoal : variant === 'danger' ? colors.danger : colors.ink;
   return (
     <Pressable
       accessibilityRole="button"
@@ -75,6 +75,7 @@ export function Button({ title, variant = 'primary', loading, disabled, icon, st
         compact && styles.buttonCompact,
         variant === 'primary' && { backgroundColor: pressed ? colors.charcoalPressed : colors.charcoal, borderColor: colors.charcoal },
         variant === 'accent' && { backgroundColor: pressed ? colors.yellowPressed : colors.yellow, borderColor: colors.yellow },
+        variant === 'outlineLight' && { backgroundColor: pressed ? colors.charcoalSoft : 'transparent', borderColor: colors.white },
         variant === 'secondary' && { backgroundColor: pressed ? colors.offWhite : colors.white, borderColor: colors.ink },
         variant === 'ghost' && { backgroundColor: pressed ? colors.offWhite : 'transparent', borderColor: 'transparent' },
         variant === 'danger' && { backgroundColor: pressed ? colors.offWhite : colors.white, borderColor: colors.danger },
