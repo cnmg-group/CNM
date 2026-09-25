@@ -9,7 +9,7 @@
       "distribution": "internal",
       "channel": "development",
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://cnm-essentials-staging.netlify.app"
+        "EXPO_PUBLIC_API_BASE_URL": "https://cnmshop.netlify.app"
       },
       "ios": { "simulator": true }
     },
@@ -17,7 +17,7 @@
       "distribution": "internal",
       "channel": "preview",
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://cnm-essentials-staging.netlify.app"
+        "EXPO_PUBLIC_API_BASE_URL": "https://cnmshop.netlify.app"
       },
       "android": { "buildType": "apk" }
     },

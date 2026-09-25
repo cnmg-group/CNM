@@ -4,7 +4,7 @@
 
 1. In Netlify: **Add new site → Import an existing project → GitHub → `gabeth7/chatbot`**.
 2. Branch: `claude/cnm-essentials-platform-s0u4wq` (or `main` once merged). The root `netlify.toml` already sets base `cnm-essentials`, build `npm ci && npm run build`, publish `dist` and functions `netlify/functions`.
-3. Site name, e.g. `cnm-essentials-staging`. The URL is `https://cnm-essentials-staging.netlify.app`.
+3. Site name, e.g. `cnm-essentials-staging`. The URL is `https://cnmshop.netlify.app`.
 4. Environment variables (see `.env.example`). The minimum for a fully interactive staging site:
    - `ADMIN_STAGING_PASSWORD`: lets you sign in to `/admin/` as `staging@cnmessentials.com`
    - optional: `SESSION_SECRET`, `RESEND_API_KEY` + `EMAIL_FROM`, `CNM_NOTIFY_EMAIL`, `GA_MEASUREMENT_ID`

@@ -17,7 +17,7 @@ A one-page summary of what's built, how to see it, and what CNM still needs to s
 
 ## 2. How to see it
 
-1. **Online (for anyone, on any phone or computer):** connect this GitHub repo to Netlify. It takes about 5 minutes; see `docs/DEPLOYMENT.md`, section 1. You'll get a link like `https://cnm-essentials-staging.netlify.app`.
+1. **Online (for anyone, on any phone or computer):** https://cnmshop.netlify.app (staging; connected to this repo on Netlify).
 2. **Screenshots now:** open `docs/visual-review/index.html` for 69 screenshots, every page on desktop and mobile.
 3. **Try it:** promo code `STAGING10`. Payments are simulated, so no money moves; you can test both a successful and a failed payment.
 
