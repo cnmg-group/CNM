@@ -197,3 +197,15 @@ test('mobile navigation menu opens and is keyboard dismissible', async ({ page, 
   await page.keyboard.press('Escape');
   await expect(page.locator('#mobile-menu')).toBeHidden();
 });
+
+test('CNM Group: Retail routes to the store; contact form sends a message', async ({ page }) => {
+  await page.goto('/cnm-group/');
+  await expect(page.locator('#divisions .company', { hasText: 'CNM Essentials' })).toHaveAttribute('href', '/');
+  await page.fill('#g-name', 'Ngozi Partner');
+  await page.fill('#g-email', 'ngozi@example.com');
+  await page.selectOption('#g-subject', 'Partnership');
+  await page.fill('#g-msg', 'We would like to discuss a partnership with CNM Group.');
+  await page.locator('#contact input[name="consent"]').check();
+  await page.locator('#contact button[type="submit"]').click();
+  await expect(page.locator('#contact [data-enquiry-ok]')).toContainText('CNM Group will be in touch');
+});

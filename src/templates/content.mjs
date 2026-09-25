@@ -221,11 +221,35 @@ export function groupPage(ctx) {
   <div class="stack"><span class="label">${escapeHtml(d.name)}</span><p class="display" id="div-${d.key}">${escapeHtml(d.name)}</p><p class="muted">${escapeHtml(d.summary)}</p></div>
   <div>${d.companies.map((c) => `<a class="company" href="${c.url}"${c.internal ? '' : ' rel="noopener"'} data-track="group_division" data-division="${d.key}"><img src="${c.logo}" alt="${escapeHtml(c.name)} logo" loading="lazy"><div><strong>${escapeHtml(c.name)}</strong><p class="muted" style="margin:4px 0">${escapeHtml(c.tagline)}</p>${c.text ? `<p style="font-size:.875rem;margin:0">${escapeHtml(c.text)}</p>` : ''}<span class="link" style="margin-top:8px">${c.internal ? 'Enter the store' : 'Visit'} ${icon('arrow')}</span></div></a>`).join('')}</div>
 </section>`).join('')}</div>
-<section class="section section--cream section--tight"><div class="container center stack">
-  <span class="label muted">Contact CNM Group</span>
-  <p><a class="textlink" href="mailto:${g.contact.email}">${escapeHtml(g.contact.email)}</a> · <a class="textlink" href="tel:${g.contact.phone.replace(/\s/g, '')}">${escapeHtml(g.contact.phone)}</a></p>
-  <p class="muted">${escapeHtml(g.contact.address)}</p>
-  <p class="muted" style="font-size:.75rem">On cnm-group.net, the Retail division's CNM Essentials "Visit Site" link should point to this store.</p>
+<section class="section section--tight"><div class="container container--narrow center stack">
+  <span class="label muted">Global presence</span><h2 class="h1">Rooted in Africa, <em class="italic">positioned for the world</em></h2>
+  <p class="lead" style="margin-inline:auto">Unlike traditional companies, CNM Group is built as an ecosystem of excellence, where each business strengthens the other — enabling growth, resilience, and long-term sustainability.</p>
+</div></section>
+<section class="section section--cream" id="contact" aria-labelledby="gc-h"><div class="container" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:clamp(32px,6vw,96px)">
+  <div class="stack">
+    <span class="label muted">Contact us</span><h2 id="gc-h" class="h1">Get in touch</h2>
+    <p class="lead">Whether you're looking to partner, invest, collaborate, or learn more about our companies, we'd love to hear from you.</p>
+    <div class="info-list">
+      <div>${icon('mail')}<div><strong>Email us</strong><br><a class="textlink" href="mailto:${g.contact.email}">${escapeHtml(g.contact.email)}</a></div></div>
+      <div>${icon('phone')}<div><strong>Call us</strong><br><a class="textlink" href="tel:${g.contact.phone.replace(/\s/g, '')}">${escapeHtml(g.contact.phone)}</a></div></div>
+      <div>${icon('pin')}<div><strong>Head office</strong><br>${escapeHtml(g.contact.address)}</div></div>
+    </div>
+    <p class="muted" style="font-size:.75rem">On cnm-group.net, the Retail division's CNM Essentials "Visit Site" link should point to this store.</p>
+  </div>
+  <form class="form" data-enquiry-form novalidate>
+    <h3 class="h3">Send us a message</h3>
+    <div class="alert alert--ok" role="status" data-enquiry-ok hidden></div>
+    <div class="alert alert--err" role="alert" data-enquiry-err hidden></div>
+    <input type="hidden" name="sector" value="group">
+    <div class="field"><label for="g-name">Full name</label><input id="g-name" name="name" autocomplete="name" required></div>
+    <div class="field"><label for="g-email">Email address</label><input id="g-email" name="email" type="email" autocomplete="email" required></div>
+    <div class="field"><label for="g-company">Company / organisation (optional)</label><input id="g-company" name="company" autocomplete="organization"></div>
+    <div class="field"><label for="g-subject">Subject</label><select id="g-subject" name="subject" required><option>General Enquiry</option><option>Partnership</option><option>Investment</option><option>Collaboration</option><option>CNM Essentials</option><option>CNM Spectra</option><option>CNMWorX</option><option>CNM Foundation</option></select></div>
+    <div class="field"><label for="g-msg">Message</label><textarea id="g-msg" name="message" required maxlength="3000" placeholder="How can we help you?"></textarea></div>
+    <label class="check"><input type="checkbox" name="consent" value="true" required> I agree to CNM Group contacting me about this message.</label>
+    <input type="text" name="website" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true">
+    <button class="btn btn--green" type="submit">Send message</button>
+  </form>
 </div></section>`;
   return { body, jsonld: [{ '@context': 'https://schema.org', '@type': 'Organization', name: 'CNM Group', url: g.url, logo: `${ctx.siteUrl}${g.logo}`, slogan: g.motto, subOrganization: g.divisions.flatMap((d) => d.companies.map((c) => ({ '@type': 'Organization', name: c.name }))) }] };
 }

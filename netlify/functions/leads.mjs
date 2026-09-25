@@ -7,7 +7,7 @@ import { rateLimit } from '../lib/ratelimit.mjs';
 import { store } from '../lib/store.mjs';
 import * as v from '../lib/validate.mjs';
 
-const SECTORS = ['events', 'weddings', 'corporate', 'hospitality', 'retail', 'offices', 'activations', 'machines', 'other'];
+const SECTORS = ['events', 'weddings', 'corporate', 'hospitality', 'retail', 'offices', 'activations', 'machines', 'group', 'other'];
 
 export default handler(async (req, context) => {
   if (req.method !== 'POST') fail(405, 'method', 'Method not allowed.');
@@ -26,6 +26,7 @@ export default handler(async (req, context) => {
         name: v.str(b.name, { name: 'Name', max: 120 }), email: v.email(b.email), phone: v.phone(b.phone, { required: false }),
         company: v.str(b.company, { name: 'Company', max: 120, required: false }), sector: v.oneOf(b.sector, SECTORS, 'Project type'),
         eventDate: v.str(b.eventDate, { name: 'Date', max: 10, required: false }), location: v.str(b.location, { name: 'Location', max: 160, required: false }),
+        subject: v.str(b.subject, { name: 'Subject', max: 60, required: false }),
         message: v.str(b.message, { name: 'Message', min: 10, max: 3000 }),
       };
       await leads.set(`enquiry/${e.id}`, e);

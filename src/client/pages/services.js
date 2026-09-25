@@ -16,10 +16,10 @@ export function init() {
     try {
       const data = formData(form);
       await api('/api/enquiry', { method: 'POST', body: data });
-      track('generate_lead', { lead_type: 'fragrance_as_a_service', sector: data.sector });
+      track('generate_lead', { lead_type: data.sector === 'group' ? 'cnm_group' : 'fragrance_as_a_service', sector: data.sector });
       form.querySelectorAll('.field, .form-row, .check, button').forEach((n) => { n.hidden = true; });
       ok.hidden = false;
-      ok.textContent = 'Thank you. Your enquiry has been received and the CNM team will be in touch.';
+      ok.textContent = data.sector === 'group' ? 'Thank you. Your message has been received and CNM Group will be in touch.' : 'Thank you. Your enquiry has been received and the CNM team will be in touch.';
       ok.focus?.();
     } catch (ex) {
       err.hidden = false;
