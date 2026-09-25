@@ -57,7 +57,7 @@ CNM supplied screenshots of **cnmessentials.com** (home, shop, about) and **cnm-
 | Commerce | Order numbers, confirmation email, order history, tracking status | DONE |
 | Account | Register, sign in, email-code (OTP) sign-in, reset, profile, addresses, orders, preferences, sign out everywhere | DONE |
 | Content | Our Story (brand and group copy, mission, vision, values), Stores (real NAP), For Business / Lease-to-Own + enquiry, Journal, CNM Group hub (Retail · Energy · Impact with all four companies) | DONE (founder and hours **NEEDS CNM APPROVAL**) |
-| Mobile | Expo iOS + Android app (tabs, shop, search, PDP, wishlist, bag, checkout, account, push, deep links, biometrics) | DONE (typecheck + 58 tests; not device-tested) |
+| Mobile | Expo iOS + Android app with the original logo, real catalogue and palette (tabs, shop, brand filter, search, PDP, wishlist, bag, checkout, account, push, deep links, biometrics) | DONE (typecheck + 69 tests; not yet device-tested) |
 | Mobile | App Store and Play Store submission | **NEEDS CNM APPROVAL** (accounts) |
 | Admin | Dashboard, orders, customers, inventory/pricing, discounts, content/merchandising, stores, SEO/redirects, enquiries, subscribers, media, analytics, users/roles, audit log, publish | DONE |
 | SEO | SSR/static HTML, canonicals, sitemap, robots, OG, breadcrumbs, Product/Breadcrumb/Organization/WebSite/Article/ItemList/Service JSON-LD, LocalBusiness (gated on verified NAP), Merchant feed (gated on approved prices) | DONE |

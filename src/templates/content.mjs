@@ -221,6 +221,22 @@ export function groupPage(ctx) {
   <div class="stack"><span class="label">${escapeHtml(d.name)}</span><p class="display" id="div-${d.key}">${escapeHtml(d.name)}</p><p class="muted">${escapeHtml(d.summary)}</p></div>
   <div>${d.companies.map((c) => `<a class="company" href="${c.url}"${c.internal ? '' : ' rel="noopener"'} data-track="group_division" data-division="${d.key}"><img src="${c.logo}" alt="${escapeHtml(c.name)} logo" loading="lazy"><div><strong>${escapeHtml(c.name)}</strong><p class="muted" style="margin:4px 0">${escapeHtml(c.tagline)}</p>${c.text ? `<p style="font-size:.875rem;margin:0">${escapeHtml(c.text)}</p>` : ''}<span class="link" style="margin-top:8px">${c.internal ? 'Enter the store' : 'Visit'} ${icon('arrow')}</span></div></a>`).join('')}</div>
 </section>`).join('')}</div>
+<section class="section" id="companies" aria-labelledby="co-h"><div class="container">
+  <div class="section-head"><div><span class="label muted">Our companies</span><h2 id="co-h" class="h1">${escapeHtml(g.companiesIntro.title)}</h2><p class="lead" style="margin-top:12px">${escapeHtml(g.companiesIntro.text)}</p></div></div>
+  ${g.profiles.map((c, i) => `<article class="profile${i % 2 ? ' profile--alt' : ''}" aria-labelledby="pf-${i}">
+    <div class="profile__media"><img src="${c.logo}" alt="${escapeHtml(c.name)} logo" loading="lazy"><div class="profile__card"><strong>${escapeHtml(c.card[0])}</strong><span class="muted">${escapeHtml(c.card[1])}</span><a class="btn ${c.internal ? 'btn--green' : 'btn--ghost'}" href="${c.url}"${c.internal ? '' : ' rel="noopener"'}>${c.internal ? 'Shop now' : 'Visit site'}</a></div><div class="search-chips">${c.places.map((pl) => `<span class="chip">${escapeHtml(pl)}</span>`).join('')}</div></div>
+    <div class="stack">
+      <span class="label muted">${escapeHtml(c.sector)}</span>
+      <h3 id="pf-${i}" class="h2">${escapeHtml(c.name)}</h3>
+      ${c.fullName ? `<p class="muted" style="margin:0">${escapeHtml(c.fullName)}</p>` : ''}
+      <p class="h3" style="color:var(--gold-ink);margin:0">${escapeHtml(c.tagline)}</p>
+      <p>${escapeHtml(c.text)}</p>
+      <div class="cards-2">${c.lists.map(([h, items]) => `<div><span class="label">${escapeHtml(h)}</span><ul style="margin-top:8px">${items.map((x) => `<li style="display:flex;gap:8px;padding:4px 0">${icon('check')} ${escapeHtml(x)}</li>`).join('')}</ul></div>`).join('')}</div>
+      <div class="box"><span class="label">Key value proposition</span><p style="margin:0">${escapeHtml(c.value)}</p></div>
+    </div>
+  </article>`).join('')}
+</div></section>
+<section class="section section--green section--tight"><div class="container center stack"><h2 class="h2">Interested in partnering with CNM Group?</h2><p class="lead" style="margin-inline:auto">Whether you're looking to collaborate, invest, or explore our companies, we'd love to hear from you.</p><div class="hero__cta" style="justify-content:center"><a class="btn btn--light" href="#contact">Get in touch</a><a class="btn btn--ghost-light" href="/our-story/">Learn about us</a></div></div></section>
 <section class="section section--tight"><div class="container container--narrow center stack">
   <span class="label muted">Global presence</span><h2 class="h1">Rooted in Africa, <em class="italic">positioned for the world</em></h2>
   <p class="lead" style="margin-inline:auto">Unlike traditional companies, CNM Group is built as an ecosystem of excellence, where each business strengthens the other — enabling growth, resilience, and long-term sustainability.</p>

@@ -3,6 +3,11 @@
 Expo (SDK 57, React Native 0.86, TypeScript, Expo Router) client for the same
 Netlify API as the website (`../docs/API.md`).
 
+Brand palette (sampled from the original logo, `src/theme.ts`): charcoal `#23221e`
+(primary / dark sections), sage `#d3dbce`, yellow `#fbcc39` (accent: primary CTAs on
+charcoal, badges, labels on dark), off-white `#f6f5f0`, lines `#e3e5de`. Type: Instrument
+Serif for headlines, Hanken Grotesk for UI.
+
 ```
 mobile/
   app.json, eas.json          Expo + EAS config (bundle ids, deep links, plugins)
@@ -145,14 +150,34 @@ if you want links to verify on internal/preview builds).
 
 ## How it behaves
 
-- **Catalogue**: `GET /catalogue.json` merged with `GET /api/catalogue/live`; cached in
-  AsyncStorage; falls back to the bundled copy in `src/data/` when offline. Skeletons
-  show only on a first launch with no cache.
-- **Honesty rules**: product fields that are `null` render "Details awaiting CNM
-  approval" (Ingredients is hidden entirely unless supplied). Prices show a "Demo price"
-  tag while `price.demo` is true. Empty `images` render a cream "CNM · Photography
-  awaiting CNM approval" tile. Store addresses, returns policy and FAQs follow the same
-  rule. No copy is invented.
+- **Catalogue**: CNM's real range (20 products from cnmessentials.com: Victoria's Secret,
+  Bath & Body Works and Febreze room sprays, Wallflowers and odour eliminators).
+  `GET /catalogue.json` is merged with `GET /api/catalogue/live`, cached in AsyncStorage,
+  and falls back to the bundled copy in `src/data/` when offline. Skeletons show only on
+  a first launch with no cache. Cards and the product page show brand and product type
+  ("Victoria's Secret · Room Spray"). Packshots load from the website
+  (`images[].src`, resolved against `EXPO_PUBLIC_API_BASE_URL`).
+- **Money** is Naira and may carry kobo: `₦17,850`, `₦14,888.75`. Local estimates round
+  to the kobo; the server quote is authoritative.
+- **Stock**: `stock.quantity: null` means CNM doesn't publish stock. Those items can be
+  ordered (up to `maxQtyPerLine`) and show "Availability to be confirmed". A known
+  quantity of 0 or `available: false` means out of stock (with a back-in-stock form).
+- **Categories**: Home "Shop by category" uses each category's `banner` (campaign image
+  from the website). Categories with no products are hidden unless `showWhenEmpty`, in
+  which case they show "Coming soon online — visit our stores" (Hair Care and Body Care
+  today; Beverages stays hidden).
+- **Shop filters**: category, brand, price bands (worked out from real prices), available
+  to order; New / Best sellers toggles only appear when products carry those flags.
+- **Home** follows the website: charcoal hero with the original logo and the site's own
+  copy, category banners, room sprays & odour eliminators rail, Wallflowers rail, shop
+  by brand, Lease-to-Own Programme teaser with key products, the four promises, Lagos
+  and Abuja stores with real addresses, and the "Stay in the Loop" newsletter
+  (`POST /api/newsletter`).
+- **Honesty rules**: product fields that are `null` (description, notes, how to use,
+  size, care, FAQs) render "Details awaiting CNM approval" (Ingredients is hidden
+  entirely unless supplied). The "Demo price" tag appears only while `price.demo` is true
+  (it's false for all live products). A product without images gets a "CNM · Photography
+  awaiting CNM approval" tile. No copy is invented.
 - **Bag & checkout**: totals always come from `POST /api/checkout/quote` (a labelled
   estimate is shown only while it loads / if it fails). Checkout: Contact → Delivery →
   Payment → Review → Confirmation. Paystack opens in an auth session
@@ -176,13 +201,14 @@ if you want links to verify on internal/preview builds).
 
 | Item | Where | Status |
 | --- | --- | --- |
-| **Original CNM logo** | `assets/brand/cnm-logo.png` → `src/components/logo.tsx` | **BLOCKED** — CNM must supply the file; it is never redrawn. A typographic "CNM ESSENTIALS" wordmark (flagged "logo placeholder" in dev builds) is shown until then. |
-| App icon & splash | `assets/images/icon.png`, `adaptive-icon.png`, `splash-icon.png` | Plain brand-green / transparent placeholders. Replace with artwork made from the official logo. |
+| Logo master files | `assets/brand/cnm-logo.png` (full, 702×801), `assets/brand/cnm-mark.png` (petal mark, 300×300) | The original CNM artwork, copied from the website (cropped from cnm-group.net), used by `<Logo variant="full" \| "mark" />`. Never redrawn. Swap in higher-resolution masters from CNM at the same paths when available. |
+| App icon & splash | `assets/images/icon.png`, `adaptive-icon.png`, `splash-icon.png` | Built from `cnm-mark.png`: the mark's dark background is keyed out and the original petal pixels placed on flat charcoal `#23221e`, because the source is only 300 px (upscaled to 680 px in the 1024 icon). Regenerate from a vector master before store release. |
 | Bundle id / package `com.cnmessentials.app` | `app.json` | **NEEDS CNM APPROVAL** — cannot be changed after the first store release. |
 | App name "CNM Essentials", store listing, developer accounts (Apple team, Play console) | `app.json`, `eas.json` | Needs CNM |
-| Product descriptions, notes, ingredients, sizes, care, FAQs, photography | `../content/products.json` | Needs CNM |
-| Prices, stock, delivery fees, VAT treatment, returns policy, payment provider | `../content/commerce.json` | Demo values — needs CNM |
-| Hero / FaaS copy, store addresses & hours | `../content/site.json`, `services.json`, `stores.json` | Needs CNM |
+| Product descriptions, notes, ingredients, sizes, care, FAQs | `../content/products.json` | Needs CNM (names, brands, prices and images come from the live site) |
+| Stock levels | `../content/products.json` (`stock.quantity: null`) | Not published — orders show "Availability to be confirmed" |
+| Delivery fees, VAT treatment, returns policy, payment provider (site lists Visa / Mastercard / PayPal; app flow is built for Paystack) | `../content/commerce.json` | Demo values — needs CNM |
+| Store opening hours, WhatsApp / Instagram links, Hair Care & Body Care ranges | `../content/stores.json`, `site.json`, `categories.json` | Needs CNM |
 | Apple Team ID + Play signing fingerprint for `.well-known` files | website | Needs CNM accounts |
 
 After CNM updates `../content/*.json`, run `npm run sync-content` so the offline
