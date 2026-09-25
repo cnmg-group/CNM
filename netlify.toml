@@ -1,0 +1,18 @@
+# CNM Essentials — Netlify configuration (base directory: cnm-essentials)
+[build]
+  command = "npm ci && npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["content/**"]
+
+# Staging/preview deploys are never indexed; production is indexed only when CNM_LAUNCH_APPROVED=true.
+[context.deploy-preview.environment]
+  CNM_LAUNCH_APPROVED = "false"
+[context.branch-deploy.environment]
+  CNM_LAUNCH_APPROVED = "false"

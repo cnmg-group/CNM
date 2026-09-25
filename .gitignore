@@ -1,0 +1,6 @@
+.data/
+dist/
+node_modules/
+test-results/
+playwright-report/
+.data-e2e/

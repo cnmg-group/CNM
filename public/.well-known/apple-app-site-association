@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["APPLE_TEAM_ID.com.cnmessentials.app"],
+        "components": [
+          { "/": "/products/*", "comment": "Product detail" },
+          { "/": "/shop/*", "comment": "Category listing" },
+          { "/": "/account/orders/*", "comment": "Order detail" }
+        ]
+      }
+    ]
+  }
+}

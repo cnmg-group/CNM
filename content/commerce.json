@@ -1,0 +1,18 @@
+{
+  "_note": "Commerce rules. Every monetary value here is a STAGING DEMO value (status NEEDS_CNM_APPROVAL). Amounts are in kobo-free whole Naira.",
+  "currency": "NGN",
+  "pricesIncludeVat": { "value": true, "status": "NEEDS_CNM_APPROVAL" },
+  "vatRate": { "value": 0.075, "status": "NEEDS_CNM_APPROVAL", "note": "Nigerian VAT standard rate; confirm treatment with CNM finance." },
+  "deliveryMethods": [
+    { "id": "lagos-standard", "label": "Lagos delivery", "eta": "1–2 business days", "fee": 3500, "freeOver": 150000, "regions": ["Lagos"], "status": "NEEDS_CNM_APPROVAL" },
+    { "id": "abuja-standard", "label": "Abuja delivery", "eta": "1–3 business days", "fee": 4500, "freeOver": 150000, "regions": ["FCT"], "status": "NEEDS_CNM_APPROVAL" },
+    { "id": "nationwide", "label": "Nationwide delivery", "eta": "3–7 business days", "fee": 8000, "freeOver": null, "regions": ["*"], "status": "NEEDS_CNM_APPROVAL" },
+    { "id": "store-pickup", "label": "Collect in store", "eta": "Ready when we notify you", "fee": 0, "freeOver": null, "regions": ["Lagos", "FCT"], "status": "NEEDS_CNM_APPROVAL" }
+  ],
+  "discounts": [
+    { "code": "STAGING10", "type": "percent", "value": 10, "active": true, "minSubtotal": 0, "note": "Staging-only demo code. Remove before launch." }
+  ],
+  "paymentProvider": { "value": "paystack", "status": "NEEDS_CNM_APPROVAL", "note": "Paystack is recommended for NGN card, bank transfer and USSD. Confirm CNM's approved provider/merchant account." },
+  "returns": { "value": null, "status": "NEEDS_CNM_APPROVAL" },
+  "maxQtyPerLine": 10
+}

@@ -1,0 +1,376 @@
+[
+  {
+    "id": "signature-diffuser-oil",
+    "slug": "signature-diffuser-oil",
+    "name": "Signature Diffuser Oil",
+    "brand": "CNM Essentials",
+    "category": "diffuser-oils",
+    "collections": [],
+    "productType": "Diffuser oil",
+    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 28000,
+      "compareAt": null,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "stock": {
+      "quantity": 24,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "images": [],
+    "video": null,
+    "badges": [],
+    "isNew": true,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "refill-oil",
+      "smart-scent-machine"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "NEEDS_CNM_APPROVAL"
+  },
+  {
+    "id": "smart-scent-machine",
+    "slug": "smart-scent-machine",
+    "name": "Smart Scent Machine",
+    "brand": "CNM Essentials",
+    "category": "smart-scent-machines",
+    "collections": [],
+    "productType": "Scent machine",
+    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 185000,
+      "compareAt": null,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "stock": {
+      "quantity": 6,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "images": [],
+    "video": null,
+    "badges": [],
+    "isNew": true,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "signature-diffuser-oil",
+      "refill-oil"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "NEEDS_CNM_APPROVAL"
+  },
+  {
+    "id": "body-butter",
+    "slug": "body-butter",
+    "name": "Body Butter",
+    "brand": "CNM Essentials",
+    "category": "body-care",
+    "collections": [],
+    "productType": "Body butter",
+    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 18500,
+      "compareAt": null,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "stock": {
+      "quantity": 30,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "images": [],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "body-wash"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "NEEDS_CNM_APPROVAL"
+  },
+  {
+    "id": "stoneglow-reed-diffuser",
+    "slug": "stoneglow-reed-diffuser",
+    "name": "Stoneglow Reed Diffuser",
+    "brand": "CNM Essentials",
+    "category": "home-fragrance",
+    "collections": [
+      "stoneglow"
+    ],
+    "productType": "Reed diffuser",
+    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 42000,
+      "compareAt": null,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "stock": {
+      "quantity": 12,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "images": [],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": true,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "home-fragrance",
+      "signature-diffuser-oil"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "NEEDS_CNM_APPROVAL"
+  },
+  {
+    "id": "car-diffuser",
+    "slug": "car-diffuser",
+    "name": "Car Diffuser",
+    "brand": "CNM Essentials",
+    "category": "car-fragrance",
+    "collections": [],
+    "productType": "Car diffuser",
+    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 15000,
+      "compareAt": null,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "stock": {
+      "quantity": 0,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "images": [],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "signature-diffuser-oil"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "NEEDS_CNM_APPROVAL"
+  },
+  {
+    "id": "body-wash",
+    "slug": "body-wash",
+    "name": "Body Wash",
+    "brand": "CNM Essentials",
+    "category": "body-care",
+    "collections": [],
+    "productType": "Body wash",
+    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 14500,
+      "compareAt": null,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "stock": {
+      "quantity": 40,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "images": [],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "body-butter"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "NEEDS_CNM_APPROVAL"
+  },
+  {
+    "id": "refill-oil",
+    "slug": "refill-oil",
+    "name": "Refill Oil",
+    "brand": "CNM Essentials",
+    "category": "refill-oils",
+    "collections": [],
+    "productType": "Refill oil",
+    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 22000,
+      "compareAt": null,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "stock": {
+      "quantity": 50,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "images": [],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": true,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "signature-diffuser-oil",
+      "smart-scent-machine"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "NEEDS_CNM_APPROVAL"
+  },
+  {
+    "id": "home-fragrance",
+    "slug": "home-fragrance",
+    "name": "Home Fragrance",
+    "brand": "CNM Essentials",
+    "category": "home-fragrance",
+    "collections": [],
+    "productType": "Home fragrance",
+    "nameStatus": "PROVIDED_BY_CNM_PROTOTYPE",
+    "description": null,
+    "scentFamily": null,
+    "scentNotes": null,
+    "ingredients": null,
+    "howToUse": null,
+    "size": null,
+    "care": null,
+    "faqs": [],
+    "variants": [],
+    "price": {
+      "amount": 25000,
+      "compareAt": null,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "stock": {
+      "quantity": 3,
+      "status": "NEEDS_CNM_APPROVAL",
+      "demo": true
+    },
+    "images": [],
+    "video": null,
+    "badges": [],
+    "isNew": false,
+    "isBestSeller": false,
+    "flagsStatus": "NEEDS_CNM_APPROVAL",
+    "related": [
+      "stoneglow-reed-diffuser"
+    ],
+    "seo": {
+      "title": null,
+      "description": null
+    },
+    "gtin": null,
+    "mpn": null,
+    "contentStatus": "NEEDS_CNM_APPROVAL"
+  }
+]

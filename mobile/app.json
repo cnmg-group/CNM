@@ -1,0 +1,91 @@
+{
+  "expo": {
+    "name": "CNM Essentials",
+    "slug": "cnm-essentials",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "cnm",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#f5f1e8",
+    "primaryColor": "#153f32",
+    "ios": {
+      "bundleIdentifier": "com.cnmessentials.app",
+      "buildNumber": "1",
+      "supportsTablet": true,
+      "associatedDomains": [
+        "applinks:cnmessentials.com",
+        "applinks:www.cnmessentials.com"
+      ],
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "CNM Essentials uses Face ID to keep your account private when you open the app.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.cnmessentials.app",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#153f32",
+        "foregroundImage": "./assets/images/adaptive-icon.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "category": ["BROWSABLE", "DEFAULT"],
+          "data": [
+            { "scheme": "https", "host": "cnmessentials.com", "pathPrefix": "/products/" },
+            { "scheme": "https", "host": "cnmessentials.com", "pathPrefix": "/shop/" },
+            { "scheme": "https", "host": "cnmessentials.com", "pathPrefix": "/account/orders/" },
+            { "scheme": "https", "host": "www.cnmessentials.com", "pathPrefix": "/products/" },
+            { "scheme": "https", "host": "www.cnmessentials.com", "pathPrefix": "/shop/" },
+            { "scheme": "https", "host": "www.cnmessentials.com", "pathPrefix": "/account/orders/" }
+          ]
+        }
+      ]
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-secure-store",
+      "expo-web-browser",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#f5f1e8",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 120
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "CNM Essentials uses Face ID to keep your account private when you open the app."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#153f32"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    },
+    "extra": {
+      "router": {},
+      "eas": {}
+    }
+  }
+}

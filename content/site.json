@@ -1,0 +1,36 @@
+{
+  "_note": "Single source of truth for brand-level facts. Any value under `approval` with status NEEDS_CNM_APPROVAL must be confirmed by CNM before production launch.",
+  "name": "CNM Essentials",
+  "legalName": { "value": null, "status": "NEEDS_CNM_APPROVAL" },
+  "productionUrl": "https://cnmessentials.com",
+  "groupUrl": "https://www.cnm-group.net",
+  "tagline": { "value": "The art of atmosphere", "status": "NEEDS_CNM_APPROVAL", "source": "Netlify prototype supplied by CNM" },
+  "heroHeadline": { "value": "Scent your space.", "status": "NEEDS_CNM_APPROVAL", "source": "Netlify prototype supplied by CNM" },
+  "heroLead": { "value": "Home fragrance, body care and intelligent scenting.", "status": "NEEDS_CNM_APPROVAL", "source": "Adapted from Netlify prototype" },
+  "country": "NG",
+  "currency": "NGN",
+  "locale": "en-NG",
+  "contact": {
+    "email": { "value": null, "status": "NEEDS_CNM_APPROVAL" },
+    "phone": { "value": null, "status": "NEEDS_CNM_APPROVAL" },
+    "whatsapp": { "value": null, "status": "NEEDS_CNM_APPROVAL" }
+  },
+  "social": [
+    { "network": "Instagram", "url": null, "status": "NEEDS_CNM_APPROVAL" },
+    { "network": "TikTok", "url": null, "status": "NEEDS_CNM_APPROVAL" },
+    { "network": "Facebook", "url": null, "status": "NEEDS_CNM_APPROVAL" }
+  ],
+  "logo": {
+    "file": "/assets/brand/cnm-logo.svg",
+    "status": "BLOCKED",
+    "note": "The ORIGINAL CNM logo file must be supplied by CNM and placed at public/assets/brand/cnm-logo.svg (or .png, update `file`). Until then a clearly labelled placeholder wordmark is rendered. The logo is never redrawn."
+  },
+  "group": {
+    "_note": "CNM Group divisions as described by CNM: Energy, Retail, Impact. Retail routes to this e-commerce site.",
+    "divisions": [
+      { "key": "energy", "name": "CNM Energy", "summary": null, "url": null, "status": "NEEDS_CNM_APPROVAL" },
+      { "key": "retail", "name": "CNM Retail", "summary": "Home fragrance, body care and intelligent scenting through CNM Essentials.", "url": "/", "status": "NEEDS_CNM_APPROVAL" },
+      { "key": "impact", "name": "CNM Impact", "summary": null, "url": null, "status": "NEEDS_CNM_APPROVAL" }
+    ]
+  }
+}

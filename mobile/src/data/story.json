@@ -1,0 +1,9 @@
+{
+  "headline": { "value": "Everyday spaces should feel like somewhere you can truly rest.", "status": "NEEDS_CNM_APPROVAL", "source": "Netlify prototype supplied by CNM" },
+  "intro": { "value": null, "status": "NEEDS_CNM_APPROVAL", "note": "Official company story to be supplied by CNM. Do not rewrite into fictional marketing copy." },
+  "founder": { "name": null, "title": null, "portrait": null, "quote": null, "status": "NEEDS_CNM_APPROVAL" },
+  "philosophy": { "brand": null, "founder": null, "status": "NEEDS_CNM_APPROVAL" },
+  "roots": { "value": "A Nigerian brand, with stores in Lagos and Abuja.", "status": "NEEDS_CNM_APPROVAL", "source": "CNM build brief" },
+  "timeline": [],
+  "timelineStatus": "NEEDS_CNM_APPROVAL"
+}

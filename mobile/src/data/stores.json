@@ -1,0 +1,18 @@
+[
+  {
+    "slug": "lagos", "city": "Lagos", "name": "CNM Essentials Lagos", "region": "Lagos", "country": "NG",
+    "cityStatus": "PROVIDED_BY_CNM_BRIEF",
+    "address": null, "postalCode": null, "geo": null, "phone": null, "email": null,
+    "hours": null, "services": ["In-store shopping", "Collect in store", "Fragrance as a Service consultations"],
+    "servicesStatus": "NEEDS_CNM_APPROVAL", "images": [], "mapQuery": "CNM Essentials Lagos",
+    "verified": false, "status": "NEEDS_CNM_APPROVAL"
+  },
+  {
+    "slug": "abuja", "city": "Abuja", "name": "CNM Essentials Abuja", "region": "FCT", "country": "NG",
+    "cityStatus": "PROVIDED_BY_CNM_BRIEF",
+    "address": null, "postalCode": null, "geo": null, "phone": null, "email": null,
+    "hours": null, "services": ["In-store shopping", "Collect in store", "Fragrance as a Service consultations"],
+    "servicesStatus": "NEEDS_CNM_APPROVAL", "images": [], "mapQuery": "CNM Essentials Abuja",
+    "verified": false, "status": "NEEDS_CNM_APPROVAL"
+  }
+]
