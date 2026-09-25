@@ -30,8 +30,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/midnight-vanilla-room-spray.png",
-        "alt": "Victoria's Secret Midnight Vanilla room spray"
+        "src": "/assets/products/midnight-vanilla-room-spray.webp",
+        "alt": "Victoria's Secret Midnight Vanilla room spray",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -85,8 +87,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/love-stoned-room-spray.png",
-        "alt": "Victoria's Secret Love Stoned room spray"
+        "src": "/assets/products/love-stoned-room-spray.webp",
+        "alt": "Victoria's Secret Love Stoned room spray",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -140,8 +144,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/petalrich-room-spray.png",
-        "alt": "Victoria's Secret Petalrich room spray"
+        "src": "/assets/products/petalrich-room-spray.webp",
+        "alt": "Victoria's Secret Petalrich room spray",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -195,8 +201,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/that-paris-hotel-room-spray.png",
-        "alt": "Victoria's Secret That Paris Hotel room spray"
+        "src": "/assets/products/that-paris-hotel-room-spray.webp",
+        "alt": "Victoria's Secret That Paris Hotel room spray",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -250,8 +258,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/rose-bohemian-room-spray.png",
-        "alt": "Victoria's Secret Rose Bohemian room spray"
+        "src": "/assets/products/rose-bohemian-room-spray.webp",
+        "alt": "Victoria's Secret Rose Bohemian room spray",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -305,8 +315,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/crushed-room-spray.png",
-        "alt": "Victoria's Secret Crushed room spray"
+        "src": "/assets/products/crushed-room-spray.webp",
+        "alt": "Victoria's Secret Crushed room spray",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -360,8 +372,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/all-dressed-up-room-spray.png",
-        "alt": "Victoria's Secret All Dressed Up room spray"
+        "src": "/assets/products/all-dressed-up-room-spray.webp",
+        "alt": "Victoria's Secret All Dressed Up room spray",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -415,8 +429,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/nurses-day-off-wallflower-refill.png",
-        "alt": "Bath & Body Works Nurses Day Off wallflower refill"
+        "src": "/assets/products/nurses-day-off-wallflower-refill.webp",
+        "alt": "Bath & Body Works Nurses Day Off wallflower refill",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -465,8 +481,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/pumpkin-bonfire-room-spray.png",
-        "alt": "Bath & Body Works Pumpkin Bonfire room spray"
+        "src": "/assets/products/pumpkin-bonfire-room-spray.webp",
+        "alt": "Bath & Body Works Pumpkin Bonfire room spray",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -520,8 +538,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/wallflower-socket-gray-wallflower-plug-in.png",
-        "alt": "Bath & Body Works Wallflower Socket Gray wallflower plug-in"
+        "src": "/assets/products/wallflower-socket-gray-wallflower-plug-in.webp",
+        "alt": "Bath & Body Works Wallflower Socket Gray wallflower plug-in",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -570,8 +590,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/warm-ocean-breeze-wallflower-plug-in-refill.png",
-        "alt": "Bath & Body Works Warm Ocean Breeze wallflower plug-in refill"
+        "src": "/assets/products/warm-ocean-breeze-wallflower-plug-in-refill.webp",
+        "alt": "Bath & Body Works Warm Ocean Breeze wallflower plug-in refill",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -625,8 +647,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/watermelon-lemonade-wallflower-plug-in-refill.png",
-        "alt": "Bath & Body Works Watermelon Lemonade wallflower plug-in refill"
+        "src": "/assets/products/watermelon-lemonade-wallflower-plug-in-refill.webp",
+        "alt": "Bath & Body Works Watermelon Lemonade wallflower plug-in refill",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -680,8 +704,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/white-jasmine-odour-eliminator.png",
-        "alt": "Febreze White Jasmine odour eliminator"
+        "src": "/assets/products/white-jasmine-odour-eliminator.webp",
+        "alt": "Febreze White Jasmine odour eliminator",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -733,8 +759,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/white-tea-and-sage-room-spray.png",
-        "alt": "Bath & Body Works White Tea & Sage room spray"
+        "src": "/assets/products/white-tea-and-sage-room-spray.webp",
+        "alt": "Bath & Body Works White Tea & Sage room spray",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -788,8 +816,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/sugarplum-delight-odour-eliminator.png",
-        "alt": "Febreze Sugarplum Delight odour eliminator"
+        "src": "/assets/products/sugarplum-delight-odour-eliminator.webp",
+        "alt": "Febreze Sugarplum Delight odour eliminator",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -841,8 +871,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/sun-kissed-santa-wallflower-plug-in-refill.png",
-        "alt": "Bath & Body Works Sun Kissed Santa wallflower plug-in refill"
+        "src": "/assets/products/sun-kissed-santa-wallflower-plug-in-refill.webp",
+        "alt": "Bath & Body Works Sun Kissed Santa wallflower plug-in refill",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -896,8 +928,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/sun-kissed-vanilla-odour-eliminator.png",
-        "alt": "Bath & Body Works Sun Kissed Vanilla odour eliminator"
+        "src": "/assets/products/sun-kissed-vanilla-odour-eliminator.webp",
+        "alt": "Bath & Body Works Sun Kissed Vanilla odour eliminator",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -950,8 +984,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/sweet-pea-wallflower-plug-in-refill.png",
-        "alt": "Bath & Body Works Sweet Pea wallflower plug-in refill"
+        "src": "/assets/products/sweet-pea-wallflower-plug-in-refill.webp",
+        "alt": "Bath & Body Works Sweet Pea wallflower plug-in refill",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -1005,8 +1041,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/the-perfect-christmas-wallflower-plug-in-refill.png",
-        "alt": "Bath & Body Works The Perfect Christmas wallflower plug-in refill"
+        "src": "/assets/products/the-perfect-christmas-wallflower-plug-in-refill.webp",
+        "alt": "Bath & Body Works The Perfect Christmas wallflower plug-in refill",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,
@@ -1060,8 +1098,10 @@
     },
     "images": [
       {
-        "src": "/assets/products/the-perfect-christmas-room-spray.png",
-        "alt": "Bath & Body Works The Perfect Christmas room spray"
+        "src": "/assets/products/the-perfect-christmas-room-spray.webp",
+        "alt": "Bath & Body Works The Perfect Christmas room spray",
+        "width": 495,
+        "height": 660
       }
     ],
     "video": null,

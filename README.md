@@ -4,6 +4,8 @@ Editorial brand site, luxury e-commerce, customer accounts, admin/operations, AP
 
 > **Staging build.** The original CNM logo, the 20 products, prices, photography, campaign banners, store addresses and copy come from cnmessentials.com and cnm-group.net. Anything not yet confirmed (stock, delivery fees, founder story, opening hours) is marked **Needs CNM approval**; nothing has been invented. Import the rest of the catalogue with `scripts/import-catalogue.mjs` (see `PROGRESS.md`).
 
+**New here? Read [`START-HERE.md`](START-HERE.md) first.** It's a one-page checklist of what's built, how to see it, and what CNM needs to send.
+
 ## Quick start
 ```bash
 cd cnm-essentials

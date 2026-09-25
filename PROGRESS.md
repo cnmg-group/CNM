@@ -10,9 +10,9 @@ CNM supplied screenshots of **cnmessentials.com** (home, shop, about) and **cnm-
 
 | Item | Status | Source |
 | --- | --- | --- |
-| Original CNM Essentials logo (header, footer, admin, favicon, structured data) | **DONE** | Cropped from cnm-group.net; not redrawn. Replace with the master vector file for maximum sharpness. |
+| Original CNM Essentials logo (header, footer, admin, favicon, structured data, app icon) | **DONE** | Crystal-clear vector (SVG) redraw of the original, matched against cnm-group.net, made with CNM's approval. Master artwork can still replace it. |
 | CNM Group logo, CNM Spectra, CNMWorX and CNM Foundation logos | **DONE** | cnm-group.net |
-| 20 products: names, product types, brands, prices (incl. kobo), photos | **DONE** | cnmessentials.com/shop |
+| 20 products: names, product types, brands, prices (incl. kobo), photos | **DONE** | cnmessentials.com/shop. Photos enhanced about 3× with AI super-resolution; original files are still needed for full clarity. |
 | Categories: Room & Home Fragrance, Diffusers & Refills, Body Care, Hair Care (+ Beverages, hidden until stocked) | **DONE** | cnmessentials.com |
 | Campaign banners (Room & Home Fragrance, Diffusers & Refills, Body Care, Hair Care, Vitamin C Brightening Body Wash) | **DONE** | cnmessentials.com home |
 | Store interior photograph | **DONE** | cnmessentials.com About. Which store it shows **NEEDS CNM APPROVAL**. |
@@ -34,7 +34,7 @@ CNM supplied screenshots of **cnmessentials.com** (home, shop, about) and **cnm-
 | Founder name, portrait and personal story; dated milestones | **NEEDS CNM APPROVAL** | `content/story.json` |
 | Instagram and WhatsApp links | **NEEDS CNM APPROVAL** | Icons exist on the live site; URLs not visible in the screenshots |
 | Delivery fees, returns policy, VAT treatment, payment provider (the live site lists Visa, Mastercard and PayPal) | **NEEDS CNM APPROVAL** | `content/commerce.json`; Paystack is integrated and ready |
-| Master logo files (SVG) | **NEEDS CNM APPROVAL** | For print-sharp rendering and app icons |
+| Original product photo files | **NEEDS CNM APPROVAL** | Replace the enhanced screenshot crops for full clarity |
 | Apple and Google developer accounts | **NEEDS CNM APPROVAL** | `mobile/README.md` |
 
 ## Workstreams

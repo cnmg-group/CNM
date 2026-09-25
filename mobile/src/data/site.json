@@ -51,9 +51,9 @@
     }
   ],
   "logo": {
-    "file": "/assets/brand/cnm-logo.png",
-    "status": "FROM_CNM_GROUP_SITE",
-    "note": "Cropped from the CNM Essentials logo shown on cnm-group.net (original artwork, not redrawn). Replace with the master vector file for maximum sharpness."
+    "file": "/assets/brand/cnm-logo.svg",
+    "status": "VECTOR_REDRAW_APPROVED_BY_CNM",
+    "note": "Vector (SVG) redraw of the original CNM Essentials logo, matched against the logo on cnm-group.net and approved for use by CNM. PNG renders: cnm-logo.png (1404x1602), cnm-mark.png (1024x1024). Replace with the master artwork file if one exists. Regenerate with scripts/brand/make-logo.mjs."
   },
   "group": {
     "name": "CNM Group",
@@ -74,12 +74,12 @@
         "Business entities"
       ],
       [
-        "3",
-        "Divisions"
-      ],
-      [
         "2",
         "Countries"
+      ],
+      [
+        "ISO",
+        "9001:2015 certified"
       ]
     ],
     "contact": {
@@ -96,7 +96,7 @@
           {
             "name": "CNM Essentials",
             "tagline": "Pure. Natural. Purposeful.",
-            "logo": "/assets/brand/cnm-logo.png",
+            "logo": "/assets/brand/cnm-logo.svg",
             "url": "/",
             "internal": true
           },
@@ -135,6 +135,185 @@
             "url": "https://www.cnm-group.net",
             "text": "Education, women's economic empowerment, youth development and community health across Nigeria and the African diaspora."
           }
+        ]
+      }
+    ],
+    "ecosystem": {
+      "title": "A Unified Ecosystem of Excellence",
+      "text": "Our strength lies in our diversity — a family of companies operating across lifestyle, engineering, and social impact sectors. Each company operates independently but is united by a shared vision: to deliver excellence while transforming lives.",
+      "pills": [
+        "Lifestyle & Retail",
+        "Engineering & Energy",
+        "Social Impact"
+      ],
+      "image": "/assets/brand/cnm-group-reception.jpg",
+      "locations": [
+        [
+          "Lagos, Nigeria",
+          "Group Headquarters · CNM Essentials · CNMWorX"
+        ],
+        [
+          "Abuja, Nigeria",
+          "CNM Essentials Abuja · Garki Area 11"
+        ],
+        [
+          "Dallas, Texas",
+          "US Operations & Diaspora Engagement"
+        ]
+      ],
+      "status": "FROM_CNM_GROUP_SITE"
+    },
+    "companiesIntro": {
+      "title": "Four Businesses. One Vision.",
+      "text": "CNM Group is a diversified conglomerate operating across lifestyle, engineering, and social impact — united by a shared commitment to excellence, innovation, and lasting purpose.",
+      "status": "FROM_CNM_GROUP_SITE"
+    },
+    "profiles": [
+      {
+        "name": "CNM Essentials",
+        "sector": "Lifestyle & Wellness",
+        "tagline": "Pure. Natural. Purposeful.",
+        "logo": "/assets/brand/cnm-logo.svg",
+        "url": "/",
+        "internal": true,
+        "text": "A premium lifestyle brand offering luxury fragrances, home décor, and body care products crafted for the intentional woman and the discerning home. CNM Essentials is the fragrance and lifestyle destination for those who believe that how you live at home reflects who you are in the world.",
+        "lists": [
+          [
+            "Core activities",
+            [
+              "Luxury fragrance curation",
+              "Home décor & ambiance",
+              "Body care & wellness",
+              "Commercial diffuser leasing"
+            ]
+          ],
+          [
+            "Key products",
+            [
+              "Industrial Diffuser series",
+              "Wellbeing Essential Oils",
+              "Body butters & hair oils",
+              "Candles, mists & humidifiers"
+            ]
+          ]
+        ],
+        "value": "Purpose-crafted luxury for modern living — combining natural ingredients, artisanal quality, and a deep sense of intentionality that transforms everyday rituals into meaningful experiences.",
+        "card": [
+          "Lease-to-Own Programme",
+          "Commercial diffuser solutions for businesses"
+        ],
+        "places": [
+          "Lagos",
+          "Abuja"
+        ]
+      },
+      {
+        "name": "CNM Spectra",
+        "sector": "Eyewear & Vision",
+        "tagline": "See clearly. Look extraordinary.",
+        "logo": "/assets/brand/cnm-spectra-logo.jpg",
+        "url": "https://www.cnm-group.net",
+        "text": "A premium eyewear brand redefining how Africans see the world. CNM Spectra offers an expertly curated range of prescription frames, sunglasses, contact lenses, and accessories that merge optical precision with contemporary style — serving the style-conscious professional who refuses to compromise on quality or visual clarity.",
+        "lists": [
+          [
+            "Core activities",
+            [
+              "Prescription eyewear",
+              "Sunglasses & fashion frames",
+              "Contact lens solutions",
+              "Eyewear accessories"
+            ]
+          ],
+          [
+            "Industry focus",
+            [
+              "Optical retail & optometry",
+              "Fashion & lifestyle accessories",
+              "Professional visual health"
+            ]
+          ]
+        ],
+        "value": "Precision optics tailored for the African market — where how you see the world matters just as much as how the world sees you. Premium quality without compromise.",
+        "card": [
+          "Prescription & Fashion Eyewear",
+          "Precision optics meet contemporary style"
+        ],
+        "places": [
+          "Lagos",
+          "Abuja"
+        ]
+      },
+      {
+        "name": "CNMWorX Limited",
+        "sector": "Engineering & Automation",
+        "tagline": "Engineering the future, one project at a time.",
+        "logo": "/assets/brand/cnmworx-logo.jpg",
+        "url": "https://www.cnm-group.net",
+        "text": "Registered in Nigeria in 2019 and ISO 9001:2015 certified, CNMWorX Limited is a preferred engineering and technical services company specialising in Industrial and Process Automation & Control, Instrumentation, Power Electronics, and ICT. Acting as a trusted System Integrator, CNMWorX delivers bespoke solutions to IOCs, Independent Oil Companies, and Industrial Services Companies across West and Central Africa.",
+        "lists": [
+          [
+            "Core activities",
+            [
+              "EPC project delivery",
+              "Automation & control systems",
+              "Instrumentation & power electronics",
+              "Lifecycle maintenance & O&M"
+            ]
+          ],
+          [
+            "Industry focus",
+            [
+              "Oil & gas engineering",
+              "Industrial automation",
+              "Power & energy systems",
+              "ICT & systems integration"
+            ]
+          ]
+        ],
+        "value": "ISO 9001:2015-certified engineering precision with a multidisciplinary team delivering weekly reporting, full project management flexibility, and truly tailor-made solutions — whether embedded in the client's organisation or managed end-to-end independently.",
+        "card": [
+          "Completed Client Engagements",
+          "Serving IOCs across West & Central Africa"
+        ],
+        "places": [
+          "ISO 9001:2015 Certified"
+        ]
+      },
+      {
+        "name": "CNM Foundation",
+        "fullName": "Chigozie Nkiruka Naeto Munachimso Foundation",
+        "sector": "Social Impact & Philanthropy",
+        "tagline": "Zero percent of zero is zero — so we give everything.",
+        "logo": "/assets/brand/cnm-foundation-logo.jpg",
+        "url": "https://www.cnm-group.net",
+        "text": "The social impact and philanthropic arm of CNM Group — a faith-rooted, community-driven organisation committed to education, women's economic empowerment, youth development, and community health across Nigeria and the African diaspora. Active for over five years through informal programmes, CNM Foundation is now formalising its reach — scaling impact, deepening partnerships, and amplifying its voice where it matters most.",
+        "lists": [
+          [
+            "Core activities",
+            [
+              "Education & literacy programmes",
+              "Women's economic empowerment",
+              "Youth development & skills training",
+              "Community health initiatives"
+            ]
+          ],
+          [
+            "Impact areas",
+            [
+              "Entrepreneurship training",
+              "Community health outreach",
+              "Skills & capacity building"
+            ]
+          ]
+        ],
+        "value": "Transformation begins where investment meets intentionality — every child deserves an education, every woman deserves an opportunity, and every community deserves to thrive.",
+        "card": [
+          "Faith-Rooted Social Impact",
+          "Active in Nigeria and the African diaspora"
+        ],
+        "places": [
+          "Lagos, Nigeria",
+          "African Diaspora Engagement"
         ]
       }
     ]

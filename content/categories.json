@@ -5,7 +5,7 @@
     "intro": null,
     "introStatus": "NEEDS_CNM_APPROVAL",
     "order": 1,
-    "banner": "/assets/campaign/room-home-fragrance.jpg",
+    "banner": "/assets/campaign/room-home-fragrance.webp",
     "showWhenEmpty": true,
     "status": "FROM_CNM_LIVE_SITE"
   },
@@ -15,7 +15,7 @@
     "intro": null,
     "introStatus": "NEEDS_CNM_APPROVAL",
     "order": 2,
-    "banner": "/assets/campaign/diffusers-refills.jpg",
+    "banner": "/assets/campaign/diffusers-refills.webp",
     "showWhenEmpty": true,
     "status": "FROM_CNM_LIVE_SITE"
   },
@@ -25,7 +25,7 @@
     "intro": null,
     "introStatus": "NEEDS_CNM_APPROVAL",
     "order": 3,
-    "banner": "/assets/campaign/body-care.jpg",
+    "banner": "/assets/campaign/body-care.webp",
     "showWhenEmpty": true,
     "status": "FROM_CNM_LIVE_SITE"
   },
@@ -35,7 +35,7 @@
     "intro": null,
     "introStatus": "NEEDS_CNM_APPROVAL",
     "order": 4,
-    "banner": "/assets/campaign/hair-care.jpg",
+    "banner": "/assets/campaign/hair-care.webp",
     "showWhenEmpty": true,
     "status": "FROM_CNM_LIVE_SITE"
   },

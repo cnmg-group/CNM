@@ -39,7 +39,7 @@ describe('catalogue', () => {
   });
 
   it('uses real images and drops placeholders', () => {
-    expect(productImages(real('midnight-vanilla-room-spray'))[0].src).toBe('/assets/products/midnight-vanilla-room-spray.png');
+    expect(productImages(real('midnight-vanilla-room-spray'))[0].src).toBe('/assets/products/midnight-vanilla-room-spray.webp');
     const p = { ...real('crushed-room-spray'), images: [{ src: '/a.jpg', alt: 'a', placeholder: true }, '/b.jpg'] };
     expect(productImages(p)).toEqual([{ src: '/b.jpg', alt: 'Crushed' }]);
     expect(absoluteUrl('https://x.netlify.app/', '/assets/p.png')).toBe('https://x.netlify.app/assets/p.png');

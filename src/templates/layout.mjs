@@ -188,7 +188,8 @@ ${noindex ? '<meta name="robots" content="noindex, nofollow">' : '<meta name="ro
 <meta property="og:image" content="${og}">
 <meta property="og:locale" content="en_NG">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/assets/brand/cnm-mark.png" type="image/png">
+<link rel="icon" href="/assets/brand/cnm-mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/brand/cnm-mark.png" type="image/png" sizes="1024x1024">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preload" href="/assets/fonts/hanken-grotesk-var.woff2" as="font" type="font/woff2" crossorigin>

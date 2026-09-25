@@ -51,9 +51,9 @@
     }
   ],
   "logo": {
-    "file": "/assets/brand/cnm-logo.png",
-    "status": "FROM_CNM_GROUP_SITE",
-    "note": "Cropped from the CNM Essentials logo shown on cnm-group.net (original artwork, not redrawn). Replace with the master vector file for maximum sharpness."
+    "file": "/assets/brand/cnm-logo.svg",
+    "status": "VECTOR_REDRAW_APPROVED_BY_CNM",
+    "note": "Vector (SVG) redraw of the original CNM Essentials logo, matched against the logo on cnm-group.net and approved for use by CNM. PNG renders: cnm-logo.png (1404x1602), cnm-mark.png (1024x1024). Replace with the master artwork file if one exists. Regenerate with scripts/brand/make-logo.mjs."
   },
   "group": {
     "name": "CNM Group",
@@ -96,7 +96,7 @@
           {
             "name": "CNM Essentials",
             "tagline": "Pure. Natural. Purposeful.",
-            "logo": "/assets/brand/cnm-logo.png",
+            "logo": "/assets/brand/cnm-logo.svg",
             "url": "/",
             "internal": true
           },
@@ -173,7 +173,7 @@
         "name": "CNM Essentials",
         "sector": "Lifestyle & Wellness",
         "tagline": "Pure. Natural. Purposeful.",
-        "logo": "/assets/brand/cnm-logo.png",
+        "logo": "/assets/brand/cnm-logo.svg",
         "url": "/",
         "internal": true,
         "text": "A premium lifestyle brand offering luxury fragrances, home décor, and body care products crafted for the intentional woman and the discerning home. CNM Essentials is the fragrance and lifestyle destination for those who believe that how you live at home reflects who you are in the world.",

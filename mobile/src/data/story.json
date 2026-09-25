@@ -77,7 +77,7 @@
     "status": "FROM_CNM_GROUP_SITE"
   },
   "image": {
-    "src": "/assets/stores/cnm-essentials-store-interior.jpg",
+    "src": "/assets/stores/cnm-essentials-store-interior.webp",
     "alt": "Inside a CNM Essentials store"
   }
 }

@@ -31,7 +31,7 @@ export function storyPage(ctx) {
   <div class="box" style="margin-top:16px"><span class="label">Key value proposition</span><p class="h3" style="font-family:var(--serif);font-weight:400;font-size:1.75rem;line-height:1.25">${escapeHtml(s.philosophy.brand)}</p></div>
 </div></section>
 <section class="split" aria-labelledby="founder-h">
-  <div class="split__media">${s.founder.portrait ? `<img src="${s.founder.portrait}" alt="${escapeHtml(s.founder.name || 'Founder')}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">` : `<img src="/assets/brand/cnm-logo.png" alt="CNM Essentials logo" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#23221e;padding:12%">`}</div>
+  <div class="split__media">${s.founder.portrait ? `<img src="${s.founder.portrait}" alt="${escapeHtml(s.founder.name || 'Founder')}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">` : `<img src="/assets/brand/cnm-logo.svg" alt="CNM Essentials logo" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#23221e;padding:12%">`}</div>
   <div class="split__copy">
     <span class="label muted">Founder-led</span>
     <h2 id="founder-h" class="h2">${escapeHtml(s.founder.name || 'Part of CNM Group')}</h2>
@@ -70,7 +70,7 @@ export function storePage(ctx, s) {
   const mapQ = encodeURIComponent(s.address ? `${s.address}, ${s.city}` : s.mapQuery);
   const body = `<div class="container">${html}</div>
 <section class="store-hero" aria-labelledby="store-h">
-  <div class="store-hero__media">${s.images?.[0] ? `<img src="${s.images[0].src}" alt="${escapeHtml(s.images[0].alt)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">${s.images[0].note ? `<div style="position:absolute;inset:auto 24px 24px">${approval(s.images[0].note)}</div>` : ''}` : `<img src="/assets/brand/cnm-logo.png" alt="" style="width:50%;max-width:280px"><div style="position:absolute;inset:auto 24px 24px">${approval(`Original ${s.city} store photography.`)}</div>`}</div>
+  <div class="store-hero__media">${s.images?.[0] ? `<img src="${s.images[0].src}" alt="${escapeHtml(s.images[0].alt)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">${s.images[0].note ? `<div style="position:absolute;inset:auto 24px 24px">${approval(s.images[0].note)}</div>` : ''}` : `<img src="/assets/brand/cnm-logo.svg" alt="" style="width:50%;max-width:280px"><div style="position:absolute;inset:auto 24px 24px">${approval(`Original ${s.city} store photography.`)}</div>`}</div>
   <div class="store-hero__copy">
     <span class="label muted">CNM Essentials</span>
     <h1 id="store-h" class="display" style="font-size:clamp(3.5rem,8vw,7rem)">${escapeHtml(s.city)}</h1>

@@ -23,7 +23,7 @@ test('home renders editorial story and navigates to shop', async ({ page }) => {
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
   await expect(page.locator('h1')).toContainText('Refresh Your Space.');
-  await expect(page.locator('.logo img').first()).toHaveAttribute('src', '/assets/brand/cnm-logo.png');
+  await expect(page.locator('.logo img').first()).toHaveAttribute('src', '/assets/brand/cnm-logo.svg');
   await page.locator('.hero__cta a', { hasText: 'Shop now' }).click();
   await expect(page).toHaveURL(/\/shop\/$/);
   await expect(page.locator('[data-grid] [data-product-card]:visible')).toHaveCount(20);

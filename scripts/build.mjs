@@ -89,7 +89,7 @@ await write('/', page({
   page: 'home', path: '/', header: 'overlay', body: homePage(ctx),
   description: 'CNM Essentials — home fragrance, diffuser oils, smart scent machines and body care. Shop online or visit us in Lagos and Abuja.',
   jsonld: [
-    { '@context': 'https://schema.org', '@type': 'Organization', name: 'CNM Essentials', url: siteUrl, ...(ctx.logoFile ? { logo: `${siteUrl}${ctx.logoFile}` } : {}), parentOrganization: { '@type': 'Organization', name: 'CNM Group', url: content.site.groupUrl }, sameAs: content.site.social.filter((s) => s.url).map((s) => s.url) },
+    { '@context': 'https://schema.org', '@type': 'Organization', name: 'CNM Essentials', url: siteUrl, ...(ctx.logoFile ? { logo: `${siteUrl}/assets/brand/cnm-logo.png` } : {}), parentOrganization: { '@type': 'Organization', name: 'CNM Group', url: content.site.groupUrl }, sameAs: content.site.social.filter((s) => s.url).map((s) => s.url) },
     { '@context': 'https://schema.org', '@type': 'WebSite', name: 'CNM Essentials', url: siteUrl, potentialAction: { '@type': 'SearchAction', target: `${siteUrl}/search/?q={search_term_string}`, 'query-input': 'required name=search_term_string' } },
   ],
 }), { priority: 1, changefreq: 'daily' });

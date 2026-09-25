@@ -34,7 +34,7 @@ export function homePage(ctx) {
         <a class="btn btn--ghost-light" href="/our-story/">Our story</a>
       </div>
     </div>
-    <a class="hero__feature" href="/shop/room-home-fragrance/" aria-label="Shop room and home fragrance"><img src="/assets/campaign/room-home-fragrance.jpg" alt="Room and home fragrance — CNM Essentials campaign" width="1094" height="1092" fetchpriority="high"></a>
+    <a class="hero__feature" href="/shop/room-home-fragrance/" aria-label="Shop room and home fragrance"><img src="/assets/campaign/room-home-fragrance.webp" alt="Room and home fragrance — CNM Essentials campaign" width="1094" height="1092" fetchpriority="high"></a>
   </div>
 </section>
 
@@ -54,7 +54,7 @@ export function homePage(ctx) {
 </section>
 
 <section class="split section--cream" aria-labelledby="diff-title">
-  <div class="split__media"><img src="/assets/campaign/diffusers-refills.jpg" alt="Diffusers and refills — CNM Essentials campaign" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>
+  <div class="split__media"><img src="/assets/campaign/diffusers-refills.webp" alt="Diffusers and refills — CNM Essentials campaign" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>
   <div class="split__copy reveal">
     <span class="label muted">Diffusers &amp; refills</span>
     <h2 id="diff-title" class="h1">The room, <em class="italic">remembered.</em></h2>
@@ -137,7 +137,7 @@ export function homePage(ctx) {
 <noscript><style>.reveal{opacity:1;transform:none}</style></noscript>`;
 }
 
-const ARTICLE_ART = ['/assets/campaign/room-home-fragrance.jpg', '/assets/campaign/diffusers-refills.jpg', '/assets/stores/cnm-essentials-store-interior.jpg'];
+const ARTICLE_ART = ['/assets/campaign/room-home-fragrance.webp', '/assets/campaign/diffusers-refills.webp', '/assets/stores/cnm-essentials-store-interior.webp'];
 export function articleCard(a, i = 0) {
   return `<article class="article-card"><a href="/journal/${a.slug}/">
     <div class="article-card__media"><img src="${a.image || ARTICLE_ART[i % 3]}" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>
