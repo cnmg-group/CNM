@@ -126,6 +126,29 @@ function overlays() {
     <p class="muted auth-dialog__small" data-signup-only hidden>By creating an account you agree to our <a class="textlink" href="/terms/">terms</a> and <a class="textlink" href="/privacy/">privacy notice</a>.</p>
   </form>
 </div>
+<div class="modal modal--quickview" id="quickview" role="dialog" aria-modal="true" aria-labelledby="qv-title" data-panel="quickview" hidden>
+  <button class="icon-btn modal__close" type="button" data-close aria-label="Close quick view">${icon('close')}</button>
+  <div class="qv" data-qv-body></div>
+</div>
+<div class="modal modal--newsletter" id="newsletter-pop" role="dialog" aria-modal="true" aria-labelledby="nlp-title" data-panel="newsletter-pop" hidden>
+  <button class="icon-btn modal__close" type="button" data-close aria-label="Close">${icon('close')}</button>
+  <div class="nlp">
+    <div class="nlp__art" aria-hidden="true"><img src="/assets/campaign/room-home-fragrance.webp" alt="" loading="lazy" width="1094" height="1090"></div>
+    <div class="nlp__copy">
+      <span class="label muted">CNM Essentials</span>
+      <h2 id="nlp-title" class="nlp__title">Be first to know</h2>
+      <p class="muted">New arrivals, restocks and in-store events in Lagos and Abuja. Unsubscribe any time.</p>
+      <form class="inline-form inline-form--pop" data-newsletter="popup" novalidate>
+        <label for="nl-pop" class="sr-only">Email address</label>
+        <input id="nl-pop" type="email" name="email" placeholder="Your email address" autocomplete="email" required>
+        <input type="hidden" name="consent" value="true">
+        <button type="submit">Subscribe</button>
+      </form>
+      <p class="nlp__fine">By subscribing you agree to receive marketing emails. See our <a class="textlink" href="/privacy/">privacy notice</a>.</p>
+      <button class="textlink muted nlp__no" type="button" data-close>No, thank you</button>
+    </div>
+  </div>
+</div>
 <div class="toast-region" aria-live="polite" data-toasts></div>
 <div class="cnm-loader" data-loader role="status" aria-live="polite" aria-hidden="true">
   <div>${butterflySVG()}<div class="cnm-loader__label">Loading</div></div>

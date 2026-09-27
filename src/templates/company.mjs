@@ -15,19 +15,19 @@ export const SITES = {
   spectra: {
     key: 'spectra', name: 'CNM Spectra', home: '/spectra/', logo: logo('/assets/brand/cnm-spectra-logo'),
     blurb: 'Premium eyewear from CNM Group. See better, feel better, look your best.',
-    nav: [['eyewear', 'Eyewear', '/spectra/eyewear/'], ['eye-care', 'Eye care', '/spectra/eye-care/'], ['about', 'About', '/spectra/about/'], ['contact', 'Visit & contact', '/spectra/contact/']],
+    nav: [['eyewear', 'Eyewear', '/spectra/eyewear/', [['Prescription eyewear', '/spectra/eyewear/#prescription'], ['Sunglasses & fashion frames', '/spectra/eyewear/#sunglasses'], ['Contact lens solutions', '/spectra/eyewear/#contact-lenses'], ['Eyewear accessories', '/spectra/eyewear/#accessories']]], ['eye-care', 'Eye care', '/spectra/eye-care/'], ['about', 'About', '/spectra/about/'], ['contact', 'Visit & contact', '/spectra/contact/']],
     cta: ['Book an appointment', '/spectra/book/'],
   },
   cnmworx: {
     key: 'cnmworx', name: 'CNMWorX Limited', home: '/cnmworx/', logo: logo('/assets/brand/cnmworx-logo'),
     blurb: 'ISO 9001:2015-certified engineering and technical services from CNM Group.',
-    nav: [['services', 'Services', '/cnmworx/services/'], ['industries', 'Industries', '/cnmworx/industries/'], ['quality', 'Quality', '/cnmworx/quality/'], ['about', 'About', '/cnmworx/about/'], ['contact', 'Contact', '/cnmworx/contact/']],
+    nav: [['services', 'Services', '/cnmworx/services/', [['EPC project delivery', '/cnmworx/services/#epc'], ['Automation & control systems', '/cnmworx/services/#automation'], ['Instrumentation & power electronics', '/cnmworx/services/#instrumentation'], ['Lifecycle maintenance & O&M', '/cnmworx/services/#maintenance']]], ['industries', 'Industries', '/cnmworx/industries/', [['Oil & gas engineering', '/cnmworx/industries/#oil-gas'], ['Industrial automation', '/cnmworx/industries/#industrial'], ['Power & energy systems', '/cnmworx/industries/#power'], ['ICT & systems integration', '/cnmworx/industries/#ict']]], ['quality', 'Quality', '/cnmworx/quality/'], ['about', 'About', '/cnmworx/about/'], ['contact', 'Contact', '/cnmworx/contact/']],
     cta: ['Request a proposal', '/cnmworx/request/'],
   },
   foundation: {
     key: 'foundation', name: 'CNM Foundation', home: '/foundation/', logo: logo('/assets/brand/cnm-foundation-logo'),
     blurb: 'The social impact and philanthropic arm of CNM Group.',
-    nav: [['programmes', 'Programmes', '/foundation/programmes/'], ['get-involved', 'Get involved', '/foundation/get-involved/'], ['about', 'About', '/foundation/about/'], ['contact', 'Contact', '/foundation/contact/']],
+    nav: [['programmes', 'Programmes', '/foundation/programmes/', [['Education & literacy', '/foundation/programmes/#education'], ["Women's economic empowerment", '/foundation/programmes/#women'], ['Youth development & skills', '/foundation/programmes/#youth'], ['Community health', '/foundation/programmes/#health']]], ['get-involved', 'Get involved', '/foundation/get-involved/'], ['about', 'About', '/foundation/about/'], ['contact', 'Contact', '/foundation/contact/']],
     cta: ['Donate', '/foundation/donate/'],
   },
 };
@@ -36,8 +36,12 @@ export const profileOf = (ctx, key) => ctx.site.group.profiles.find((p) => p.slu
 
 export function companyHeader(ctx, key, current) {
   const s = SITES[key];
-  const links = s.nav.map(([k, label, href]) => `<li><a href="${href}"${k === current ? ' aria-current="page"' : ''}>${escapeHtml(label)}</a></li>`).join('');
-  const menu = [['home', 'Home', s.home], ...s.nav].map(([k, label, href]) => `<li><a href="${href}"${k === current ? ' aria-current="page"' : ''}>${escapeHtml(label)}</a></li>`).join('');
+  const cur = (k) => (k === current ? ' aria-current="page"' : '');
+  const links = s.nav.map(([k, label, href, kids]) => (kids
+    ? `<li class="co-drop" data-drop><a href="${href}"${cur(k)}>${escapeHtml(label)}</a><button type="button" class="co-drop__btn" data-drop-toggle aria-expanded="false" aria-controls="drop-${k}" aria-label="${escapeHtml(label)} menu">${icon('chevron')}</button>
+      <div class="co-drop__panel" id="drop-${k}" data-drop-panel><a class="co-drop__all" href="${href}">All ${escapeHtml(label.toLowerCase())} ${icon('arrow')}</a>${kids.map(([l, h]) => `<a href="${h}">${escapeHtml(l)}</a>`).join('')}</div></li>`
+    : `<li><a href="${href}"${cur(k)}>${escapeHtml(label)}</a></li>`)).join('');
+  const menu = [['home', 'Home', s.home], ...s.nav].map(([k, label, href, kids]) => `<li><a href="${href}"${cur(k)}>${escapeHtml(label)}</a>${kids ? `<ul class="co-menu__sub">${kids.map(([l, h]) => `<li><a href="${h}">${escapeHtml(l)}</a></li>`).join('')}</ul>` : ''}</li>`).join('');
   return `${backBar(key)}
 <header class="co-header" data-co-header>
   <div class="container co-header__row">
@@ -131,3 +135,13 @@ export const orgLd = (ctx, key, extra = {}) => {
   const s = SITES[key];
   return { '@context': 'https://schema.org', '@type': 'Organization', name: p.name, ...(p.fullName ? { legalName: p.fullName } : {}), url: `${ctx.siteUrl}${s.home}`, logo: `${ctx.siteUrl}${s.logo}`, slogan: p.tagline, description: p.text, parentOrganization: { '@type': 'Organization', name: 'CNM Group', url: ctx.siteUrl }, ...extra };
 };
+
+/** "Continue exploring" card that leads to the next page in the site's natural order. */
+export const nextPage = ({ href, label, eyebrow }) => `<section class="next-page" aria-label="Next page"><div class="container"><a class="next-page__link" href="${href}"><span class="next-page__eyebrow">${escapeHtml(eyebrow)}</span><span class="next-page__title">${escapeHtml(label)}</span><span class="next-page__arrow">${icon('arrow')}</span></a></div></section>`;
+
+export function labelFor(key, current) {
+  const s = SITES[key];
+  if (current === 'home') return `${s.name} home`;
+  if (current === 'cta') return s.cta[0];
+  return s.nav.find(([k]) => k === current)?.[1] || s.name;
+}

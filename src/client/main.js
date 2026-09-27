@@ -7,6 +7,8 @@ import { demoLoader } from './loader.js';
 import * as S from './store.js';
 import { close, formData, initUI, open, setBusy, toast } from './ui.js';
 import { lineHTML, paintWish } from './render.js';
+import { initMotion } from './motion.js';
+import { priceHTML } from '../shared/card.mjs';
 
 document.documentElement.classList.remove('no-js');
 initUI();
@@ -232,3 +234,69 @@ document.querySelectorAll('[data-group-menu], [data-co-menu]').forEach((menu) =>
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && menu.open) { menu.open = false; summary.focus(); } });
 });
+
+// ---------- Quick view pop-up (shop grids): see a product without leaving the page ----------
+document.addEventListener('click', async (e) => {
+  const qv = e.target.closest('[data-quickview]');
+  if (!qv) return;
+  e.preventDefault();
+  const { byId } = await S.catalogue();
+  const p = byId.get(qv.dataset.quickview);
+  if (!p) return;
+  const imgs = productImages(p);
+  const st = stockState(p);
+  const max = Math.min(10, p.stock?.quantity ?? 10);
+  document.querySelector('[data-qv-body]').innerHTML = `
+    <div class="qv__media">${imgs.slice(0, 3).map((im, i) => `<img src="${im.src}" alt="${i ? '' : escapeHtml(im.alt || p.name)}" width="800" height="1000"${i ? ' loading="lazy"' : ''}>`).join('')}</div>
+    <div class="qv__info">
+      <span class="label muted">${escapeHtml(p.brand)} · ${escapeHtml(p.productType)}</span>
+      <h2 id="qv-title" class="qv__title">${escapeHtml(p.name)}</h2>
+      <div class="qv__price">${priceHTML(p)}</div>
+      <p class="qv__stock ${st.key === 'out' ? 'stock-out' : st.key === 'low' ? 'stock-low' : ''}">${escapeHtml(st.label || 'In stock')}</p>
+      ${p.description ? `<p class="muted">${escapeHtml(p.description)}</p>` : ''}
+      ${st.orderable ? `<div class="qv__buy"><div class="qty" role="group" aria-label="Quantity"><button type="button" data-qv-dec aria-label="Decrease">${icon('minus')}</button><input type="number" value="1" min="1" max="${max}" aria-label="Quantity" data-qv-qty><button type="button" data-qv-inc aria-label="Increase">${icon('plus')}</button></div><button class="btn btn--green" type="button" data-qv-add="${escapeHtml(p.id)}">Add to bag</button></div>` : ''}
+      <a class="textlink" href="${productUrl(p)}">View full details</a>
+    </div>`;
+  open('quickview');
+  track('view_item', { currency: 'NGN', value: p.price.amount, items: [item(p)], source: 'quick_view' });
+});
+document.querySelector('[data-panel="quickview"]')?.addEventListener('click', async (e) => {
+  const input = e.currentTarget.querySelector('[data-qv-qty]');
+  if (e.target.closest('[data-qv-dec]')) input.value = Math.max(1, Number(input.value) - 1);
+  if (e.target.closest('[data-qv-inc]')) input.value = Math.min(Number(input.max) || 10, Number(input.value) + 1);
+  const add = e.target.closest('[data-qv-add]');
+  if (!add) return;
+  const { byId } = await S.catalogue();
+  const p = byId.get(add.dataset.qvAdd);
+  const qty = Math.max(1, parseInt(input.value || '1', 10));
+  S.addToBag(p.id, qty, Math.min(10, p.stock?.quantity ?? 10));
+  track('add_to_cart', { currency: 'NGN', value: (p.price.amount || 0) * qty, items: [item(p, { quantity: qty })] });
+  close();
+  setTimeout(() => open('bag'), 420);
+});
+
+// ---------- Newsletter pop-up (CNM Essentials only): once per visitor, after real interest, never during checkout ----------
+(() => {
+  const pop = document.querySelector('[data-panel="newsletter-pop"]');
+  const quiet = ['checkout', 'confirmation', 'auth', 'account', 'bag', '404'];
+  const force = new URLSearchParams(location.search).has('nlpop'); // review/testing: show immediately
+  if (!pop || document.body.dataset.chrome || quiet.includes(document.body.dataset.page) || (navigator.webdriver && !force)) return;
+  const KEY = 'cnm.nlpop';
+  let seen;
+  try { seen = Number(localStorage.getItem(KEY) || 0); } catch { return; }
+  if (!force && Date.now() - seen < 30 * 864e5) return;
+  let shown = false;
+  const show = () => {
+    if (shown || document.querySelector('[data-panel].is-open')) return;
+    shown = true;
+    try { localStorage.setItem(KEY, String(Date.now())); } catch { /* storage blocked */ }
+    open('newsletter-pop');
+    track('popup_view', { popup: 'newsletter' });
+  };
+  const timer = setTimeout(show, force ? 300 : 25000);
+  const onScroll = () => { if (scrollY > (document.documentElement.scrollHeight - innerHeight) * 0.6) { removeEventListener('scroll', onScroll); clearTimeout(timer); show(); } };
+  addEventListener('scroll', onScroll, { passive: true });
+  document.addEventListener('mouseout', (e) => { if (!e.relatedTarget && e.clientY < 8 && scrollY > 400) show(); });
+})();
+
+initMotion();

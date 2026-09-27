@@ -10,12 +10,13 @@ const GROUP_HOME = { name: 'CNM Group', path: '/' };
 
 export function groupHeader(ctx, current) {
   const g = ctx.site.group;
-  const nav = [
-    { key: 'about', label: 'About', href: '/about/' },
-    ...g.profiles.map((p) => ({ key: p.slug, label: p.name.replace(' Limited', ''), href: p.page })),
-    { key: 'contact', label: 'Contact', href: '/contact/' },
-  ];
-  const links = nav.map((n) => `<li><a href="${n.href}"${n.key === current ? ' aria-current="page"' : ''}>${escapeHtml(n.label)}</a></li>`).join('');
+  const companiesActive = g.profiles.some((p) => p.slug === current);
+  const drop = `<li class="gdrop" data-drop><button type="button" class="gdrop__btn" data-drop-toggle aria-expanded="false" aria-controls="gdrop-companies"${companiesActive ? ' aria-current="page"' : ''}>Companies ${icon('chevron')}</button>
+    <div class="gdrop__panel" id="gdrop-companies" data-drop-panel><div class="container gdrop__grid">
+      ${g.profiles.map((p) => `<a class="gdrop__co" href="${p.page}"><span class="gdrop__logo"><img src="${p.logo}" alt="" loading="lazy"></span><span><strong>${escapeHtml(p.name)}</strong><span class="gdrop__sub">${escapeHtml(p.menuLabel)}</span><span class="gdrop__tag">${escapeHtml(p.tagline)}</span></span></a>`).join('')}
+    </div></div></li>`;
+  const item = (key, label, href) => `<li><a href="${href}"${key === current ? ' aria-current="page"' : ''}>${label}</a></li>`;
+  const links = `${item('about', 'About', '/about/')}${drop}${item('leadership', 'Leadership', '/about/#leadership')}${item('contact', 'Contact', '/contact/')}`;
   const menu = [
     { href: '/', name: 'Home', key: 'home' },
     { href: '/about/', name: 'About CNM Group', key: 'about' },
@@ -102,6 +103,7 @@ export function groupHome(ctx) {
     </div>
   </div>
 </section>
+${(() => { const words = ['Energy', 'Retail', 'Impact', g.motto, ...g.profiles.map((p) => p.name)]; const row = words.map((w) => `<span>${escapeHtml(w)}</span>`).join(''); return `<div class="gticker" aria-hidden="true"><div class="gticker__track">${row}${row}</div></div>`; })()}
 <section class="gdark" id="companies" aria-labelledby="co-h"><div class="container">
   <span class="geyebrow">Our companies · Energy · Retail · Impact</span>
   <h2 id="co-h" class="gtitle gtitle--light">Four businesses. <em>One vision.</em></h2>

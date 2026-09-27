@@ -202,7 +202,14 @@ test('CNMGroup.com hub: founder photo, all companies, menu, and contact form', a
   await page.goto('/');
   await expect(page.locator('h1')).toContainText('transcend');
   await expect(page.locator('.ghero__portrait img')).toBeVisible();
-  expect(await page.locator('.ghero__portrait img').evaluate((i) => i.naturalWidth)).toBeGreaterThan(900);
+  // Sharp on this screen: the file the browser chose has at least as many pixels as the portrait displays.
+  const sharp = await page.locator('.ghero__portrait img').evaluate(async (i) => {
+    await i.decode();
+    const f = new Image(); f.src = i.currentSrc; await f.decode();
+    return { file: f.naturalWidth, needed: Math.round(i.getBoundingClientRect().width * devicePixelRatio) };
+  });
+  expect(sharp.file).toBeGreaterThanOrEqual(Math.min(sharp.needed, 2000));
+  expect(sharp.file).toBeGreaterThanOrEqual(1000);
   await expect(page.locator('#companies .gpanel')).toHaveCount(4);
   await expect(page.locator('#companies .gpanel', { hasText: 'CNM Essentials' })).toHaveAttribute('href', '/essentials/');
   for (const [name, href] of [['CNM Spectra', '/spectra/'], ['CNMWorX', '/cnmworx/'], ['CNM Foundation', '/foundation/']]) {
@@ -213,7 +220,9 @@ test('CNMGroup.com hub: founder photo, all companies, menu, and contact form', a
     await expect(page.locator('.gmenu__sub', { hasText: 'Engineering & Energy' })).toBeVisible();
     await page.locator('.gmenu__list a', { hasText: 'CNMWorX' }).click();
   } else {
-    await page.locator('.group-nav a', { hasText: 'CNMWorX' }).click();
+    await page.locator('.gdrop__btn').click();
+    await expect(page.locator('.gdrop__panel')).toBeVisible();
+    await page.locator('.gdrop__co', { hasText: 'CNMWorX' }).click();
   }
   await expect(page).toHaveURL(/\/cnmworx\/$/);
   await expect(page.locator('h1')).toContainText('Engineering the future');
@@ -224,7 +233,7 @@ test('CNMGroup.com hub: founder photo, all companies, menu, and contact form', a
   await page.fill('#f-group-email', 'ngozi@example.com');
   await page.selectOption('#f-group-subject', 'Partnership');
   await page.fill('#f-group-msg', 'We would like to discuss a partnership with CNM Group.');
-  await page.locator('input[name="consent"]').check();
+  await page.locator('[data-enquiry-form] input[name="consent"]').check();
   await page.locator('[data-enquiry-form] button[type="submit"]').click();
   await expect(page.locator('[data-enquiry-ok]')).toContainText('CNM Group will be in touch');
 });
@@ -263,7 +272,7 @@ test('company journeys: Spectra appointment, CNMWorX proposal, Foundation pledge
   await page.selectOption('#f-book-loc', 'Abuja');
   const d = new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
   await page.fill('#f-book-date', d);
-  await page.locator('input[name="consent"]').check();
+  await page.locator('[data-enquiry-form] input[name="consent"]').check();
   await page.locator('[data-enquiry-form] button[type="submit"]').click();
   await expect(page.locator('[data-enquiry-ok]')).toContainText('appointment request');
 
@@ -280,7 +289,7 @@ test('company journeys: Spectra appointment, CNMWorX proposal, Foundation pledge
   await page.fill('#f-request-loc', 'Port Harcourt');
   await page.selectOption('#f-request-time', 'Within 3 months');
   await page.fill('#f-request-msg', 'Instrumentation upgrade for a gas plant control room.');
-  await page.locator('input[name="consent"]').check();
+  await page.locator('[data-enquiry-form] input[name="consent"]').check();
   await page.locator('[data-enquiry-form] button[type="submit"]').click();
   await expect(page.locator('[data-enquiry-ok]')).toContainText('project request');
 
@@ -293,7 +302,7 @@ test('company journeys: Spectra appointment, CNMWorX proposal, Foundation pledge
   await page.selectOption('#f-donate-freq', 'Monthly');
   await page.fill('#f-donate-name', 'Ada Giver');
   await page.fill('#f-donate-email', 'ada@example.com');
-  await page.locator('input[name="consent"]').check();
+  await page.locator('[data-enquiry-form] input[name="consent"]').check();
   const [res] = await Promise.all([page.waitForRequest('**/api/enquiry'), page.locator('[data-enquiry-form] button[type="submit"]').click()]);
   const sent = res.postDataJSON();
   expect(sent).toMatchObject({ division: 'foundation', subject: 'Donation pledge', timeline: '₦15,000 · Monthly', interest: 'Education & literacy programmes' });
@@ -399,8 +408,10 @@ test('campaign artwork is shown whole with captions below, not on top', async ({
   await page.goto('/essentials/');
   const banner = page.locator('.banner').first();
   await banner.scrollIntoViewIfNeeded();
+  await expect(banner).not.toHaveClass(/m-reveal(?! is-in)/); // let the scroll reveal finish
+  await page.waitForTimeout(1000);
   const [img, cap] = await Promise.all([banner.locator('img').boundingBox(), banner.locator('.banner__cap').boundingBox()]);
-  expect(cap.y).toBeGreaterThanOrEqual(img.y + img.height - 1);
+  expect(cap.y).toBeGreaterThanOrEqual(img.y + img.height - 2);
   expect(await banner.locator('img').evaluate((n) => getComputedStyle(n).objectFit)).toBe('contain');
 });
 
@@ -438,4 +449,49 @@ test('header account icon offers sign in without leaving the page (guest)', asyn
   await expect(page.locator('#auth-dialog')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.locator('#auth-dialog')).toBeHidden();
+});
+
+test('interactions: dropdowns, quick view pop-up, next page, back to top', async ({ page, isMobile }) => {
+  // Company-site dropdown (desktop) or nested menu (phone)
+  await page.goto('/cnmworx/');
+  if (isMobile) {
+    await page.locator('.co-menu summary').click();
+    await expect(page.locator('.co-menu__sub a', { hasText: 'Instrumentation & power electronics' })).toBeVisible();
+    await page.locator('.co-menu__sub a', { hasText: 'Instrumentation & power electronics' }).click();
+  } else {
+    await page.locator('.co-drop__btn').first().click();
+    await expect(page.locator('.co-drop__panel').first()).toBeVisible();
+    await page.locator('.co-drop__panel a', { hasText: 'Instrumentation & power electronics' }).click();
+  }
+  await expect(page).toHaveURL(/\/cnmworx\/services\/#instrumentation$/);
+
+  // "Continue exploring" goes to the next page of the site
+  await page.locator('.next-page__link').click();
+  await expect(page).toHaveURL(/\/cnmworx\/industries\/$/);
+
+  // Back to top appears after scrolling and returns to the top
+  await page.evaluate(() => scrollTo(0, document.body.scrollHeight));
+  await expect(page.locator('.to-top')).toHaveClass(/is-on/);
+  await page.locator('.to-top').click();
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThan(10);
+
+  // Quick view pop-up: add to bag without leaving the shop
+  await page.goto('/shop/');
+  await page.locator('[data-quickview]').first().dispatchEvent('click');
+  await expect(page.locator('#quickview')).toBeVisible();
+  await expect(page.locator('#qv-title')).not.toBeEmpty();
+  await page.locator('[data-qv-inc]').click();
+  await page.locator('[data-qv-add]').click();
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('cnm.bag') || '[]')[0]?.qty)).toBe(2);
+  await expect(page.locator('#bag-drawer')).toBeVisible();
+});
+
+test('newsletter pop-up: shows once, dismisses, and never during checkout', async ({ page }) => {
+  await page.goto('/essentials/?nlpop=1');
+  await expect(page.locator('#newsletter-pop')).toBeVisible();
+  await page.locator('#newsletter-pop .nlp__no').click();
+  await expect(page.locator('#newsletter-pop')).toBeHidden();
+  await page.goto('/checkout/?nlpop=1');
+  await page.waitForTimeout(800);
+  await expect(page.locator('#newsletter-pop')).toBeHidden();
 });

@@ -26,7 +26,7 @@ export function productCardHTML(p, { position = 0, list = 'grid', eager = false 
   </a>
   ${badges.length ? `<div class="card__badges">${badges.join('')}</div>` : ''}
   <button class="icon-btn card__wish" type="button" data-wish="${escapeHtml(p.id)}" aria-pressed="false" aria-label="Save ${escapeHtml(p.name)} to wishlist">${icon('heart')}</button>
-  ${stock.orderable ? `<div class="card__quick"><button class="btn" type="button" data-add="${escapeHtml(p.id)}">Add to bag</button></div>` : ''}
+  <div class="card__quick">${stock.orderable ? `<button class="btn" type="button" data-add="${escapeHtml(p.id)}">Add to bag</button>` : ''}<button class="btn btn--light" type="button" data-quickview="${escapeHtml(p.id)}" aria-label="Quick view: ${escapeHtml(p.name)}">Quick view</button></div>
   <div class="card__body">
     <span class="card__type">${escapeHtml(p.productType)}</span>
     <span class="card__brand">${escapeHtml(p.brand)}</span>

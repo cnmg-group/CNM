@@ -16,6 +16,7 @@ import { bagPage, wishlistPage, searchPage, checkoutPage, confirmationPage } fro
 import { ACCOUNT_VIEWS, accountPage, loginPage, registerPage, resetPage } from '../src/templates/account.mjs';
 import { storyPage, storesIndex, storePage, servicesPage, journalIndex, articlePage, infoPage, notFoundPage, styleguidePage, adminPage } from '../src/templates/content.mjs';
 import { groupAbout, groupContactPage, groupHome } from '../src/templates/group.mjs';
+import { labelFor, nextPage, SITES } from '../src/templates/company.mjs';
 import { spectraPages } from '../src/templates/sites/spectra.mjs';
 import { cnmworxPages } from '../src/templates/sites/cnmworx.mjs';
 import { foundationPages } from '../src/templates/sites/foundation.mjs';
@@ -165,13 +166,16 @@ for (const a of content.articles) {
 }
 // CNMGroup.com hub (group chrome): Home, About, Contact.
 { const r = groupHome(ctx); await write('/', page({ page: 'group', chrome: 'group', current: 'home', path: '/', title: 'CNM Group — Energy, Retail, Impact', description: content.site.group.intro, body: r.body, jsonld: r.jsonld }), { priority: 1, changefreq: 'weekly' }); }
-{ const r = groupAbout(ctx); await write('/about/', page({ page: 'group', chrome: 'group', current: 'about', path: '/about/', title: 'About CNM Group', description: content.site.group.about, body: r.body, jsonld: r.jsonld }), { priority: 0.8, changefreq: 'monthly' }); }
-{ const r = groupContactPage(ctx); await write('/contact/', page({ page: 'group', chrome: 'group', current: 'contact', path: '/contact/', title: 'Contact CNM Group', description: 'Contact CNM Group about partnerships, investment, collaboration or any of our companies.', body: r.body, jsonld: r.jsonld }), { priority: 0.6, changefreq: 'monthly' }); }
+{ const r = groupAbout(ctx); await write('/about/', page({ page: 'group', chrome: 'group', current: 'about', path: '/about/', title: 'About CNM Group', description: content.site.group.about, body: r.body + nextPage({ href: '/contact/', label: 'Contact CNM Group', eyebrow: 'Continue' }), jsonld: r.jsonld }), { priority: 0.8, changefreq: 'monthly' }); }
+{ const r = groupContactPage(ctx); await write('/contact/', page({ page: 'group', chrome: 'group', current: 'contact', path: '/contact/', title: 'Contact CNM Group', description: 'Contact CNM Group about partnerships, investment, collaboration or any of our companies.', body: r.body + nextPage({ href: '/essentials/', label: 'Shop CNM Essentials', eyebrow: 'Explore our companies' }), jsonld: r.jsonld }), { priority: 0.6, changefreq: 'monthly' }); }
 
 // Company websites: each with its own identity and a "Back to CNM Group" button.
 for (const [site, pagesOf] of [['spectra', spectraPages], ['cnmworx', cnmworxPages], ['foundation', foundationPages]]) {
-  for (const pg of pagesOf(ctx)) {
-    await write(pg.path, page({ page: 'site', chrome: 'company', site, current: pg.current, path: pg.path, title: pg.title, description: pg.description, body: pg.body, jsonld: pg.jsonld }), { priority: pg.current === 'home' ? 0.9 : 0.6, changefreq: 'monthly' });
+  const list = pagesOf(ctx);
+  for (const [i, pg] of list.entries()) {
+    const next = list[(i + 1) % list.length];
+    const body = pg.body + nextPage({ href: next.path, label: labelFor(site, next.current), eyebrow: `Continue exploring ${SITES[site].name}` });
+    await write(pg.path, page({ page: 'site', chrome: 'company', site, current: pg.current, path: pg.path, title: pg.title, description: pg.description, body, jsonld: pg.jsonld }), { priority: pg.current === 'home' ? 0.9 : 0.6, changefreq: 'monthly' });
   }
 }
 
