@@ -53,10 +53,14 @@ function shell() {
   const sections = [...new Set(items.map((x) => x[3]))];
   root.innerHTML = `<div class="os${collapsed ? ' is-collapsed' : ''}" data-os>
     <header class="os-top"><button class="os-icon" type="button" data-nav-open aria-label="Open menu" aria-controls="os-nav" aria-expanded="false"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
-      <a class="os-top__brand" href="#command"><img src="/assets/brand/cnm-group-emblem-128.webp" alt="" width="28" height="29"><span>CNM Group <b>OS</b></span></a></header>
+      <a class="os-top__brand" href="#command"><img src="/assets/brand/cnm-group-emblem-128.webp" alt="" width="28" height="29"><span>CNM Group <b>OS</b></span></a>
+      <button class="os-top__me" type="button" data-nav-open aria-label="Account and menu"><span class="os-avatar" aria-hidden="true">${e((me.name || me.email).slice(0, 1).toUpperCase())}</span></button></header>
     <aside class="os-nav" id="os-nav" aria-label="CNM Group OS">
       <div class="os-nav__brand"><a href="#command" class="os-nav__logo"><img src="/assets/brand/cnm-group-emblem-128.webp" alt="" width="34" height="36"><span><strong>CNM Group</strong><small>Operating system</small></span></a>
         <button class="os-icon os-nav__collapse" type="button" data-collapse aria-label="${collapsed ? 'Expand' : 'Collapse'} sidebar" aria-pressed="${collapsed}"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      <div class="os-nav__acct"><span class="os-avatar" aria-hidden="true">${e((me.name || me.email).slice(0, 1).toUpperCase())}</span><span class="os-nav__who"><strong>${e(me.name)}</strong><small>${e(me.email)}</small></span>
+        <button class="os-acct__out" type="button" data-logout><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M15 17l5-5-5-5M20 12H9M12 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>
+        <button class="os-icon os-acct__close" type="button" data-nav-close aria-label="Close menu"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
       <nav>${sections.map((sec) => `<p class="os-nav__sec">${sec}</p>${items.filter((x) => x[3] === sec).map(([k, l]) => `<a href="#${k}" data-nav="${k}" title="${e(l)}">${icon(k)}<span>${e(l)}</span></a>`).join('')}`).join('')}</nav>
       <div class="os-nav__me"><span class="os-avatar" aria-hidden="true">${e((me.name || me.email).slice(0, 1).toUpperCase())}</span><span class="os-nav__who"><strong>${e(me.name)}</strong><small>${e(me.role)}${Array.isArray(me.scope) ? ` · ${me.scope.length} compan${me.scope.length === 1 ? 'y' : 'ies'}` : ' · all companies'}</small></span></div>
       <div class="os-nav__actions"><button class="os-link os-theme" type="button" data-os-theme title="Light / dark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><span data-os-theme-label></span></button>${me.permissions.includes('publish') ? '<button class="os-btn os-btn--light" type="button" data-publish>Publish site</button>' : ''}<a class="os-link" href="/" target="_blank" rel="noopener">View sites ↗</a><button class="os-link" type="button" data-logout>Sign out</button></div>
@@ -80,12 +84,12 @@ function shell() {
     if (window.cnmSetTheme) window.cnmSetTheme(next); else document.documentElement.dataset.theme = next;
     themeLabel();
   });
-  const setMobile = (open) => { os.classList.toggle('is-nav-open', open); root.querySelector('[data-nav-open]').setAttribute('aria-expanded', String(open)); };
-  root.querySelector('[data-nav-open]').addEventListener('click', () => setMobile(true));
-  root.querySelector('[data-nav-close]').addEventListener('click', () => setMobile(false));
+  const setMobile = (open) => { os.classList.toggle('is-nav-open', open); root.querySelector('.os-top [data-nav-open]').setAttribute('aria-expanded', String(open)); };
+  root.querySelectorAll('[data-nav-open]').forEach((b) => b.addEventListener('click', () => setMobile(true)));
+  root.querySelectorAll('[data-nav-close]').forEach((b) => b.addEventListener('click', () => setMobile(false)));
   root.querySelectorAll('[data-nav]').forEach((a) => a.addEventListener('click', () => setMobile(false)));
   document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') setMobile(false); });
-  root.querySelector('[data-logout]').addEventListener('click', async () => { await api('/api/admin/logout', { method: 'POST' }); location.reload(); });
+  root.querySelectorAll('[data-logout]').forEach((b) => b.addEventListener('click', async () => { await api('/api/admin/logout', { method: 'POST' }); location.reload(); }));
   root.querySelector('[data-publish]')?.addEventListener('click', async () => {
     if (!confirm('Rebuild and publish the site with the latest content?')) return;
     try { await api('/api/admin/publish', { method: 'POST' }); flash('Publishing started. Changes go live in a few minutes.'); } catch (x) { flash(x.message, false); }
