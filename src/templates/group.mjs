@@ -13,7 +13,7 @@ export function groupHeader(ctx, current) {
   const companiesActive = g.profiles.some((p) => p.slug === current);
   const drop = `<li class="gdrop" data-drop><button type="button" class="gdrop__btn" data-drop-toggle aria-expanded="false" aria-controls="gdrop-companies"${companiesActive ? ' aria-current="page"' : ''}>Companies ${icon('chevron')}</button>
     <div class="gdrop__panel" id="gdrop-companies" data-drop-panel><div class="container gdrop__grid">
-      ${g.profiles.map((p) => `<a class="gdrop__co" href="${p.page}"><span class="gdrop__logo"><img src="${p.logo}" alt="" loading="lazy"></span><span><strong>${escapeHtml(p.name)}</strong><span class="gdrop__sub">${escapeHtml(p.menuLabel)}</span><span class="gdrop__tag">${escapeHtml(p.tagline)}</span></span></a>`).join('')}
+      ${g.profiles.map((p) => `<a class="gdrop__co" href="${p.page}"><span class="gdrop__logo"><img class="logo-blend" src="${p.logo}" alt="" loading="lazy"></span><span><strong>${escapeHtml(p.name)}</strong><span class="gdrop__sub">${escapeHtml(p.menuLabel)}</span><span class="gdrop__tag">${escapeHtml(p.tagline)}</span></span></a>`).join('')}
     </div></div></li>`;
   const item = (key, label, href) => `<li><a href="${href}"${key === current ? ' aria-current="page"' : ''}>${label}</a></li>`;
   const links = `${item('about', 'About', '/about/')}${drop}${item('leadership', 'Leadership', '/about/#leadership')}${item('contact', 'Contact', '/contact/')}`;
@@ -71,14 +71,11 @@ export function groupFooter(ctx) {
 /* ---------------- Home ---------------- */
 function companyPanel(p, i) {
   const cta = p.internal ? 'Shop CNM Essentials' : `Visit ${p.name.replace(' Limited', '')}`;
-  const media = p.image
-    ? photo(p.image, p.imageAlt, { sizes: '(max-width: 960px) 100vw, 50vw', position: p.imagePosition, width: p.imageWidth || 2000, height: p.imageHeight || 1530 })
-    : `<span class="gpanel__logo"><img src="${p.logo}" alt="" loading="lazy" width="200" height="200"></span>`;
-  return `<a class="gpanel${p.image ? '' : ' gpanel--plain'}" href="${p.page}" data-track="group_company" data-company="${p.slug}">
-    <span class="gpanel__media">${media}</span>
-    ${p.image ? `<span class="gpanel__badge"><img src="${p.logo}" alt="${escapeHtml(p.name)} logo" loading="lazy"></span>` : ''}
+  // Photo on top, left completely uncovered; the logo (background removed) blends into the navy panel below it.
+  return `<a class="gpanel" href="${p.page}" data-track="group_company" data-company="${p.slug}">
+    <span class="gpanel__media">${photo(p.image, p.imageAlt, { sizes: '(max-width: 960px) 100vw, 50vw', position: p.imagePosition, width: p.imageWidth || 2000, height: p.imageHeight || 1530 })}</span>
     <span class="gpanel__copy">
-      <span class="gpanel__eyebrow">${String(i + 1).padStart(2, '0')} — ${escapeHtml(p.menuLabel || p.sector)}</span>
+      <span class="gpanel__brand"><img class="logo-blend" src="${p.logo}" alt="${escapeHtml(p.name)} logo" loading="lazy"><span class="gpanel__eyebrow">${String(i + 1).padStart(2, '0')} — ${escapeHtml(p.menuLabel || p.sector)}</span></span>
       <span class="gpanel__name">${escapeHtml(p.name)}</span>
       <span class="gpanel__tag">${escapeHtml(p.tagline)}</span>
       <span class="gbtn gbtn--line">${cta} ${icon('arrow')}</span>

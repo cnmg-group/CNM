@@ -104,7 +104,7 @@
           {
             "name": "CNM Spectra",
             "tagline": "See clearly. Look extraordinary.",
-            "logo": "/assets/brand/cnm-spectra-logo.jpg",
+            "logo": "/assets/brand/cnm-spectra-logo.webp",
             "url": "/spectra/",
             "text": "A premium eyewear brand offering prescription frames, sunglasses, contact lenses and accessories.",
             "slug": "spectra",
@@ -120,7 +120,7 @@
           {
             "name": "CNMWorX Limited",
             "tagline": "Engineering the future, one project at a time.",
-            "logo": "/assets/brand/cnmworx-logo.jpg",
+            "logo": "/assets/brand/cnmworx-logo.webp",
             "url": "/cnmworx/",
             "text": "ISO 9001:2015-certified engineering and technical services: industrial and process automation, instrumentation, power electronics and ICT.",
             "slug": "cnmworx",
@@ -136,7 +136,7 @@
           {
             "name": "CNM Foundation",
             "tagline": "Zero percent of zero is zero — so we give everything.",
-            "logo": "/assets/brand/cnm-foundation-logo.jpg",
+            "logo": "/assets/brand/cnm-foundation-logo.webp",
             "url": "/foundation/",
             "text": "Education, women's economic empowerment, youth development and community health across Nigeria and the African diaspora.",
             "slug": "foundation",
@@ -223,7 +223,7 @@
         "name": "CNM Spectra",
         "sector": "Eyewear & Vision",
         "tagline": "See clearly. Look extraordinary.",
-        "logo": "/assets/brand/cnm-spectra-logo.jpg",
+        "logo": "/assets/brand/cnm-spectra-logo.webp",
         "url": "/spectra/",
         "text": "A premium eyewear brand redefining how Africans see the world. CNM Spectra offers an expertly curated range of prescription frames, sunglasses, contact lenses, and accessories that merge optical precision with contemporary style — serving the style-conscious professional who refuses to compromise on quality or visual clarity.",
         "lists": [
@@ -294,7 +294,7 @@
         "name": "CNMWorX Limited",
         "sector": "Engineering & Automation",
         "tagline": "Engineering the future, one project at a time.",
-        "logo": "/assets/brand/cnmworx-logo.jpg",
+        "logo": "/assets/brand/cnmworx-logo.webp",
         "url": "/cnmworx/",
         "text": "Registered in Nigeria in 2019 and ISO 9001:2015 certified, CNMWorX Limited is a preferred engineering and technical services company specialising in Industrial and Process Automation & Control, Instrumentation, Power Electronics, and ICT. Acting as a trusted System Integrator, CNMWorX delivers bespoke solutions to IOCs, Independent Oil Companies, and Industrial Services Companies across West and Central Africa.",
         "lists": [
@@ -366,7 +366,7 @@
         "fullName": "Chigozie Nkiruka Naeto Munachimso Foundation",
         "sector": "Social Impact & Philanthropy",
         "tagline": "Zero percent of zero is zero — so we give everything.",
-        "logo": "/assets/brand/cnm-foundation-logo.jpg",
+        "logo": "/assets/brand/cnm-foundation-logo.webp",
         "url": "/foundation/",
         "text": "The social impact and philanthropic arm of CNM Group — a faith-rooted, community-driven organisation committed to education, women's economic empowerment, youth development, and community health across Nigeria and the African diaspora. Active for over five years through informal programmes, CNM Foundation is now formalising its reach — scaling impact, deepening partnerships, and amplifying its voice where it matters most.",
         "lists": [
