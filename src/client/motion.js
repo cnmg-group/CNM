@@ -164,15 +164,32 @@ function initDropdowns() {
   drops.forEach((d) => {
     const btn = d.querySelector('[data-drop-toggle]');
     let t;
-    btn.addEventListener('click', (e) => { e.preventDefault(); const open = !d.classList.contains('is-open'); closeAll(d); set(d, open); if (open) d.querySelector('[data-drop-panel] a')?.focus({ preventScroll: true }); });
+    let hoverOpenedAt = 0;
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const isOpen = d.classList.contains('is-open');
+      // A click right after hover-open (mouse devices) means "keep it open", not "toggle closed".
+      const open = isOpen && Date.now() - hoverOpenedAt < 700 ? true : !isOpen;
+      closeAll(d);
+      set(d, open);
+      if (open && e.detail === 0) d.querySelector('[data-drop-panel] a')?.focus({ preventScroll: true }); // keyboard activation
+    });
     if (hoverable) {
-      d.addEventListener('mouseenter', () => { clearTimeout(t); closeAll(d); set(d, true); });
+      d.addEventListener('mouseenter', () => { clearTimeout(t); if (!d.classList.contains('is-open')) hoverOpenedAt = Date.now(); closeAll(d); set(d, true); });
       d.addEventListener('mouseleave', () => { t = setTimeout(() => set(d, false), 140); });
     }
     d.addEventListener('keydown', (e) => { if (e.key === 'Escape' && d.classList.contains('is-open')) { set(d, false); btn.focus(); } });
     d.addEventListener('focusout', (e) => { if (!d.contains(e.relatedTarget)) set(d, false); });
   });
   document.addEventListener('click', (e) => { if (!e.target.closest('[data-drop]')) closeAll(); });
+}
+
+/* ---------- floating "Back to CNM Group" pill once the back bar has scrolled away ---------- */
+function initBackPill() {
+  const bar = document.querySelector('[data-backbar]');
+  const pill = document.querySelector('[data-backpill]');
+  if (!bar || !pill || !('IntersectionObserver' in window)) return;
+  new IntersectionObserver(([en]) => pill.classList.toggle('is-on', !en.isIntersecting), { threshold: 0 }).observe(bar);
 }
 
 export function initMotion() {
@@ -184,4 +201,5 @@ export function initMotion() {
   initTransitions();
   initImageFade();
   initDropdowns();
+  initBackPill();
 }

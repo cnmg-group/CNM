@@ -52,12 +52,28 @@ export const COMPANY_LINKS = [
   { key: 'foundation', name: 'CNM Foundation', href: '/foundation/' },
 ];
 
-/** The bar at the top of every company site: a clear way back to CNMGroup.com, plus sister companies. */
+/**
+ * "Back to CNM Group" navigation on every company site (incl. CNM Essentials):
+ * desktop shows the sister companies as tabs; phones get a compact company switcher; and a floating
+ * "CNM Group" pill appears once the bar scrolls away (see motion.js).
+ */
 export function backBar(current) {
+  const here = COMPANY_LINKS.find((c) => c.key === current);
+  const emblem = '<img class="backbar__emblem" src="/assets/brand/cnm-group-emblem-128.webp" alt="" width="128" height="134">';
   return `<div class="backbar" data-backbar><div class="container backbar__row">
-    <a class="backbar__btn" href="/" data-track="back_to_group" data-from="${current}">${icon('arrowLeft')} <span>Back to CNM Group</span></a>
-    <nav aria-label="CNM Group companies"><ul class="backbar__links">${COMPANY_LINKS.map((c) => `<li><a href="${c.href}"${c.key === current ? ' aria-current="true"' : ''}>${c.name}</a></li>`).join('')}</ul></nav>
-  </div></div>`;
+    <a class="backbar__home" href="/" data-track="back_to_group" data-from="${current}"><span class="backbar__arrow">${icon('arrowLeft')}</span>${emblem}<span class="backbar__label"><span class="backbar__hint">Back to</span> CNM Group</span></a>
+    <nav class="backbar__switch" aria-label="CNM Group companies">
+      <ul class="backbar__tabs">${COMPANY_LINKS.map((c) => `<li><a href="${c.href}"${c.key === current ? ' aria-current="true"' : ''}>${c.name}</a></li>`).join('')}</ul>
+      <div class="backbar__drop" data-drop>
+        <button type="button" class="backbar__dropbtn" data-drop-toggle aria-expanded="false" aria-controls="backbar-companies"><span class="backbar__hint">You’re in</span> <strong>${here ? here.name : 'CNM Group'}</strong>${icon('chevron')}</button>
+        <div class="backbar__panel" id="backbar-companies" data-drop-panel>
+          <a class="backbar__panel-home" href="/">${emblem}<span><strong>CNM Group</strong><span>Home of all our companies</span></span></a>
+          ${COMPANY_LINKS.map((c) => `<a href="${c.href}"${c.key === current ? ' aria-current="true"' : ''}>${c.name}${c.key === current ? '<span class="backbar__here">You’re here</span>' : icon('arrow')}</a>`).join('')}
+        </div>
+      </div>
+    </nav>
+  </div></div>
+  <a class="backpill" href="/" data-backpill aria-label="Back to CNM Group home" data-track="back_to_group_pill" data-from="${current}"><span class="backpill__arrow">${icon('arrowLeft')}</span>${emblem}<span>CNM Group</span></a>`;
 }
 
 export const mailto = (email) => `<a class="textlink" href="mailto:${email}">${escapeHtml(email)}</a>`;

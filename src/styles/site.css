@@ -1016,16 +1016,6 @@ body[data-chrome="group"] .group-footer { background: var(--g-navy); }
    ===================================================================== */
 
 /* ---------- "Back to CNM Group" bar (every company site, incl. CNM Essentials) ---------- */
-.backbar { background: #0b1120; color: #f3ecdd; font-size: .75rem; }
-.backbar__row { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 44px; }
-.backbar__btn { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; padding: 0 14px; border: 1px solid rgba(212,176,106,.7); color: #f3ecdd; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; font-size: .6875rem; transition: background .2s, color .2s; }
-.backbar__btn:hover, .backbar__btn:focus-visible { background: #d4b06a; color: #0b1120; }
-.backbar__btn svg { width: 14px; height: 14px; }
-.backbar__links { display: flex; gap: 22px; letter-spacing: .06em; }
-.backbar__links a { opacity: .72; }
-.backbar__links a:hover, .backbar__links a[aria-current] { opacity: 1; }
-.backbar__links a[aria-current] { color: #d4b06a; }
-@media (max-width: 760px) { .backbar__links li:not(:has([aria-current])) { display: none; } }
 
 /* ---------- site theming tokens ---------- */
 body[data-site] { --c-bg: #fff; --c-soft: #f5f5f2; --c-ink: #16161a; --c-mute: #5d5f66; --c-line: #e6e7ea; --c-accent: #16161a; --c-accent-ink: #fff; --c-em: var(--c-accent); --c-dark: #16161a; --c-radius: 0px; --c-display: var(--sans); --c-display-weight: 600; --c-display-track: -.025em; --c-eyebrow-font: var(--sans); background: var(--c-bg); color: var(--c-ink); }
@@ -1356,3 +1346,68 @@ body[data-chrome="group"] .next-page__link:hover .next-page__arrow { background:
 /* A backdrop-filter would make the header the containing block of the full-screen phone menu, so use a solid bar. */
 .co-header { background: var(--c-bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
 .co-menu__back svg { width: 16px; height: 16px; }
+
+/* ---------- CNM Essentials logo without background ---------- */
+.logo img, .site-footer .logo img, .site-header--overlay .logo img, .site-header--overlay.is-solid .logo img { filter: none; }
+.logo img { height: 52px; width: auto; }
+.logo .logo__on-dark { display: none; }
+.site-header--overlay:not(.is-solid) .logo .logo__on-light { display: none; }
+.site-header--overlay:not(.is-solid) .logo .logo__on-dark { display: block; }
+.site-footer .logo img { height: 88px; }
+.mobile-menu__top .logo img, .checkout-header .logo img { height: 44px; }
+@media (max-width: 960px) { .logo img { height: 42px; } }
+
+/* ---------- "Back to CNM Group" navigation (every company site) ---------- */
+.backbar { position: relative; z-index: 70; background: #0b1120; color: #f3ecdd; font-size: .75rem; border-bottom: 1px solid rgba(212, 176, 106, .22); }
+.backbar::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: linear-gradient(90deg, transparent, #d4b06a, transparent); opacity: .5; }
+.backbar__row { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 48px; }
+.backbar__home { display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 8px; border: 1px solid rgba(212, 176, 106, .45); border-radius: 999px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; font-size: .6875rem; transition: background .3s var(--ease), color .3s, border-color .3s, box-shadow .3s; }
+.backbar__home:hover, .backbar__home:focus-visible { background: #d4b06a; color: #0b1120; border-color: #d4b06a; box-shadow: 0 6px 20px rgba(212, 176, 106, .25); }
+.backbar__arrow { display: inline-grid; place-items: center; width: 16px; transition: transform .35s var(--ease); }
+.backbar__arrow svg { width: 14px; height: 14px; }
+.backbar__home:hover .backbar__arrow { transform: translateX(-4px); }
+.backbar__emblem { width: 26px; height: auto; flex: none; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .35)); }
+.backbar__hint { font-weight: 400; opacity: .7; }
+.backbar__switch { display: flex; align-items: center; }
+.backbar__tabs { display: flex; gap: 4px; }
+.backbar__tabs a { position: relative; display: inline-block; padding: 10px 12px; letter-spacing: .06em; color: rgba(243, 236, 221, .72); transition: color .25s; }
+.backbar__tabs a::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 4px; height: 1px; background: #d4b06a; transform: scaleX(0); transform-origin: left; transition: transform .35s var(--ease); }
+.backbar__tabs a:hover { color: #f3ecdd; }
+.backbar__tabs a:hover::after, .backbar__tabs a[aria-current]::after { transform: scaleX(1); }
+.backbar__tabs a[aria-current] { color: #d4b06a; }
+.backbar__drop { display: none; position: relative; }
+.backbar__dropbtn { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 4px 0 10px; background: none; border: 0; color: inherit; font: inherit; letter-spacing: .04em; cursor: pointer; }
+.backbar__dropbtn strong { color: #d4b06a; font-weight: 600; }
+.backbar__dropbtn svg { width: 12px; height: 12px; transform: rotate(90deg); transition: transform .3s var(--ease); }
+.backbar__drop.is-open .backbar__dropbtn svg { transform: rotate(-90deg); }
+.backbar__panel { position: absolute; right: 0; top: calc(100% + 8px); width: min(300px, calc(100vw - 32px)); display: grid; padding: 8px; background: #0f1729; border: 1px solid rgba(212, 176, 106, .3); border-radius: 14px; box-shadow: 0 24px 50px rgba(0, 0, 0, .45); opacity: 0; visibility: hidden; transform: translateY(-6px) scale(.98); transform-origin: top right; transition: opacity .25s var(--ease), transform .25s var(--ease), visibility 0s .25s; }
+.backbar__drop.is-open .backbar__panel { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.backbar__panel a { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px; border-radius: 10px; font-size: .875rem; color: #f3ecdd; }
+.backbar__panel a:hover, .backbar__panel a:focus-visible { background: rgba(243, 236, 221, .06); }
+.backbar__panel a svg { width: 14px; height: 14px; opacity: .6; }
+.backbar__panel a[aria-current] { color: #d4b06a; }
+.backbar__here { font-size: .625rem; letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
+.backbar__panel-home { justify-content: flex-start !important; border-bottom: 1px solid rgba(243, 236, 221, .1); border-radius: 10px 10px 0 0 !important; margin-bottom: 4px; }
+.backbar__panel-home span { display: grid; gap: 2px; }
+.backbar__panel-home span span { font-size: .75rem; opacity: .65; }
+.backbar__panel-home .backbar__emblem { width: 34px; }
+@media (max-width: 860px) {
+  .backbar__tabs { display: none; }
+  .backbar__drop { display: block; }
+}
+@media (max-width: 420px) {
+  .backbar__hint { display: none; }
+  .backbar__home { padding-right: 12px; }
+}
+
+/* Floating pill: the way back stays one tap away after the bar scrolls off */
+.backpill { position: fixed; left: max(16px, env(safe-area-inset-left)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: 70; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px 8px 10px; border-radius: 999px; background: rgba(11, 17, 32, .92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #f3ecdd; border: 1px solid rgba(212, 176, 106, .5); font-size: .6875rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; box-shadow: 0 12px 30px rgba(0, 0, 0, .25); opacity: 0; transform: translateY(16px); pointer-events: none; transition: opacity .35s var(--ease), transform .35s var(--ease), background .25s, color .25s; }
+.backpill.is-on { opacity: 1; transform: none; pointer-events: auto; }
+.backpill:hover, .backpill:focus-visible { background: #d4b06a; color: #0b1120; }
+.backpill__arrow { display: inline-grid; transition: transform .3s var(--ease); }
+.backpill__arrow svg { width: 13px; height: 13px; }
+.backpill:hover .backpill__arrow { transform: translateX(-3px); }
+.backpill .backbar__emblem { width: 22px; }
+body[data-page="pdp"] .backpill { bottom: calc(max(16px, env(safe-area-inset-bottom)) + 76px); }
+body[data-page="checkout"] .backpill, html[style*="overflow: hidden"] .backpill { opacity: 0; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .backpill { transition: none; } }

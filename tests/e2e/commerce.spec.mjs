@@ -23,7 +23,9 @@ test('home renders editorial story and navigates to shop', async ({ page }) => {
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/essentials/');
   await expect(page.locator('h1')).toContainText('Refresh Your Space.');
-  await expect(page.locator('.logo img').first()).toHaveAttribute('src', '/assets/brand/cnm-logo.svg');
+  // Background-free logo: the light-CNM version over the hero, the charcoal-CNM version once the header turns white
+  await expect(page.locator('.site-header .logo .logo__on-dark')).toBeVisible();
+  await expect(page.locator('.site-header .logo .logo__on-light')).toHaveAttribute('src', '/assets/brand/cnm-logo-on-light.svg');
   await page.locator('.hero__cta a', { hasText: 'Shop now' }).click();
   await expect(page).toHaveURL(/\/shop\/$/);
   await expect(page.locator('[data-grid] [data-product-card]:visible')).toHaveCount(20);
@@ -254,7 +256,7 @@ test('every company site has its own pages and a Back to CNM Group button', asyn
     }
     await page.goto(paths[0]);
     await expect(page.locator('.co-logo img')).toBeVisible();
-    await page.locator('.backbar__btn').click();
+    await page.locator('.backbar__home').click();
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('h1')).toContainText('transcend');
   }
@@ -396,10 +398,10 @@ test('passwordless sign-in: email code creates an account, then asks for a name'
 test('every Essentials page has a Back to CNM Group button', async ({ page }) => {
   for (const path of ['/essentials/', '/shop/', '/products/white-tea-and-sage-room-spray/', '/checkout/', '/scent-finder/', '/our-story/']) {
     await page.goto(path);
-    await expect(page.locator('.backbar__btn')).toHaveAttribute('href', '/');
-    await expect(page.locator('.backbar__btn')).toContainText('Back to CNM Group');
+    await expect(page.locator('.backbar__home')).toHaveAttribute('href', '/');
+    await expect(page.locator('.backbar__home')).toContainText('Back to CNM Group');
   }
-  await page.locator('.backbar__btn').click();
+  await page.locator('.backbar__home').click();
   await expect(page).toHaveURL(/\/$/);
   await expect(page.locator('.ghero__portrait')).toBeVisible();
 });
@@ -494,4 +496,26 @@ test('newsletter pop-up: shows once, dismisses, and never during checkout', asyn
   await page.goto('/checkout/?nlpop=1');
   await page.waitForTimeout(800);
   await expect(page.locator('#newsletter-pop')).toBeHidden();
+});
+
+test('Back to CNM Group navigation: switcher on phones, tabs on desktop, floating pill after scrolling', async ({ page, isMobile }) => {
+  await page.goto('/foundation/');
+  if (isMobile) {
+    await expect(page.locator('.backbar__tabs')).toBeHidden();
+    await page.locator('.backbar__dropbtn').click();
+    await expect(page.locator('.backbar__panel')).toBeVisible();
+    await expect(page.locator('.backbar__panel a[aria-current]')).toContainText('CNM Foundation');
+    await page.locator('.backbar__panel a[href="/spectra/"]').click();
+    await expect(page).toHaveURL(/\/spectra\/$/);
+  } else {
+    await expect(page.locator('.backbar__tabs a[aria-current]')).toHaveText('CNM Foundation');
+    await page.locator('.backbar__tabs a[href="/spectra/"]').click();
+    await expect(page).toHaveURL(/\/spectra\/$/);
+  }
+  await expect(page.locator('.backpill')).not.toHaveClass(/is-on/);
+  await page.evaluate(() => scrollTo(0, 2000));
+  await expect(page.locator('.backpill')).toHaveClass(/is-on/);
+  await page.locator('.backpill').click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator('.ghero__portrait')).toBeVisible();
 });

@@ -8,8 +8,12 @@ export const approval = (what, detail = '') =>
   `<div class="approval" role="note"><strong>Needs CNM approval</strong>${escapeHtml(what)}${detail ? ` <span>${escapeHtml(detail)}</span>` : ''}</div>`;
 
 export function logo(ctx, { footer = false } = {}) {
+  // Background-free logo: charcoal "CNM" on light surfaces, the original light "CNM" on dark ones (footer, transparent hero header).
+  const alt = 'CNM Essentials — crafting serenity, pioneering comfort';
   const inner = ctx.logoFile
-    ? `<img src="${ctx.logoFile}" alt="CNM Essentials — crafting serenity, pioneering comfort" width="702" height="801">`
+    ? (footer
+      ? `<img src="/assets/brand/cnm-logo-on-dark.svg" alt="${alt}" width="581" height="447">`
+      : `<img class="logo__on-light" src="/assets/brand/cnm-logo-on-light.svg" alt="${alt}" width="581" height="447"><img class="logo__on-dark" src="/assets/brand/cnm-logo-on-dark.svg" alt="" width="581" height="447" aria-hidden="true">`)
     : `<span><span class="logo__wordmark">CNM Essentials</span>${footer ? '' : '<span class="logo__flag">Logo placeholder · original file pending</span>'}</span>`;
   return `<a class="logo" href="/essentials/" aria-label="CNM Essentials — home">${inner}</a>`;
 }
