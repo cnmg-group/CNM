@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 
-export const DEFAULT_API_BASE_URL = 'https://cnmshop.netlify.app';
+export const DEFAULT_API_BASE_URL = 'https://cnmgg.netlify.app';
 
 /** EXPO_PUBLIC_* vars are inlined at build time by Metro. */
 export const API_BASE_URL = (process.env.EXPO_PUBLIC_API_BASE_URL || DEFAULT_API_BASE_URL).replace(/\/+$/, '');

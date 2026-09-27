@@ -2,8 +2,8 @@ Build **CNM Essentials**, a luxury e-commerce website for a Nigerian home-fragra
 
 ## Brand
 - **Logo:** use the original image. Never redraw it or replace it with text.
-  - Full logo (dark square): `https://cnmshop.netlify.app/assets/brand/cnm-logo.svg`
-  - Petal mark (favicon): `https://cnmshop.netlify.app/assets/brand/cnm-mark.svg`
+  - Full logo (dark square): `https://cnmgg.netlify.app/assets/brand/cnm-logo.svg`
+  - Petal mark (favicon): `https://cnmgg.netlify.app/assets/brand/cnm-mark.svg`
 - **Colours:** charcoal `#23221e` (primary/dark sections), deep `#121110`, sage `#d3dbce`, yellow `#fbcc39` (primary buttons on dark, badges, labels on dark), gold text on light `#7a5c00`, off-white `#f6f5f0`, hairlines `#e3e5de`, ink `#111`, muted `#6d6b66`.
 - **Type:** "Instrument Serif" (Google Fonts) for headlines, with italic accents. "Hanken Grotesk" for everything else. Small labels are uppercase, 11px, letter-spacing 0.16em.
 - **Style:** generous whitespace, square corners (no pills), hairline borders, calm fade and slide reveals on scroll (respect prefers-reduced-motion), subtle image zoom on hover.
@@ -22,7 +22,7 @@ Build **CNM Essentials**, a luxury e-commerce website for a Nigerian home-fragra
   - "We accept: Visa · Mastercard · PayPal". © CNM Essentials, part of CNM Group.
 
 ## Data
-Create `src/data/products.ts`. The currency is NGN; format as `₦17,850` or `₦14,888.75` (up to 2 decimals). All brands are sold by CNM. The image for each product is `https://cnmshop.netlify.app/assets/products/{id}.webp` (portrait 3:4, white background: show with object-contain on white).
+Create `src/data/products.ts`. The currency is NGN; format as `₦17,850` or `₦14,888.75` (up to 2 decimals). All brands are sold by CNM. The image for each product is `https://cnmgg.netlify.app/assets/products/{id}.webp` (portrait 3:4, white background: show with object-contain on white).
 
 | id | name | brand | type | category | price |
 |---|---|---|---|---|---|
@@ -47,7 +47,7 @@ Create `src/data/products.ts`. The currency is NGN; format as `₦17,850` or `�
 | the-perfect-christmas-wallflower-plug-in-refill | The Perfect Christmas | Bath & Body Works | Wallflower Plug-In Refill | diffusers-refills | 14888.75 |
 | the-perfect-christmas-room-spray | The Perfect Christmas | Bath & Body Works | Room Spray | room-home-fragrance | 16125 |
 
-**Categories** (banner images at `https://cnmshop.netlify.app/assets/campaign/{slug}.webp`, square): `room-home-fragrance` "Room & Home Fragrance", `diffusers-refills` "Diffusers & Refills", `body-care` "Body Care", `hair-care` "Hair Care". Body Care and Hair Care have no products yet; their pages show "Coming soon online — visit our stores".
+**Categories** (banner images at `https://cnmgg.netlify.app/assets/campaign/{slug}.webp`, square): `room-home-fragrance` "Room & Home Fragrance", `diffusers-refills` "Diffusers & Refills", `body-care` "Body Care", `hair-care` "Hair Care". Body Care and Hair Care have no products yet; their pages show "Coming soon online — visit our stores".
 
 **Never invent product facts.** Descriptions, scent notes, ingredients, sizes and stock are not supplied yet. Where they would appear, show a subtle dashed "Details coming soon" box. Stock is unknown, so show "Availability to be confirmed" and allow ordering.
 
@@ -63,7 +63,7 @@ Create `src/data/products.ts`. The currency is NGN; format as `₦17,850` or `�
    - **Dark "For business" section:** "Lease-to-Own Programme — Commercial diffuser solutions for businesses, in Lagos and Abuja". Key products: Industrial Diffuser series · Wellbeing Essential Oils · Body butters & hair oils · Candles, mists & humidifiers. Buttons: Enquire and How it works.
    - **"Featured"** grid of 8 products.
    - **About split:**
-     - Image: `https://cnmshop.netlify.app/assets/stores/cnm-essentials-store-interior.webp`.
+     - Image: `https://cnmgg.netlify.app/assets/stores/cnm-essentials-store-interior.webp`.
      - Heading: "Where Luxury Meets Atmosphere."
      - Text: "A premium lifestyle brand offering luxury fragrances, home décor, and body care products crafted for the intentional woman and the discerning home. CNM Essentials is the fragrance and lifestyle destination for those who believe that how you live at home reflects who you are in the world."
      - Stats: "4 Curated collections" and "100% Premium sourced".
@@ -94,12 +94,12 @@ Create `src/data/products.ts`. The currency is NGN; format as `₦17,850` or `�
 10. **Stores (`/stores`, `/stores/lagos`, `/stores/abuja`):** address, phone, "Get directions" link to Google Maps, a map embed, services (In-store shopping · Collect in store · Lease-to-Own commercial diffusers), and "Opening hours coming soon".
 11. **For business (`/fragrance-as-a-service`):** Lease-to-Own Programme hero, the sectors served (Events, Weddings, Corporate events, Hospitality, Retail spaces, Offices, Brand activations, Scent-machine solutions), a 4-step process (Enquire, Consult, Scent, Maintain), and an enquiry form (name, company, email, phone, project type, event date, location, message, consent).
 12. **CNM Group (`/cnm-group`)**
-   - **Hero:** navy `#1d2b4a` with the logo `https://cnmshop.netlify.app/assets/brand/cnm-group-logo.png`, "Creating Sustainable Businesses That Transcend Industries", and stats 16 Years · 4 Business entities · 2 Countries · ISO 9001:2015. Motto: "Driven by Excellence. Defined by Trust."
+   - **Hero:** navy `#1d2b4a` with the logo `https://cnmgg.netlify.app/assets/brand/cnm-group-logo.png`, "Creating Sustainable Businesses That Transcend Industries", and stats 16 Years · 4 Business entities · 2 Countries · ISO 9001:2015. Motto: "Driven by Excellence. Defined by Trust."
    - **Divisions:** three columns.
      - **Retail:** CNM Essentials (links to `/`, "Shop now") and CNM Spectra.
      - **Energy:** CNMWorX Limited.
      - **Impact:** CNM Foundation.
-     - Logos: `/assets/brand/cnm-spectra-logo.jpg`, `/assets/brand/cnmworx-logo.jpg` and `/assets/brand/cnm-foundation-logo.jpg`, all on `https://cnmshop.netlify.app`.
+     - Logos: `/assets/brand/cnm-spectra-logo.jpg`, `/assets/brand/cnmworx-logo.jpg` and `/assets/brand/cnm-foundation-logo.jpg`, all on `https://cnmgg.netlify.app`.
    - **Contact:** info@cnm-group.net, +234 901 544 5554, and a message form.
 13. **Legal and help:** Privacy, Terms, Delivery & returns, FAQs, Contact, 404.
 

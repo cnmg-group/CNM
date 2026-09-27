@@ -23,7 +23,7 @@ test('paystack.initialize: kobo amount, NGN, channels, metadata, bearer auth', a
   process.env.PAYSTACK_SECRET_KEY = 'sk_test_abc';
   process.env.PAYSTACK_CHANNELS = 'card,bank_transfer';
   const calls = mockFetch(() => ({ body: { status: true, data: { authorization_url: 'https://checkout.paystack.com/xyz', access_code: 'xyz' } } }));
-  const r = await paystack.initialize(order, { callbackUrl: 'https://cnmshop.netlify.app/checkout/confirmation/?n=1' });
+  const r = await paystack.initialize(order, { callbackUrl: 'https://cnmgg.netlify.app/checkout/confirmation/?n=1' });
   assert.equal(r.authorizationUrl, 'https://checkout.paystack.com/xyz');
   assert.equal(calls[0].url, 'https://api.paystack.co/transaction/initialize');
   assert.equal(calls[0].init.headers.Authorization, 'Bearer sk_test_abc');

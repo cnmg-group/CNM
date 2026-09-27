@@ -26,7 +26,7 @@ All forms arrive in **Admin → Enquiries** (and by email once `CNM_NOTIFY_EMAIL
 
 ## 2. How to see it
 
-1. **Online (for anyone, on any phone or computer):** https://cnmshop.netlify.app (staging; connected to this repo on Netlify).
+1. **Online (for anyone, on any phone or computer):** https://cnmgg.netlify.app (staging; connected to this repo on Netlify).
 2. **Screenshots now:** open `docs/visual-review/index.html` for 69 screenshots, every page on desktop and mobile.
 3. **Try it:** promo code `STAGING10`. Payments are simulated, so no money moves; you can test both a successful and a failed payment.
 

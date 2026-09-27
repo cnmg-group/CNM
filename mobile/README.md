@@ -62,7 +62,7 @@ npx expo start --dev-client
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `EXPO_PUBLIC_API_BASE_URL` | `https://cnmshop.netlify.app` | Origin of the website + API. `/catalogue.json`, `/api/*` and web pages (FaaS, stores, policies) are loaded from here. |
+| `EXPO_PUBLIC_API_BASE_URL` | `https://cnmgg.netlify.app` | Origin of the website + API. `/catalogue.json`, `/api/*` and web pages (FaaS, stores, policies) are loaded from here. |
 
 Set per build profile in `eas.json` (development/preview → staging, production →
 `https://cnmessentials.com`). `EXPO_PUBLIC_*` values are inlined at build time, so never

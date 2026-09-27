@@ -40,7 +40,7 @@ The **publishable** key (`sb_publishable_…`) is safe to be public but can't wr
 
 1. In Paystack, go to **Settings → API Keys & Webhooks**.
 2. In Netlify, set `PAYSTACK_SECRET_KEY` = `sk_test_…` for staging. Use `sk_live_…` only on the production site after approval.
-3. Set the **Webhook URL** in Paystack to `https://cnmshop.netlify.app/api/payments/paystack-webhook` (on production, use your live domain).
+3. Set the **Webhook URL** in Paystack to `https://cnmgg.netlify.app/api/payments/paystack-webhook` (on production, use your live domain).
 4. Redeploy. At checkout the customer picks **Card**, **Bank transfer** or **USSD**, and Paystack's secure page opens on that method. Checkout now sends customers to Paystack's secure page (card, bank, USSD, bank transfer, QR). When they return, the payment is verified, and the webhook confirms it as well. The staging simulator switches off automatically.
 
 **Real payments stay off in staging.** A live key (`sk_live_…`) is ignored unless the deploy is the production context **and** `CNM_LAUNCH_APPROVED=true`. Anywhere else, including branch and preview deploys, checkout uses the simulator even if a live key is set site-wide. A test key (`sk_test_…`) works everywhere and never moves real money. The checkout page and order review both say when no real payment will be taken.
