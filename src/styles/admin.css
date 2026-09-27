@@ -584,3 +584,4 @@ body[data-page="admin"] { --os-bg: #f6f4ef; --os-card: #fff; --os-line: #e7e3da;
 .os-card.os-form { padding: 18px 20px; }
 .doc__meta dd { white-space: nowrap; }
 .doc__meta { flex: none; }
+:root[data-theme="dark"] body[data-page="admin"] .os-tabs a[aria-current="true"] small { background: rgba(11, 17, 32, .16); color: #0b1120; }
