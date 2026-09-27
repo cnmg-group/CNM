@@ -179,8 +179,22 @@ if ('IntersectionObserver' in window) {
   document.querySelectorAll('[data-product-card]').forEach((c) => io.observe(c));
 }
 
-// ---------- account link reflects sign-in ----------
-if (S.getUser()) document.querySelectorAll('[data-account-link]').forEach((a) => a.setAttribute('aria-label', `Account — ${S.getUser().firstName}`));
+// ---------- account: optional sign in / create account, never required to shop ----------
+function paintAuth() {
+  const u = S.getUser();
+  document.querySelectorAll('[data-account-link]').forEach((a) => a.setAttribute('aria-label', u ? `Account — ${u.firstName || u.email}` : 'Sign in or create an account'));
+  document.querySelectorAll('[data-signed-in]').forEach((n) => { n.hidden = !u; });
+  document.querySelectorAll('[data-signed-out]').forEach((n) => { n.hidden = !!u; });
+}
+paintAuth();
+S.on('user', paintAuth);
+const openAuth = (mode, opts) => import('./auth-dialog.js').then((m) => m.openAuth(mode, opts));
+document.addEventListener('click', (e) => {
+  const trigger = e.target.closest('[data-auth-open]');
+  if (trigger) { e.preventDefault(); openAuth(trigger.dataset.authOpen, { reason: trigger.dataset.authReason, email: trigger.dataset.authEmail }); return; }
+  const account = e.target.closest('[data-account-link]');
+  if (account && !S.getUser()) { e.preventDefault(); openAuth('signin', { reason: 'Optional: track orders, save addresses and keep your wishlist on web and app.' }); }
+});
 
 // ---------- search overlay (lazy) ----------
 const searchPanel = document.querySelector('[data-panel="search"]');

@@ -28,7 +28,7 @@ export function bagPage(ctx) {
 export function wishlistPage(ctx) {
   const { html: crumbs } = breadcrumbs(ctx, [{ name: 'Wishlist', path: '/wishlist/' }]);
   return `<div class="container">${crumbs}
-  <header class="plp-head" style="display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap"><div><h1 class="h1">Wishlist</h1><p class="muted" data-wish-note>Saved on this device. <a class="textlink" href="/account/login/?next=/wishlist/">Sign in</a> to keep it across web and app.</p></div><button class="link" type="button" data-wish-share>${icon('share')} Share wishlist</button></header>
+  <header class="plp-head" style="display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap"><div><h1 class="h1">Wishlist</h1><p class="muted" data-wish-note>Saved on this device. <button class="textlink" type="button" data-auth-open="signin" data-auth-reason="Optional: keep your wishlist across web and app.">Sign in</button> to keep it across web and app (optional).</p></div><button class="link" type="button" data-wish-share>${icon('share')} Share wishlist</button></header>
   <div class="grid-products" data-wishlist-grid style="padding-bottom:96px"></div>
   <div class="empty-state" data-wishlist-empty hidden><p class="h3">Nothing saved yet.</p><p class="muted">Tap the heart on any product to keep it here.</p><a class="btn" href="/shop/">Explore the shop</a></div>
 </div>`;
@@ -53,7 +53,10 @@ export function checkoutPage(ctx) {
 
       <form class="step-panel" data-step="contact" novalidate>
         <h2>Contact</h2>
-        <p class="muted" data-signin-hint>Have an account? <a class="textlink" href="/account/login/?next=/checkout/">Sign in</a> for faster checkout — or continue as a guest.</p>
+        <div class="co-auth" data-co-auth>
+          <p data-co-auth-guest><strong>Checking out as a guest.</strong> <span class="muted">No account needed.</span></p>
+          <div class="co-auth__actions" data-co-auth-actions><button class="textlink" type="button" data-auth-open="signin" data-auth-reason="Optional: sign in to use your saved details. You can also close this and check out as a guest.">Sign in</button><button class="textlink" type="button" data-auth-open="signup" data-auth-reason="Optional: an account lets you track orders and save addresses. You can also close this and check out as a guest.">Create account</button></div>
+        </div>
         <div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email" required></div>
         <div class="form-row"><div class="field"><label for="c-first">First name</label><input id="c-first" name="firstName" autocomplete="given-name" required></div><div class="field"><label for="c-last">Last name</label><input id="c-last" name="lastName" autocomplete="family-name" required></div></div>
         <div class="field"><label for="c-phone">Phone</label><input id="c-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="+234"><span class="hint">For delivery updates only.</span></div>

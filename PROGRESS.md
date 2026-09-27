@@ -59,6 +59,9 @@ CNM supplied screenshots of **cnmessentials.com** (home, shop, about) and **cnm-
 | Commerce | AI scent finder (`/scent-finder/`): scents, room, mood, budget → matching products via Netlify AI Gateway, grounded + validated, with rules fallback | DONE (gateway to enable) |
 | Commerce | Order numbers, confirmation email, order history, tracking status | DONE |
 | Account | Register, sign in, email-code (OTP) sign-in, reset, profile, addresses, orders, preferences, sign out everywhere | DONE |
+| Account | Optional sign-in / create-account dialog (email code or password) from the header, mobile menu, checkout, wishlist and confirmation; shopping and checkout never require an account | DONE |
+| Navigation | CNM Group bar on every Essentials page (back to CNM Group + sister companies); group header on company pages | DONE |
+| Visual | Campaign artwork shown whole (no cropping, no text overlaid); captions sit below | DONE |
 | Content | Our Story (brand and group copy, mission, vision, values), Stores (real NAP), For Business / Lease-to-Own + enquiry, Journal, CNM Group hub with its own group header/footer and "Visit store" (Retail · Energy · Impact, leadership), company pages for Spectra (consultation form), CNMWorX (project/tender form), Foundation (partner/volunteer form), group contact page | DONE (founder and hours **NEEDS CNM APPROVAL**) |
 | Mobile | Expo iOS + Android app with the original logo, real catalogue and palette (tabs, shop, brand filter, search, PDP, wishlist, bag, checkout, account, push, deep links, biometrics) | DONE (typecheck + 69 tests; not yet device-tested) |
 | Mobile | App Store and Play Store submission | **NEEDS CNM APPROVAL** (accounts) |
@@ -72,7 +75,7 @@ CNM supplied screenshots of **cnmessentials.com** (home, shop, about) and **cnm-
 | Integrations | Resend email (sign-in codes, orders), Supabase database adapter + SQL migration, Paystack payment adapter (initialize, verify, webhooks, refunds) | DONE (needs keys in Netlify: see `docs/INTEGRATIONS.md`) |
 | Sign-in | Passwordless email code (OTP) as the default sign-in; new customers are created on first code | DONE |
 | Security | Signed HttpOnly sessions, CSRF, rate limits, validation, server-side pricing, RBAC, webhook HMAC, CSP/HSTS | DONE |
-| Testing | 38 unit/integration tests, 34 Playwright E2E runs (desktop + mobile), 69 mobile app tests | DONE (all passing) |
+| Testing | 38 unit/integration tests, 41 Playwright E2E runs (desktop + mobile), 69 mobile app tests | DONE (all passing) |
 | Visual QA | CNM Group, company, contact and scent-finder pages checked at 360 / 390 / 768 / 1024 / 1440 px (no horizontal scroll) | DONE |
 | Staging | Netlify config; staging is noindexed with a staging banner and payment simulator | DONE (deploy needs Netlify access, see `docs/DEPLOYMENT.md`) |
 | Visual QA | 69 screenshots, desktop + mobile, `docs/visual-review/index.html` | DONE (with real CNM assets) |

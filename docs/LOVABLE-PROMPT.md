@@ -108,3 +108,39 @@ Create `src/data/products.ts`. The currency is NGN; format as `₦17,850` or `�
 - Lazy-load images. Use skeletons, not spinners, for lists.
 - **Loader:** a small "butterfly" loader. Two sage wing shapes drift together and merge into a droplet. Show it only when an action takes longer than 250 ms, and never add artificial delays.
 - Per-page titles and meta descriptions.
+
+---
+
+## Follow-up prompt: fixes after review (paste into Lovable as a new message)
+
+```
+Please fix these four issues across the whole site. Keep the existing design, colours, fonts and real product data. Do not invent products, prices or facts.
+
+1. NEVER PUT TEXT ON TOP OF CAMPAIGN ARTWORK
+The CNM campaign images (Room & Home Fragrance, Diffusers & Refills, Body Care, Hair Care) already have words and product packaging printed on them. Right now titles like "CNM Essentials", "Pure. Natural. Purposeful." and "Explore" are laid on top, so the words collide and the image is cropped.
+- Show these images whole: object-fit: contain, keep their square 1:1 aspect ratio, and put a soft neutral background behind them. Never crop them with object-fit: cover.
+- Put any heading, tagline, number ("01 — ...") and button BELOW or BESIDE the image, never over it. No dark gradient overlays on these images.
+- On company cards (CNM Group page), use the company logo or a plain photo without printed text as the image. Show the name, tagline and "Explore" button in a text area under the image.
+- Check at 360, 390, 768, 1024 and 1440 px wide: every word printed in the artwork must be fully visible, and nothing may overlap.
+
+2. ALWAYS A WAY BACK TO CNM GROUP
+- Add a thin navy bar (#1d2b4a, white text, 36px tall) at the very top of EVERY page of every company (CNM Essentials shop, product pages, bag, checkout, account, Spectra, CNMWorX, Foundation).
+- Left side: "← CNM Group", linking to the CNM Group home page.
+- Right side: links to CNM Essentials, Spectra, CNMWorX and Foundation, with the current company underlined. On phones, show only the current company.
+- The CNM Group logo in the group header always links to the CNM Group home page.
+- The mobile menu ends with "← Back to CNM Group".
+
+3. SHOPPING NEVER REQUIRES AN ACCOUNT
+- Browsing, search, product pages, the wishlist (saved on the device), the bag and the whole checkout must all work as a guest. Nothing redirects to a login page.
+- Only offer an account when the shopper is about to pay, and make it a choice. At the top of checkout show "Checking out as a guest. No account needed." with two small text links, "Sign in" and "Create account". Both are optional; closing them leaves checkout exactly as it was.
+- If they sign in during checkout, prefill their name, email, phone and default address, and show "Signed in as <email>".
+- On the order confirmation page, offer "Create an account (optional)" with their email prefilled.
+
+4. SIGN IN AND SIGN UP (Supabase Auth)
+- Build a sign-in / create-account dialog: a centred modal on desktop and a bottom sheet on phones. It has two tabs, "Sign in" and "Create account".
+- Default method is an email one-time code (Supabase signInWithOtp with a 6-digit code). Enter email → "Email me a code" → enter the code → signed in. The code field auto-submits at 6 digits. There's a "Resend code" button with a 60-second countdown, and "Use a password instead" as an alternative.
+- Create account asks for first name, last name and email, plus an optional marketing tick-box, then uses the same code step. Password sign-up needs at least 10 characters.
+- Open the dialog from: the header account icon (when signed out), the mobile menu ("Sign in" / "Create account" buttons), the checkout links, the wishlist note and the confirmation page. After success, stay on the same page, show a small toast "Signed in as ...", and merge the guest wishlist into the account.
+- When signed in, the account icon goes to /account (orders, addresses, profile, wishlist, sign out).
+- Show clear errors: wrong code (with attempts left), expired code, too many attempts, and "please wait before requesting another code".
+```

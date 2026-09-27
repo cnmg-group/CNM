@@ -41,7 +41,7 @@ export function homePage(ctx) {
 <section class="section section--tight" aria-labelledby="cat-title">
   <div class="container">
     <div class="section-head"><div><span class="label muted">Browse</span><h2 id="cat-title" class="h2">Shop by category</h2></div><a class="link" href="/shop/">Shop all ${icon('arrow')}</a></div>
-    <div class="banner-grid">${bannerCats.map((c) => `<a class="banner" href="/shop/${c.slug}/" data-promo="cat-${c.slug}"><img src="${c.banner}" alt="${escapeHtml(c.name)} — CNM Essentials campaign" loading="lazy" width="1094" height="1092"><span class="banner__cap">${escapeHtml(c.name)} ${icon('arrow')}</span></a>`).join('')}</div>
+    <div class="banner-grid">${bannerCats.map((c) => `<a class="banner" href="/shop/${c.slug}/" data-promo="cat-${c.slug}"><span class="banner__img"><img src="${c.banner}" alt="${escapeHtml(c.name)} — CNM Essentials campaign" loading="lazy" width="1094" height="1092"></span><span class="banner__cap">${escapeHtml(c.name)} ${icon('arrow')}</span></a>`).join('')}</div>
   </div>
 </section>
 
@@ -61,7 +61,7 @@ export function homePage(ctx) {
 </section>
 
 <section class="split section--cream" aria-labelledby="diff-title">
-  <div class="split__media"><img src="/assets/campaign/diffusers-refills.webp" alt="Diffusers and refills — CNM Essentials campaign" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>
+  <div class="split__media split__media--artwork"><img src="/assets/campaign/diffusers-refills.webp" alt="Diffusers and refills — CNM Essentials campaign" loading="lazy" width="1094" height="1092"></div>
   <div class="split__copy reveal">
     <span class="label muted">Diffusers &amp; refills</span>
     <h2 id="diff-title" class="h1">The room, <em class="italic">remembered.</em></h2>

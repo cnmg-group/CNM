@@ -319,3 +319,60 @@ test('passwordless sign-in: email code creates an account, then asks for a name'
   await expect(page).toHaveURL(/\/account\/$/);
   await expect(page.locator('[data-account-panel] h1')).toContainText('Welcome, Chioma');
 });
+
+test('every Essentials page links back to CNM Group and its companies', async ({ page }) => {
+  for (const path of ['/', '/shop/', '/products/white-tea-and-sage-room-spray/', '/checkout/', '/scent-finder/']) {
+    await page.goto(path);
+    await expect(page.locator('.group-bar__back')).toHaveAttribute('href', '/cnm-group/');
+  }
+  await page.locator('.group-bar__back').click();
+  await expect(page).toHaveURL(/\/cnm-group\/$/);
+  await page.goto('/cnm-group/foundation/');
+  await page.locator('.group-logo').first().click();
+  await expect(page).toHaveURL(/\/cnm-group\/$/);
+});
+
+test('campaign artwork is shown whole with captions below, not on top', async ({ page }) => {
+  await page.goto('/');
+  const banner = page.locator('.banner').first();
+  await banner.scrollIntoViewIfNeeded();
+  const [img, cap] = await Promise.all([banner.locator('img').boundingBox(), banner.locator('.banner__cap').boundingBox()]);
+  expect(cap.y).toBeGreaterThanOrEqual(img.y + img.height - 1);
+  expect(await banner.locator('img').evaluate((n) => getComputedStyle(n).objectFit)).toBe('contain');
+});
+
+test('shopping never requires an account; sign up is optional and inline at checkout', async ({ page, isMobile }) => {
+  await page.goto('/products/white-tea-and-sage-room-spray/');
+  await page.locator('.buy-actions [data-add]').click();
+  await page.goto('/checkout/');
+  await expect(page).toHaveURL(/\/checkout\/$/);
+  await expect(page.locator('[data-co-auth]')).toContainText('Checking out as a guest');
+  await page.locator('[data-co-auth] [data-auth-open="signup"]').click();
+  const dlg = page.locator('#auth-dialog');
+  await expect(dlg).toBeVisible();
+  await expect(dlg.locator('[data-auth-reason]')).toContainText('check out as a guest');
+  const email = unique();
+  await dlg.locator('#ad-first').fill('Ifeoma');
+  await dlg.locator('#ad-last').fill('Eze');
+  await dlg.locator('#ad-email').fill(email);
+  await dlg.locator('[data-ad-submit]').click();
+  const note = dlg.locator('[data-ad-note]');
+  await expect(note).toContainText(/\d{6}/);
+  await dlg.locator('#ad-code').fill((await note.textContent()).match(/(\d{6})/)[1]);
+  await expect(dlg).toBeHidden();
+  await expect(page.locator('[data-co-auth]')).toContainText(`Signed in as ${email}`);
+  await expect(page.locator('#c-email')).toHaveValue(email);
+  await expect(page.locator('#c-first')).toHaveValue('Ifeoma');
+  // header account icon now goes to the account instead of the dialog
+  if (!isMobile) { await page.goto('/'); await page.locator('[data-account-link]').click(); await expect(page).toHaveURL(/\/account\/$/); }
+});
+
+test('header account icon offers sign in without leaving the page (guest)', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'account icon is in the mobile menu');
+  await page.goto('/shop/');
+  await page.locator('[data-account-link]').click();
+  await expect(page).toHaveURL(/\/shop\/$/);
+  await expect(page.locator('#auth-dialog')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#auth-dialog')).toBeHidden();
+});

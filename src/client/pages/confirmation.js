@@ -54,7 +54,7 @@ export async function init() {
       <h1 class="h1">${ok ? `Thank you, ${escapeHtml(o.contact.firstName)}.` : 'We haven’t received payment yet.'}</h1>
       <p class="muted">Order number</p><p class="order-num">${escapeHtml(o.number)}</p>
       <p class="lead">${ok ? `A confirmation has been sent to ${escapeHtml(o.contact.email)}. Placed ${formatDate(o.createdAt)}.` : 'If you completed payment, this page will update shortly. Otherwise, return to checkout to try again.'}</p>
-      <div class="hero__cta" style="justify-content:center">${ok ? '<a class="btn" href="/shop/">Continue shopping</a>' : '<a class="btn" href="/checkout/">Return to checkout</a>'}${S.getUser() ? `<a class="btn btn--ghost" href="/account/orders/view/?n=${encodeURIComponent(o.number)}">View in account</a>` : '<a class="btn btn--ghost" href="/account/register/">Create an account</a>'}</div>
+      <div class="hero__cta" style="justify-content:center">${ok ? '<a class="btn" href="/shop/">Continue shopping</a>' : '<a class="btn" href="/checkout/">Return to checkout</a>'}${S.getUser() ? `<a class="btn btn--ghost" href="/account/orders/view/?n=${encodeURIComponent(o.number)}">View in account</a>` : `<button class="btn btn--ghost" type="button" data-auth-open="signup" data-auth-email="${escapeHtml(o.contact.email)}" data-auth-reason="Optional: an account makes your next order faster and lets you save addresses and your wishlist.">Create an account (optional)</button>`}</div>
     </div>${orderDetailHTML(o)}<div style="height:96px"></div>`;
   } catch (e) {
     body.innerHTML = `<div class="confirm-hero"><h1 class="h2">We couldn’t find that order.</h1><p class="muted">${escapeHtml(e.message)}</p><a class="btn" href="/">Back to home</a></div>`;

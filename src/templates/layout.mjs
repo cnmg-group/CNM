@@ -21,9 +21,17 @@ function megaMenu(ctx) {
     <div><h3 class="label">Shop</h3><ul><li><a href="/shop/">Shop all</a></li><li><a href="/gifts/">Gift options</a></li><li><a href="/scent-finder/">Scent finder</a></li><li><a href="/fragrance-as-a-service/">Lease-to-Own diffusers</a></li><li><a href="/stores/">Stores</a></li></ul></div>
     <div><h3 class="label">Categories</h3><ul>${cats}</ul></div>
     <div><h3 class="label">Brands</h3><ul>${brands}</ul></div>
-    ${feature ? `<a class="mega__feature" href="/shop/${feature.slug}/" style="padding:0;position:relative;overflow:hidden"><img src="${feature.banner}" alt="${escapeHtml(feature.name)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0"></a>` : ''}
+    ${feature ? `<a class="mega__feature" href="/shop/${feature.slug}/" style="padding:0;position:relative;overflow:hidden"><img src="${feature.banner}" alt="${escapeHtml(feature.name)}" loading="lazy" style="width:100%;height:100%;object-fit:contain;position:absolute;inset:0"></a>` : ''}
   </div>
 </div>`;
+}
+
+/** Thin CNM Group bar on every Essentials page: one tap back to the group or a sister company. */
+function groupBar() {
+  return `<div class="group-bar"><div class="container group-bar__row">
+    <a class="group-bar__back" href="/cnm-group/" data-track="group_bar_back">${icon('arrowLeft')} CNM Group</a>
+    <nav aria-label="CNM Group companies"><ul class="group-bar__links"><li><a href="/" aria-current="true">CNM Essentials</a></li><li><a href="/cnm-group/spectra/">Spectra</a></li><li><a href="/cnm-group/cnmworx/">CNMWorX</a></li><li><a href="/cnm-group/foundation/">Foundation</a></li></ul></nav>
+  </div></div>`;
 }
 
 function header(ctx, mode, current) {
@@ -71,9 +79,10 @@ function mobileMenu(ctx) {
     <li><a href="/journal/">Journal</a></li>
   </ul></nav>
   <div class="mobile-menu__foot">
-    <a href="/account/" class="link">${icon('user')} Account</a>
+    <div class="mobile-menu__auth" data-signed-out><button class="btn btn--block" type="button" data-auth-open="signin">Sign in</button><button class="btn btn--ghost btn--block" type="button" data-auth-open="signup">Create account</button></div>
+    <a href="/account/" class="link" data-signed-in hidden>${icon('user')} My account</a>
     <a href="/wishlist/" class="link">${icon('heart')} Wishlist</a>
-    <a href="/cnm-group/" class="muted">CNM Group — Retail · Energy · Impact</a>
+    <a href="/cnm-group/" class="link">${icon('arrowLeft')} Back to CNM Group</a>
   </div>
 </div>`;
 }
@@ -102,6 +111,26 @@ function overlays() {
       <div id="search-suggest" role="listbox" aria-label="Suggestions" data-search-results></div>
     </div>
   </div>
+</div>
+<div class="auth-dialog" id="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title" data-panel="auth" hidden>
+  <div class="auth-dialog__head"><h2 id="auth-title" class="h3" data-auth-title>Sign in</h2><button class="icon-btn" type="button" data-close aria-label="Close">${icon('close')}</button></div>
+  <div class="tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-auth-mode="signin">Sign in</button><button type="button" role="tab" aria-selected="false" data-auth-mode="signup">Create account</button></div>
+  <p class="muted auth-dialog__reason" data-auth-reason hidden></p>
+  <div class="alert alert--err" role="alert" data-auth-dialog-error hidden></div>
+  <form class="form" data-auth-dialog-form novalidate>
+    <div class="form-row" data-signup-only hidden><div class="field"><label for="ad-first">First name</label><input id="ad-first" name="firstName" autocomplete="given-name"></div><div class="field"><label for="ad-last">Last name</label><input id="ad-last" name="lastName" autocomplete="family-name"></div></div>
+    <div class="field"><label for="ad-email">Email</label><input id="ad-email" name="email" type="email" autocomplete="email" required></div>
+    <div class="field" data-ad-password hidden><label for="ad-pass">Password</label><input id="ad-pass" name="password" type="password" autocomplete="current-password"></div>
+    <div class="field" data-ad-code hidden><label for="ad-code">6-digit code</label><input id="ad-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" class="otp-input"></div>
+    <label class="check" data-signup-only hidden><input type="checkbox" name="marketingOptIn"> Email me about new arrivals and events (optional)</label>
+    <button class="btn btn--green btn--block" type="submit" data-ad-submit>Email me a code</button>
+    <p class="muted auth-dialog__note" data-ad-note aria-live="polite"></p>
+    <div class="auth-dialog__links">
+      <button class="textlink muted" type="button" data-ad-toggle-password>Use a password instead</button>
+      <button class="textlink muted" type="button" data-ad-resend hidden disabled>Resend code</button>
+    </div>
+    <p class="muted auth-dialog__small" data-signup-only hidden>By creating an account you agree to our <a class="textlink" href="/terms/">terms</a> and <a class="textlink" href="/privacy/">privacy notice</a>.</p>
+  </form>
 </div>
 <div class="toast-region" aria-live="polite" data-toasts></div>
 <div class="cnm-loader" data-loader role="status" aria-live="polite" aria-hidden="true">
@@ -208,7 +237,7 @@ ${ld}
 <a class="skip-link" href="#main">Skip to content</a>
 ${ctx.staging ? `<div class="staging-bar">Staging preview — products, prices and imagery from cnmessentials.com; stock, delivery fees and policies await CNM approval. No real payments are taken.</div>` : ''}
 ${ctx.announcement && mode !== 'checkout' && !group ? `<div class="announce-bar">${ctx.announcement.href ? `<a href="${escapeHtml(ctx.announcement.href)}">${escapeHtml(ctx.announcement.message)}</a>` : escapeHtml(ctx.announcement.message)}</div>` : ''}
-${group ? groupHeader(ctx, o.current) : header(ctx, mode, o.current)}
+${group ? groupHeader(ctx, o.current) : `${groupBar()}${header(ctx, mode, o.current)}`}
 ${mode === 'checkout' || group ? '' : mobileMenu(ctx)}
 <main id="main" tabindex="-1">
 ${o.body}

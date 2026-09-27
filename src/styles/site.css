@@ -858,3 +858,43 @@ li > svg, .banner__cap svg, .info-list svg { width: 16px; height: 16px; flex: no
 .group-company > span { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .group-company > span > .link { align-self: flex-start; }
 .group-division .group-company { align-items: start; }
+
+/* ---------- campaign artwork: shown whole, never cropped, never overlaid with text ---------- */
+.banner { aspect-ratio: auto; background: none; display: grid; gap: 0; }
+.banner__img { display: block; aspect-ratio: 1094 / 1092; overflow: hidden; background: var(--sand); }
+.banner__img img { width: 100%; height: 100%; object-fit: contain; }
+.banner__cap { position: static; background: none; color: var(--ink); padding: 12px 0 0; }
+.banner:hover .banner__cap { text-decoration: underline; text-underline-offset: 4px; }
+.split__media--artwork { display: grid; place-items: center; background: var(--sand); padding: clamp(16px, 3vw, 48px); }
+.split__media--artwork img { position: static; width: 100%; max-width: 620px; height: auto; aspect-ratio: 1094 / 1092; object-fit: contain; }
+@media (max-width: 960px) { .split__media--artwork { min-height: 0; } }
+
+/* ---------- CNM Group bar (every Essentials page) ---------- */
+.group-bar { background: #1d2b4a; color: #fff; font-size: .75rem; letter-spacing: .06em; }
+.group-bar__row { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 36px; }
+.group-bar__back { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; min-height: 36px; }
+.group-bar__back svg { width: 14px; height: 14px; }
+.group-bar__links { display: flex; gap: 20px; }
+.group-bar__links a { opacity: .75; }
+.group-bar__links a:hover, .group-bar__links a[aria-current] { opacity: 1; }
+.group-bar__links a[aria-current] { text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 640px) { .group-bar__links li:not(:first-child) { display: none; } }
+
+/* ---------- sign in / create account dialog ---------- */
+.auth-dialog { position: fixed; z-index: 90; left: 50%; top: 50%; width: min(460px, calc(100vw - 32px)); max-height: calc(100svh - 32px); overflow-y: auto; background: #fff; padding: var(--s6); display: grid; gap: var(--s4); transform: translate(-50%, -46%); opacity: 0; transition: transform .35s var(--ease), opacity .35s var(--ease); }
+.auth-dialog.is-open { transform: translate(-50%, -50%); opacity: 1; }
+.auth-dialog__head { display: flex; justify-content: space-between; align-items: center; }
+.auth-dialog__head .h3 { font-family: var(--serif); font-size: 1.75rem; font-weight: 400; margin: 0; }
+.auth-dialog__reason, .auth-dialog__note, .auth-dialog__small { font-size: .8125rem; margin: 0; }
+.auth-dialog__links { display: flex; justify-content: space-between; gap: 12px; font-size: .8125rem; }
+.otp-input { letter-spacing: .5em; font-size: 1.25rem; text-align: center; }
+@media (max-width: 640px) {
+  .auth-dialog { top: auto; bottom: 0; left: 0; width: 100%; max-height: 92svh; transform: translateY(100%); opacity: 1; padding: var(--s5) var(--gutter) max(var(--s5), env(safe-area-inset-bottom)); border-radius: 14px 14px 0 0; }
+  .auth-dialog.is-open { transform: none; }
+}
+.mobile-menu__auth { display: grid; gap: 8px; margin-bottom: 8px; }
+
+/* ---------- checkout: optional account ---------- */
+.co-auth { display: flex; justify-content: space-between; align-items: center; gap: 12px 24px; flex-wrap: wrap; padding: 14px 16px; background: var(--cream); font-size: .875rem; }
+.co-auth p { margin: 0; }
+.co-auth__actions { display: flex; gap: 16px; }

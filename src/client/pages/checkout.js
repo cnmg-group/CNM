@@ -24,18 +24,27 @@ export async function init() {
     return;
   }
 
-  // Prefill for signed-in customers
-  if (S.getUser()) {
-    root.querySelector('[data-signin-hint]').hidden = true;
+  // Signing in is optional. Guests check out without an account; signed-in customers get their details prefilled.
+  const fill = (form, data) => Object.entries(data || {}).forEach(([k, v]) => { const f = form.elements[k]; if (f && typeof v === 'string' && !f.dataset.touched) f.value = v; });
+  root.querySelectorAll('input, select').forEach((f) => f.addEventListener('input', () => { f.dataset.touched = '1'; }));
+  async function prefillFromAccount() {
+    const guest = root.querySelector('[data-co-auth-guest]');
+    const actions = root.querySelector('[data-co-auth-actions]');
+    if (!S.getUser()) { guest.innerHTML = '<strong>Checking out as a guest.</strong> <span class="muted">No account needed.</span>'; actions.hidden = false; return; }
     try {
       const [{ user }, { addresses }] = await Promise.all([api('/api/auth/me', { loader: false }), api('/api/account/addresses', { loader: false })]);
-      state.contact = { email: user.email, firstName: user.firstName, lastName: user.lastName, phone: user.phone || '', ...state.contact };
+      state.contact = { ...state.contact, email: user.email, firstName: state.contact.firstName || user.firstName, lastName: state.contact.lastName || user.lastName, phone: state.contact.phone || user.phone || '' };
       const def = addresses.find((a) => a.isDefault) || addresses[0];
       if (def && !state.delivery.line1) Object.assign(state.delivery, { line1: def.line1, line2: def.line2, city: def.city, state: def.state });
+      guest.innerHTML = `<strong>Signed in as ${escapeHtml(user.email)}.</strong> <span class="muted">Your order will appear in your account.</span>`;
+      actions.hidden = true;
     } catch { S.setUser(null); }
+    fill(root.querySelector('[data-step="contact"]'), state.contact);
+    fill(root.querySelector('[data-step="delivery"]'), state.delivery);
   }
+  await prefillFromAccount();
+  S.on('user', () => prefillFromAccount());
 
-  const fill = (form, data) => Object.entries(data || {}).forEach(([k, v]) => { const f = form.elements[k]; if (f && typeof v === 'string') f.value = v; });
   fill(root.querySelector('[data-step="contact"]'), state.contact);
   fill(root.querySelector('[data-step="delivery"]'), state.delivery);
   const payRadio = root.querySelector(`[name="paymentMethod"][value="${state.payment?.method}"]`);
