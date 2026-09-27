@@ -70,6 +70,7 @@ export default handler(async (req, context) => {
   const number = orderNumber();
   const order = {
     number, accessToken: randomToken(24), userId: user?.id || null, status: 'pending_payment', createdAt: now, updatedAt: now,
+    companyId: 'essentials', channel: req.headers.get('x-cnm-client') === 'mobile' ? 'app' : 'web',
     contact, delivery, notes: v.str(body.notes, { name: 'Notes', max: 300, required: false }),
     lines: quote.lines, promoCode: quote.promo?.valid ? quote.promo.code : null,
     totals: { subtotal: quote.subtotal, discount: quote.discount, delivery: quote.delivery, vat: quote.vat, vatIncluded: quote.vatIncluded, total: quote.total, currency: 'NGN' },

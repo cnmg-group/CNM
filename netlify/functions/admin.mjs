@@ -1,5 +1,8 @@
 // /api/admin/* — operations back office. Role-based access; every route checks permissions server-side.
-import { baseProducts, commerce } from '../lib/catalogue.mjs';
+import { baseProducts, commerce, liveOverrides, stores } from '../lib/catalogue.mjs';
+import { createCompany, leadCompany, listCompanies, scopeFor, updateCompany } from '../lib/companies.mjs';
+import { idempotent } from '../lib/idempotency.mjs';
+import { commandCenter, pulseStamp } from '../lib/metrics.mjs';
 import { randomToken, verifyPassword } from '../lib/crypto.mjs';
 import { sendEmail, statusEmail } from '../lib/email.mjs';
 import { assertCsrf, clientIp, fail, handler, json, readJson, segments } from '../lib/http.mjs';
@@ -11,8 +14,8 @@ import { store } from '../lib/store.mjs';
 import * as v from '../lib/validate.mjs';
 
 export const ROLES = {
-  owner: ['dashboard', 'orders', 'customers', 'inventory', 'discounts', 'content', 'enquiries', 'subscribers', 'analytics', 'publish', 'users', 'media'],
-  manager: ['dashboard', 'orders', 'customers', 'inventory', 'discounts', 'content', 'enquiries', 'subscribers', 'analytics', 'publish', 'media'],
+  owner: ['dashboard', 'companies', 'audit', 'orders', 'customers', 'inventory', 'discounts', 'content', 'enquiries', 'subscribers', 'analytics', 'publish', 'users', 'media'],
+  manager: ['dashboard', 'audit', 'orders', 'customers', 'inventory', 'discounts', 'content', 'enquiries', 'subscribers', 'analytics', 'publish', 'media'],
   fulfilment: ['dashboard', 'orders'],
   editor: ['dashboard', 'content', 'enquiries', 'publish', 'media', 'analytics'],
 };
@@ -57,6 +60,36 @@ async function dashboard() {
   };
 }
 
+/** All raw records the Command Center needs (small today; see ADMIN-OS-SPEC §12 for the Postgres rollups that replace this at scale). */
+async function commandData() {
+  const [orders, companies, inventory] = await Promise.all([listOrders(), listCompanies(), liveOverrides()]);
+  const ev = await store('events');
+  const keys = (await ev.list('daily/')).sort().slice(-800);
+  const eventDays = await Promise.all(keys.map(async (k) => ({ date: k.slice(6), ...(await ev.get(k)) })));
+  const leads = await store('leads');
+  const enquiries = (await Promise.all((await leads.list('enquiry/')).map((k) => leads.get(k)))).filter(Boolean).map((e) => ({ ...e, companyId: leadCompany(e) }));
+  return { orders, companies, inventory, eventDays, enquiries, products: baseProducts, stores };
+}
+
+const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+function commandQuery(req, admin, companies) {
+  const u = new URL(req.url).searchParams;
+  const today = new Date(Date.now() + 3600e3).toISOString().slice(0, 10);
+  const to = DAY_RE.test(u.get('to') || '') ? u.get('to') : today;
+  const from = DAY_RE.test(u.get('from') || '') ? u.get('from') : new Date(Date.parse(`${to}T00:00:00Z`) - 29 * 864e5).toISOString().slice(0, 10);
+  if (from > to) fail(422, 'invalid', 'The start date must be on or before the end date.');
+  if ((Date.parse(to) - Date.parse(from)) / 864e5 > 731) fail(422, 'invalid', 'Choose a range of two years or less.');
+  const scope = scopeFor(admin, companies);
+  const company = u.get('company') || 'all';
+  if (company !== 'all' && !companies.some((c) => c.id === company)) fail(404, 'not_found', 'Unknown company.');
+  if (scope && company !== 'all' && !scope.includes(company)) fail(403, 'forbidden', 'You do not have access to that company.');
+  return {
+    from, to, company, scope,
+    compare: ['previous', 'year', 'none'].includes(u.get('compare')) ? u.get('compare') : 'previous',
+    location: (u.get('location') || 'all').slice(0, 60), channel: ['all', 'web', 'app', 'manual', 'pos'].includes(u.get('channel')) ? u.get('channel') : 'all',
+  };
+}
+
 async function analytics() {
   const s = await store('events');
   const keys = (await s.list('daily/')).sort().slice(-30);
@@ -92,10 +125,59 @@ export default handler(async (req, context) => {
   if (!admin) fail(401, 'unauthenticated', 'Please sign in to the admin.');
   const b = ['PUT', 'PATCH', 'POST'].includes(req.method) ? await readJson(req, area === 'media' ? 6 * 1024 * 1024 : 256 * 1024) : null;
   const cfg = await store('config');
-  const audit = async (action, detail) => (await store('audit')).set(`${new Date().toISOString()}-${randomToken(4)}`, { admin: admin.email, role: admin.role, action, detail });
+  // Audit trail for every sensitive action: who, role, what, before/after detail, from which IP and device.
+  const audit = async (action, detail) => (await store('audit')).set(`${new Date().toISOString()}-${randomToken(4)}`, { admin: admin.email, role: admin.role, action, detail, ip: clientIp(req, context), agent: (req.headers.get('user-agent') || '').slice(0, 160) });
 
   switch (area) {
-    case 'me': return json({ admin: { email: admin.email, role: admin.role, name: admin.name, permissions: ROLES[admin.role] } });
+    case 'me': {
+      const companies = await listCompanies();
+      const scope = scopeFor(admin, companies);
+      return json({ admin: { email: admin.email, role: admin.role, name: admin.name, permissions: ROLES[admin.role], scope } });
+    }
+
+    // ---- Command Center: group / company overview with filters and comparisons ----
+    case 'command': {
+      need(admin, 'dashboard');
+      const data = await commandData();
+      const q = commandQuery(req, admin, data.companies);
+      return json(commandCenter(data, q), 200, { 'Cache-Control': 'no-store' });
+    }
+    // ---- Live updates: a tiny change stamp the dashboard polls; it refetches only when something changed ----
+    case 'pulse': {
+      need(admin, 'dashboard');
+      const orders = await listOrders();
+      const leads = await store('leads');
+      const enquiries = (await Promise.all((await leads.list('enquiry/')).map((k) => leads.get(k)))).filter(Boolean);
+      return json({ stamp: pulseStamp(orders, enquiries), at: new Date().toISOString() }, 200, { 'Cache-Control': 'no-store' });
+    }
+
+    // ---- Companies (super admin): create, edit, archive; each change audited with before/after ----
+    case 'companies': {
+      const companies = await listCompanies();
+      if (req.method === 'GET') {
+        need(admin, 'dashboard');
+        const scope = scopeFor(admin, companies);
+        return json({ companies: companies.filter((c) => !scope || scope.includes(c.id)), canManage: can(admin, 'companies') });
+      }
+      need(admin, 'companies');
+      if (req.method === 'POST' && !id) {
+        const r = await idempotent(req, `${admin.email}:companies.create`, b, async () => {
+          const c = await createCompany(b, admin.email);
+          await audit('company.create', { id: c.id, name: c.name });
+          return { status: 201, body: { company: c } };
+        });
+        return json({ ...r.body, ...(r.replayed ? { replayed: true } : {}) }, r.status);
+      }
+      if (req.method === 'PATCH' && id) {
+        const { company, changed, before } = await updateCompany(decodeURIComponent(id), b, admin.email);
+        if (changed.length) {
+          const action = changed.includes('status') ? (company.status === 'archived' ? 'company.archive' : 'company.restore') : 'company.update';
+          await audit(action, { id: company.id, changed, before: Object.fromEntries(changed.map((k) => [k, before[k]])), after: Object.fromEntries(changed.map((k) => [k, company[k]])) });
+        }
+        return json({ company, changed });
+      }
+      fail(405, 'method', 'Method not allowed.');
+    }
     case 'dashboard': need(admin, 'dashboard'); return json(await dashboard());
     case 'analytics': need(admin, 'analytics'); return json(await analytics());
 
@@ -242,9 +324,9 @@ export default handler(async (req, context) => {
     }
 
     case 'audit': {
-      need(admin, 'users');
+      need(admin, 'audit');
       const a = await store('audit');
-      const keys = (await a.list('')).sort().slice(-100).reverse();
+      const keys = (await a.list('')).sort().slice(-300).reverse();
       return json({ entries: await Promise.all(keys.map(async (k) => ({ at: k.slice(0, 24), ...(await a.get(k)) }))) });
     }
 

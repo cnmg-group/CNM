@@ -1,19 +1,27 @@
-// POST /api/events — first-party, cookie-less analytics beacon. Aggregates daily counts only (no personal data).
+// POST /api/events — first-party, cookie-less analytics beacon. Aggregates daily counts only (no personal data),
+// in total and per CNM company (derived from the page path), bucketed by Lagos day.
 import { clientIp, handler, json, readJson } from '../lib/http.mjs';
 import { rateLimit } from '../lib/ratelimit.mjs';
 import { store } from '../lib/store.mjs';
 
-const ALLOWED = new Set(['view_item_list', 'select_item', 'view_item', 'add_to_wishlist', 'add_to_cart', 'remove_from_cart', 'view_cart', 'begin_checkout', 'add_shipping_info', 'add_payment_info', 'purchase', 'payment_failed', 'search', 'filter_products', 'sign_up', 'login', 'generate_lead', 'store_directions', 'share', 'back_in_stock_signup', 'group_division']);
+const ALLOWED = new Set(['view_item_list', 'select_item', 'view_item', 'add_to_wishlist', 'add_to_cart', 'remove_from_cart', 'view_cart', 'begin_checkout', 'add_shipping_info', 'add_payment_info', 'purchase', 'payment_failed', 'search', 'filter_products', 'sign_up', 'login', 'generate_lead', 'store_directions', 'share', 'back_in_stock_signup', 'group_division', 'active_user', 'cnmnav_switch', 'print_receipt']);
+const COMPANY_PREFIX = [['/spectra/', 'spectra'], ['/cnmworx/', 'cnmworx'], ['/foundation/', 'foundation']];
+const GROUP_PATHS = new Set(['/', '/about/', '/contact/']);
+export const companyOfPath = (p = '') => COMPANY_PREFIX.find(([pre]) => p.startsWith(pre))?.[1] || (GROUP_PATHS.has(p) ? 'group' : 'essentials');
 
 export default handler(async (req, context) => {
   if (req.method !== 'POST') return json({ ok: false }, 405);
   try { await rateLimit('events', clientIp(req, context)); } catch { return json({ ok: false }, 429); }
   const { name, params = {} } = await readJson(req, 8 * 1024);
   if (!ALLOWED.has(name)) return json({ ok: false }, 202);
-  const day = new Date().toISOString().slice(0, 10);
+  const day = new Date(Date.now() + 3600e3).toISOString().slice(0, 10); // Africa/Lagos
   const s = await store('events');
   const agg = (await s.get(`daily/${day}`)) || { counts: {}, searches: {}, zeroSearches: {}, pages: {}, revenue: 0 };
   agg.counts[name] = (agg.counts[name] || 0) + 1;
+  const company = typeof params.company === 'string' && /^[a-z0-9-]{2,40}$/.test(params.company) ? params.company : companyOfPath(typeof params.path === 'string' ? params.path : '');
+  agg.byCompany ||= {};
+  agg.byCompany[company] ||= {};
+  agg.byCompany[company][name] = (agg.byCompany[company][name] || 0) + 1;
   if (name === 'search' && typeof params.search_term === 'string') {
     const term = params.search_term.toLowerCase().slice(0, 60);
     agg.searches[term] = (agg.searches[term] || 0) + 1;

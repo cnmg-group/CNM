@@ -2,7 +2,7 @@
   "name": "cnm-essentials",
   "private": true,
   "version": "0.1.0",
-  "description": "CNM Essentials — editorial brand site, luxury e-commerce, admin and APIs (Netlify).",
+  "description": "CNM Essentials \u2014 editorial brand site, luxury e-commerce, admin and APIs (Netlify).",
   "type": "module",
   "engines": {
     "node": ">=20"
@@ -13,7 +13,8 @@
     "serve": "node scripts/dev-server.mjs",
     "test": "node --test --test-concurrency=1 tests/unit/*.test.mjs",
     "test:e2e": "playwright test",
-    "screenshots": "node scripts/screenshots.mjs"
+    "screenshots": "node scripts/screenshots.mjs",
+    "seed:demo": "node scripts/seed-demo.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",

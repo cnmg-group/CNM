@@ -187,12 +187,59 @@ test('admin: sign in, dashboard, move an order to processing', async ({ page, re
   await page.fill('#ae', 'admin@cnm.local');
   await page.fill('#ap', 'cnm-local-admin');
   await page.click('[data-login] button');
-  await expect(page.locator('h1')).toHaveText('Dashboard');
+  await expect(page.locator('h1')).toHaveText('Command Center');
+  // The paid order shows up in the Command Center and the live feed
+  await expect(page.locator('.os-kpi').first()).toBeVisible();
+  await expect(page.locator('.os-feed')).toContainText(r.order.number);
   await page.goto('/admin/#orders?status=paid');
   await page.locator('a[href^="#orders/CNM-"]').first().click();
   await page.selectOption('[data-status] select', 'processing');
   await page.click('[data-status] button');
   await expect(page.locator('[data-flash]')).toContainText('customer notified');
+});
+
+test('CNM Group OS: filters in the URL, company drill-down, create and archive a company, audit log, phone menu', async ({ page, isMobile }) => {
+  await page.goto('/admin/');
+  await page.fill('#ae', 'admin@cnm.local');
+  await page.fill('#ap', 'cnm-local-admin');
+  await page.click('[data-login] button');
+  await expect(page.locator('.os-title')).toHaveText('Command Center');
+  await expect(page.locator('.os-kpi')).toHaveCount(10);
+  await expect(page.locator('.os-cos tbody tr')).toHaveCount(4);
+  // Period preset and comparison are kept in the URL
+  await page.click('[data-preset="7d"]');
+  await expect(page).toHaveURL(/#command\?range=7d/);
+  await page.selectOption('[data-filters] select[name="compare"]', 'year');
+  await expect(page).toHaveURL(/compare=year/);
+  await expect(page.locator('.os-sub')).toContainText('vs');
+  // Drill into one company from the companies table
+  await page.locator('.os-cos tr[data-co="spectra"]').click();
+  await expect(page).toHaveURL(/company=spectra/);
+  await expect(page.locator('.os-eyebrow')).toContainText('CNM Spectra');
+  // Create a company (idempotent) and archive it
+  if (isMobile) { await page.click('[data-nav-open]'); await expect(page.locator('.os-nav')).toBeInViewport(); }
+  await page.locator('.os-nav a[data-nav="companies"]').click();
+  await expect(page.locator('.os-co')).toHaveCount(4);
+  const name = `CNM Test ${Date.now().toString(36)}`;
+  await page.click('[data-new]');
+  await page.fill('[data-co-form] [name="name"]', name);
+  await page.selectOption('[data-co-form] [name="kind"]', 'digital');
+  await page.fill('[data-co-form] [name="color"]', '#7a3cff');
+  await page.check('[data-co-form] input[value="card"]');
+  await page.click('[data-co-form] [type="submit"]');
+  await expect(page.locator('[data-flash]')).toContainText('Company created');
+  const card = page.locator('.os-co', { hasText: name });
+  await expect(card).toBeVisible();
+  page.once('dialog', (d) => d.accept());
+  await card.locator('[data-archive]').click();
+  await expect(page.locator('[data-flash]')).toContainText('archived');
+  await expect(page.locator('.os-co', { hasText: name })).toHaveCount(0);
+  await page.goto('/admin/#companies?show=archived');
+  await expect(page.locator('.os-co', { hasText: name })).toBeVisible();
+  // The audit log records both actions
+  await page.goto('/admin/#audit');
+  await expect(page.locator('.os-audit')).toContainText('Company created');
+  await expect(page.locator('.os-audit')).toContainText('Company archived');
 });
 
 test('SEO: canonical, structured data, noindex on staging, sitemap', async ({ page, request }) => {

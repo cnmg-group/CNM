@@ -1,7 +1,7 @@
 import { escapeHtml, formatMoney } from '../shared/format.mjs';
 import { icon } from '../shared/icons.mjs';
 import { productImages, productUrl, stockState } from '../shared/product.mjs';
-import { initConsent, item, track } from './analytics.js';
+import { initConsent, item, pingActive, track } from './analytics.js';
 import { api } from './api.js';
 import { demoLoader } from './loader.js';
 import * as S from './store.js';
@@ -13,6 +13,7 @@ import { priceHTML } from '../shared/card.mjs';
 document.documentElement.classList.remove('no-js');
 initUI();
 initConsent();
+pingActive();
 
 // ---------- counts & wishlist state ----------
 function paintCounts() {

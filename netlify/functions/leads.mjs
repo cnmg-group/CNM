@@ -2,6 +2,7 @@
 import { randomToken } from '../lib/crypto.mjs';
 import { enquiryNotice, sendEmail } from '../lib/email.mjs';
 import { baseProducts } from '../lib/catalogue.mjs';
+import { leadCompany } from '../lib/companies.mjs';
 import { assertCsrf, clientIp, fail, handler, json, readJson, segments } from '../lib/http.mjs';
 import { rateLimit } from '../lib/ratelimit.mjs';
 import { store } from '../lib/store.mjs';
@@ -33,6 +34,7 @@ export default handler(async (req, context) => {
         timeline: v.str(b.timeline, { name: 'Timeline', max: 60, required: false }),
         message: v.str(b.message, { name: 'Message', min: 10, max: 3000 }),
       };
+      e.companyId = leadCompany(e);
       await leads.set(`enquiry/${e.id}`, e);
       if (process.env.CNM_NOTIFY_EMAIL) await sendEmail(enquiryNotice(e));
       return json({ ok: true, id: e.id }, 201);

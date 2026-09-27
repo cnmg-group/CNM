@@ -1,16 +1,29 @@
-// CNM Admin — operations back office (single-page, role-aware). All authorisation is enforced server-side.
+// CNM Group OS — the operating system for every CNM company (single-page, role- and company-aware).
+// All authorisation is enforced server-side; the UI only hides what a role can't use.
 import { escapeHtml as e, formatDate, formatMoney } from '../../shared/format.mjs';
 import { api } from '../api.js';
+import { auditView, command, companiesView, stopLive } from './os.js';
 
 const root = document.querySelector('[data-admin]');
 let me = null;
 
+const I = {
+  command: 'M3 13h8V3H3zm10 8h8V11h-8zM3 21h8v-6H3zm10-18v6h8V3z', companies: 'M3 21V7l6-4 6 4v14M9 21v-5h0M15 11h6v10M3 21h18M7 9h.01M11 9h.01M7 13h.01M11 13h.01',
+  orders: 'M6 2h12l2 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7zM4 7h16M9 11a3 3 0 0 0 6 0', customers: 'M16 21v-2a4 4 0 0 0-8 0v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M2 21v-2a4 4 0 0 1 3-3.87',
+  inventory: 'M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8', discounts: 'M20 12l-8 8-9-9V3h8zM7.5 7.5h.01', content: 'M4 4h16v16H4zM4 9h16M9 9v11',
+  stores: 'M3 9l1-5h16l1 5M4 9v11h16V9M9 20v-6h6v6M3 9h18', seo: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3', enquiries: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+  subscribers: 'M4 4h16v16H4zM4 7l8 6 8-6', media: 'M4 5h16v14H4zM8 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM20 16l-5-5-9 8', analytics: 'M4 20V10M10 20V4M16 20v-7M22 20H2',
+  users: 'M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21v-2a6 6 0 0 1 12 0v2M19 8v6M22 11h-6', audit: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',
+};
+const icon = (k) => `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="${I[k] || I.command}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+// [key, label, permission, section]
 const NAV = [
-  ['dashboard', 'Dashboard', 'dashboard'], ['orders', 'Orders', 'orders'], ['customers', 'Customers', 'customers'],
-  ['inventory', 'Products & inventory', 'inventory'], ['discounts', 'Discounts & promotions', 'discounts'],
-  ['content', 'Content & merchandising', 'content'], ['stores', 'Stores', 'content'], ['seo', 'SEO & redirects', 'content'],
-  ['enquiries', 'Service enquiries', 'enquiries'], ['subscribers', 'Subscribers', 'subscribers'], ['media', 'Media', 'media'],
-  ['analytics', 'Analytics', 'analytics'], ['users', 'Users & roles', 'users'],
+  ['command', 'Command Center', 'dashboard', 'Overview'], ['companies', 'Companies', 'dashboard', 'Overview'],
+  ['orders', 'Orders', 'orders', 'Commerce'], ['inventory', 'Products & inventory', 'inventory', 'Commerce'], ['customers', 'Customers', 'customers', 'Commerce'], ['discounts', 'Discounts & promotions', 'discounts', 'Commerce'],
+  ['enquiries', 'Leads & enquiries', 'enquiries', 'Commerce'],
+  ['content', 'Homepage & banners', 'content', 'Content'], ['stores', 'Stores', 'content', 'Content'], ['seo', 'SEO & redirects', 'content', 'Content'], ['media', 'Media', 'media', 'Content'],
+  ['analytics', 'Analytics', 'analytics', 'Insights'], ['subscribers', 'Subscribers', 'subscribers', 'Insights'],
+  ['users', 'Staff & roles', 'users', 'Settings'], ['audit', 'Audit log', 'audit', 'Settings'],
 ];
 const pill = (s) => `<span class="pill pill--${e(s)}">${e(String(s).replace(/_/g, ' '))}</span>`;
 const flash = (msg, ok = true) => { const f = document.querySelector('[data-flash]'); f.className = `alert ${ok ? 'alert--ok' : 'alert--err'}`; f.textContent = msg; f.hidden = false; setTimeout(() => { f.hidden = true; }, 3500); };
@@ -20,11 +33,11 @@ async function boot() {
 }
 
 function login(err = '') {
-  root.innerHTML = `<div class="admin-login"><div class="stack">${document.body.dataset.logo ? `<img src="${document.body.dataset.logo}" alt="CNM Essentials" style="height:32px">` : '<p class="label">CNM Essentials</p>'}<h1 class="h2">Admin sign in</h1>
+  root.innerHTML = `<div class="admin-login os-login"><div class="stack"><img src="/assets/brand/cnm-group-emblem-128.webp" alt="" width="56" height="59"><p class="os-eyebrow">CNM Group</p><h1 class="h2">Operating system</h1><p class="muted" style="margin-top:-8px">Sign in to manage every CNM company.</p>
   ${err ? `<p class="alert alert--err">${e(err)}</p>` : ''}
   <form class="form" data-login novalidate><div class="field"><label for="ae">Email</label><input id="ae" name="email" type="email" autocomplete="username" required></div>
   <div class="field"><label for="ap">Password</label><input id="ap" name="password" type="password" autocomplete="current-password" required></div>
-  <button class="btn btn--green" type="submit">Sign in</button></form>
+  <button class="os-btn" type="submit">Sign in</button></form>
   <p class="muted" style="font-size:.75rem">Access is restricted to CNM staff. Activity is audited.</p></div></div>`;
   root.querySelector('[data-login]').addEventListener('submit', async (ev) => {
     ev.preventDefault();
@@ -33,13 +46,36 @@ function login(err = '') {
   });
 }
 
+const NAV_KEY = 'cnm.os.nav';
 function shell() {
-  root.innerHTML = `<div class="admin">
-    <aside class="admin__nav"><a class="admin__brand" href="/admin/">${document.body.dataset.logo ? `<img src="${document.body.dataset.logo}" alt="CNM Essentials" style="height:26px;filter:brightness(0) invert(.95)">` : 'CNM'} <span>Admin</span></a>
-      <nav>${NAV.filter(([, , p]) => me.permissions.includes(p)).map(([k, l]) => `<a href="#${k}" data-nav="${k}">${l}</a>`).join('')}</nav>
-      <div class="admin__me"><span>${e(me.name)}</span><span class="pill">${e(me.role)}</span>${me.permissions.includes('publish') ? '<button class="btn btn--light" type="button" data-publish>Publish site</button>' : ''}<a class="textlink" href="/" target="_blank">View store</a><button class="textlink" type="button" data-logout>Sign out</button></div>
+  const collapsed = (() => { try { return localStorage.getItem(NAV_KEY) === 'collapsed'; } catch { return false; } })();
+  const items = NAV.filter(([, , p]) => me.permissions.includes(p));
+  const sections = [...new Set(items.map((x) => x[3]))];
+  root.innerHTML = `<div class="os${collapsed ? ' is-collapsed' : ''}" data-os>
+    <header class="os-top"><button class="os-icon" type="button" data-nav-open aria-label="Open menu" aria-controls="os-nav" aria-expanded="false"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <a class="os-top__brand" href="#command"><img src="/assets/brand/cnm-group-emblem-128.webp" alt="" width="28" height="29"><span>CNM Group <b>OS</b></span></a></header>
+    <aside class="os-nav" id="os-nav" aria-label="CNM Group OS">
+      <div class="os-nav__brand"><a href="#command" class="os-nav__logo"><img src="/assets/brand/cnm-group-emblem-128.webp" alt="" width="34" height="36"><span><strong>CNM Group</strong><small>Operating system</small></span></a>
+        <button class="os-icon os-nav__collapse" type="button" data-collapse aria-label="${collapsed ? 'Expand' : 'Collapse'} sidebar" aria-pressed="${collapsed}"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      <nav>${sections.map((sec) => `<p class="os-nav__sec">${sec}</p>${items.filter((x) => x[3] === sec).map(([k, l]) => `<a href="#${k}" data-nav="${k}" title="${e(l)}">${icon(k)}<span>${e(l)}</span></a>`).join('')}`).join('')}</nav>
+      <div class="os-nav__me"><span class="os-avatar" aria-hidden="true">${e((me.name || me.email).slice(0, 1).toUpperCase())}</span><span class="os-nav__who"><strong>${e(me.name)}</strong><small>${e(me.role)}${Array.isArray(me.scope) ? ` · ${me.scope.length} compan${me.scope.length === 1 ? 'y' : 'ies'}` : ' · all companies'}</small></span></div>
+      <div class="os-nav__actions">${me.permissions.includes('publish') ? '<button class="os-btn os-btn--light" type="button" data-publish>Publish site</button>' : ''}<a class="os-link" href="/" target="_blank" rel="noopener">View sites ↗</a><button class="os-link" type="button" data-logout>Sign out</button></div>
     </aside>
-    <main class="admin__main"><div class="alert" data-flash hidden></div><div data-view></div></main></div>`;
+    <div class="os-scrim" data-nav-close></div>
+    <main class="os-main"><div class="alert" data-flash hidden></div><div data-view></div></main></div>`;
+  const os = root.querySelector('[data-os]');
+  root.querySelector('[data-collapse]').addEventListener('click', (ev) => {
+    const on = !os.classList.contains('is-collapsed');
+    os.classList.toggle('is-collapsed', on);
+    ev.currentTarget.setAttribute('aria-pressed', String(on));
+    ev.currentTarget.setAttribute('aria-label', `${on ? 'Expand' : 'Collapse'} sidebar`);
+    try { localStorage.setItem(NAV_KEY, on ? 'collapsed' : 'open'); } catch { /* ignore */ }
+  });
+  const setMobile = (open) => { os.classList.toggle('is-nav-open', open); root.querySelector('[data-nav-open]').setAttribute('aria-expanded', String(open)); };
+  root.querySelector('[data-nav-open]').addEventListener('click', () => setMobile(true));
+  root.querySelector('[data-nav-close]').addEventListener('click', () => setMobile(false));
+  root.querySelectorAll('[data-nav]').forEach((a) => a.addEventListener('click', () => setMobile(false)));
+  document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') setMobile(false); });
   root.querySelector('[data-logout]').addEventListener('click', async () => { await api('/api/admin/logout', { method: 'POST' }); location.reload(); });
   root.querySelector('[data-publish]')?.addEventListener('click', async () => {
     if (!confirm('Rebuild and publish the site with the latest content?')) return;
@@ -49,12 +85,15 @@ function shell() {
 }
 
 async function route() {
-  const key = location.hash.slice(1).split(/[/?]/)[0] || 'dashboard';
+  let key = location.hash.slice(1).split(/[/?]/)[0] || 'command';
+  if (key === 'dashboard') key = 'command';
   const arg = decodeURIComponent(location.hash.split('?')[0].split('/')[1] || '');
-  root.querySelectorAll('[data-nav]').forEach((a) => a.setAttribute('aria-current', String(a.dataset.nav === key)));
+  stopLive();
+  root.querySelectorAll('[data-nav]').forEach((a) => { if (a.dataset.nav === key) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   const view = root.querySelector('[data-view]');
   view.innerHTML = '<div class="skeleton" style="height:32px;width:30%"></div><div class="skeleton" style="height:240px;margin-top:24px"></div>';
-  try { await (VIEWS[key] || VIEWS.dashboard)(view, arg); } catch (x) { view.innerHTML = `<p class="alert alert--err">${e(x.message)}</p>`; }
+  document.title = `${NAV.find(([k]) => k === key)?.[1] || 'Command Center'} · CNM Group OS`;
+  try { await (VIEWS[key] || VIEWS.command)(view, arg); } catch (x) { view.innerHTML = `<p class="alert alert--err">${e(x.message)}</p>`; }
 }
 
 /* ---------- charts: single-series bars, brand green, tooltip on hover, table fallback ---------- */
@@ -67,6 +106,10 @@ function barChart(series, { valueKey, label, fmt = (n) => n }) {
 }
 
 const VIEWS = {
+  command: (v) => command(v, { me }),
+  companies: (v) => companiesView(v, { me }, flash),
+  audit: (v) => auditView(v),
+
   async dashboard(v) {
     const d = await api('/api/admin/dashboard', { loader: false });
     const k = d.kpis;

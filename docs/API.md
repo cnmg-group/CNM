@@ -78,10 +78,14 @@ Order statuses: `pending_payment → paid → processing → dispatched → deli
 
 ## Admin — `/api/admin/*`
 
-Separate `cnm_admin` cookie. Roles: `owner` (everything), `manager` (catalogue, content, orders, customers, discounts), `fulfilment` (orders only), `editor` (content, SEO, stores). Admin users are defined in the `ADMIN_USERS` env var (see `.env.example`).
+Separate `cnm_admin` cookie. Roles: `owner` (everything), `manager` (catalogue, content, orders, customers, discounts), `fulfilment` (orders only), `editor` (content, SEO, stores). Admin users are defined in the `ADMIN_USERS` env var (see `.env.example`); add `"companies": ["spectra"]` to an entry to limit that person to specific companies. Full platform spec: [ADMIN-OS-SPEC.md](ADMIN-OS-SPEC.md).
 
 - `POST /api/admin/login`, `POST /api/admin/logout`, `GET /api/admin/me`
 - `GET /api/admin/dashboard`
+- `GET /api/admin/command?from=YYYY-MM-DD&to=YYYY-MM-DD&compare=previous|year|none&company=all|<id>&location=all|<state>&channel=all|web|app|manual|pos`: CNM Group OS Command Center (KPIs with deltas, ops, attention, series, per-company roll-up, locations, channels, top sellers/viewed/trending, low stock, live feed). Company-scoped admins get only their companies; others return 403.
+- `GET /api/admin/pulse`: live-update change stamp (poll every ~20 s; refetch `command` when it changes).
+- `GET /api/admin/companies`, `POST /api/admin/companies` (owner; send an `Idempotency-Key` header), `PATCH /api/admin/companies/:id` (edit fields, `status: archived|active`). Every change is audited with before and after.
+- `GET /api/admin/audit`: last 300 audit entries (owner, manager).
 - `GET /api/admin/orders`, `GET /api/admin/orders/:number`, `PATCH /api/admin/orders/:number` `{ status, note }`
 - `GET /api/admin/customers`
 - `GET /api/admin/enquiries`, `PATCH /api/admin/enquiries/:id` `{ status }`

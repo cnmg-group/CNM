@@ -74,7 +74,7 @@ export async function requireUser(req) {
 }
 
 export async function issueAdminSession(req, admin) {
-  const token = await sign({ typ: 'admin', email: admin.email, role: admin.role, name: admin.name, exp: Math.floor(Date.now() / 1000) + ADMIN_TTL });
+  const token = await sign({ typ: 'admin', email: admin.email, role: admin.role, name: admin.name, ...(Array.isArray(admin.companies) && admin.companies.length ? { companies: admin.companies } : {}), exp: Math.floor(Date.now() / 1000) + ADMIN_TTL });
   return cookie(req, ADMIN_COOKIE, token, ADMIN_TTL, 'Strict');
 }
 export const clearAdminCookie = (req) => cookie(req, ADMIN_COOKIE, '', 0, 'Strict');

@@ -47,3 +47,22 @@ export function initConsent() {
   if (c === 'granted') loadGA(id);
   else if (!c && id) render();
 }
+
+/**
+ * Daily active user signal for the CNM Group Command Center: at most one beacon per browser, per company, per day.
+ * No cookie, no identifier — just "someone was active on CNM Spectra today".
+ */
+export function pingActive() {
+  try {
+    const b = document.body;
+    const company = b.dataset.chrome === 'group' ? 'group' : b.dataset.site || (b.dataset.page === 'admin' ? null : 'essentials');
+    if (!company || navigator.webdriver) return;
+    const day = new Date(Date.now() + 3600e3).toISOString().slice(0, 10);
+    const seen = JSON.parse(localStorage.getItem('cnm.active') || '{}');
+    if (seen[company] === day) return;
+    seen[company] = day;
+    localStorage.setItem('cnm.active', JSON.stringify(seen));
+    const body = JSON.stringify({ name: 'active_user', params: { company, path: location.pathname } });
+    if (navigator.sendBeacon) navigator.sendBeacon('/api/events', new Blob([body], { type: 'application/json' }));
+  } catch { /* never break the page */ }
+}

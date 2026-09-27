@@ -10,8 +10,8 @@ export class ApiError extends Error {
 }
 
 /** JSON API call. State-changing requests carry the CSRF header; the loader only shows for slow requests. */
-export async function api(path, { method = 'GET', body, loader = true, signal } = {}) {
-  const headers = { Accept: 'application/json' };
+export async function api(path, { method = 'GET', body, loader = true, signal, headers: extra = {} } = {}) {
+  const headers = { Accept: 'application/json', ...extra };
   if (method !== 'GET') { headers['Content-Type'] = 'application/json'; headers['X-CNM-Request'] = '1'; }
   const run = fetch(path, { method, headers, body: body ? JSON.stringify(body) : undefined, credentials: 'same-origin', signal })
     .then(async (res) => {
