@@ -203,6 +203,8 @@ test('admin: sign in, dashboard, move an order to processing', async ({ page, re
   // Sign-in: email + password → code from email (shown locally, since no email is sent) → PIN → dashboard
   await page.fill('#ae', 'admin@cnm.local');
   await page.fill('#ap', 'cnm-local-admin');
+  await page.check('[data-login] input[name="remember"]');
+  await page.check('[data-login] input[name="rememberDetails"]');
   await page.click('[data-login] button');
   await expect(page.locator('[aria-current="step"]')).toHaveText('Email code');
   await expect(page.locator('h1')).toHaveText('Operating system');
@@ -216,6 +218,9 @@ test('admin: sign in, dashboard, move an order to processing', async ({ page, re
   await page.fill('#apin', '246810');
   await page.click('[data-pin] button');
   await expect(page.locator('h1')).toHaveText('Command Center');
+  // Kept signed in (24 hours at most) and the email is remembered on this device until Forget
+  await expect(page.locator('[data-session-until]').first()).toContainText('Kept signed in until', { useInnerText: false });
+  expect(JSON.parse(await page.evaluate(() => localStorage.getItem('cnm.admin.remember'))).email).toBe('admin@cnm.local');
   // The paid order shows up in the Command Center and the live feed
   await expect(page.locator('.os-kpi').first()).toBeVisible();
   await expect(page.locator('.os-feed')).toContainText(r.order.number);
@@ -251,6 +256,25 @@ test('admin: sign in, dashboard, move an order to processing', async ({ page, re
   await page.emulateMedia({ media: 'print' });
   await expect(page.locator('.os-nav')).toBeHidden();
   await expect(page.locator('.doc')).toBeVisible();
+});
+
+test('admin sign-in remembers login details on this device until Forget', async ({ page }) => {
+  await page.goto('/admin/');
+  await page.fill('#ae', 'admin@cnm.local');
+  await page.fill('#ap', 'cnm-local-admin');
+  await page.check('[data-login] input[name="rememberDetails"]');
+  await page.click('[data-login] button');
+  await expect(page.locator('[data-otp]')).toBeVisible();
+  await page.click('[data-restart]');
+  await expect(page.locator('#ae')).toHaveValue('admin@cnm.local');
+  await expect(page.locator('[data-login] input[name="rememberDetails"]')).toBeChecked();
+  await expect(page.locator('[data-login] input[name="remember"]')).not.toBeChecked();
+  await page.reload();
+  await expect(page.locator('#ae')).toHaveValue('admin@cnm.local', { timeout: 10000 });
+  await page.click('[data-forget]');
+  await expect(page.locator('.alert--ok')).toContainText('Forgotten');
+  await expect(page.locator('#ae')).toHaveValue('');
+  expect(await page.evaluate(() => localStorage.getItem('cnm.admin.remember'))).toBeNull();
 });
 
 test('operations: fulfilment board, new phone order paid in store, refund', async ({ page, isMobile }) => {

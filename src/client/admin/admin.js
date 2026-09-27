@@ -38,15 +38,38 @@ const loginCard = (inner, step) => `<div class="admin-login os-login"><div class
   <ol class="os-login__steps" aria-label="Sign-in steps">${['Password', 'Email code', 'PIN'].map((t, i) => `<li class="${i < step ? 'is-done' : i === step ? 'is-now' : ''}"${i === step ? ' aria-current="step"' : ''}>${t}</li>`).join('')}</ol>
   ${inner}<p class="muted" style="font-size:.75rem">Access is restricted to CNM staff. Activity is audited.</p></div></div>`;
 const errBox = (err) => (err ? `<p class="alert alert--err" role="alert">${e(err)}</p>` : '');
-function login(err = '') {
-  root.innerHTML = loginCard(`<p class="muted os-login__lead">Sign in to manage every CNM company.</p>${errBox(err)}
-  <form class="form" data-login novalidate><div class="field"><label for="ae">Email</label><input id="ae" name="email" type="email" autocomplete="username" required></div>
+// "Remember login details": the email is kept on this device (until Forget), and the password is offered to the
+// browser's own password manager — never stored by this page. The session itself lasts at most 24 hours.
+const REMEMBER_KEY = 'cnm.admin.remember';
+const remembered = () => { try { return JSON.parse(localStorage.getItem(REMEMBER_KEY) || 'null'); } catch { return null; } };
+const setRemembered = (email) => { try { if (email) localStorage.setItem(REMEMBER_KEY, JSON.stringify({ email, since: new Date().toISOString() })); else localStorage.removeItem(REMEMBER_KEY); } catch { /* storage blocked */ } };
+function forgetDetails() {
+  setRemembered(null);
+  try { navigator.credentials?.preventSilentAccess?.(); } catch { /* not supported */ }
+}
+let pendingCredential = null;
+async function saveCredential() {
+  const c = pendingCredential; pendingCredential = null;
+  if (!c || !window.PasswordCredential) return;
+  try { await navigator.credentials.store(new PasswordCredential({ id: c.email, password: c.password, name: c.name || c.email })); } catch { /* the browser declined */ }
+}
+function login(err = '', note = '') {
+  const rem = remembered();
+  root.innerHTML = loginCard(`<p class="muted os-login__lead">Sign in to manage every CNM company.</p>${errBox(err)}${note ? `<p class="alert alert--ok" role="status">${e(note)}</p>` : ''}
+  <form class="form" data-login novalidate><div class="field"><label for="ae">Email</label><input id="ae" name="email" type="email" autocomplete="username" required value="${e(rem?.email || '')}"></div>
   <div class="field"><label for="ap">Password</label><input id="ap" name="password" type="password" autocomplete="current-password" required></div>
-  <button class="os-btn" type="submit">Continue</button></form>`, 0);
-  root.querySelector('[data-login]').addEventListener('submit', async (ev) => {
+  <label class="os-check"><input type="checkbox" name="remember"> Keep me signed in for 24 hours</label>
+  <label class="os-check"><input type="checkbox" name="rememberDetails"${rem ? ' checked' : ''}> Remember my login details on this device</label>
+  <button class="os-btn" type="submit">Continue</button></form>
+  ${rem ? `<p class="os-login__links"><span class="muted">Login details remembered for ${e(rem.email)}</span><button class="textlink" type="button" data-forget>Forget</button></p>` : ''}`, 0);
+  const f = root.querySelector('[data-login]');
+  (rem ? f.password : f.email).focus();
+  root.querySelector('[data-forget]')?.addEventListener('click', () => { forgetDetails(); login('', 'Forgotten on this device. A password saved in your browser can be removed in its password settings.'); });
+  f.addEventListener('submit', async (ev) => {
     ev.preventDefault();
-    const f = ev.currentTarget;
-    try { otpStep(await api('/api/admin/login', { method: 'POST', body: { email: f.email.value.trim(), password: f.password.value } })); } catch (x) { login(x.message); }
+    const email = f.email.value.trim();
+    if (f.rememberDetails.checked) { setRemembered(email); pendingCredential = { email, password: f.password.value }; } else { forgetDetails(); pendingCredential = null; }
+    try { otpStep(await api('/api/admin/login', { method: 'POST', body: { email, password: f.password.value, remember: f.remember.checked } })); } catch (x) { pendingCredential = null; login(x.message); }
   });
 }
 const restartOr = (x, again) => (x.code === 'login_expired' ? login(x.message) : again(x.message));
@@ -66,7 +89,7 @@ function otpStep(info, err = '', note = '') {
   root.querySelector('[data-resend]').addEventListener('click', async () => {
     try { const next = await api('/api/admin/login/resend', { method: 'POST', body: {} }); otpStep(next, '', 'A new code is on its way. Earlier codes no longer work.'); } catch (x) { restartOr(x, (m) => otpStep(info, m)); }
   });
-  root.querySelector('[data-restart]').addEventListener('click', () => login());
+  root.querySelector('[data-restart]').addEventListener('click', () => { pendingCredential = null; login(); });
 }
 function pinStep(err = '') {
   root.innerHTML = loginCard(`<p class="muted os-login__lead">Code verified. Enter your 6-digit admin PIN to open the dashboard.</p>${errBox(err)}
@@ -78,9 +101,9 @@ function pinStep(err = '') {
   f.pin.addEventListener('input', () => { f.pin.value = f.pin.value.replace(/\D/g, '').slice(0, 6); });
   f.addEventListener('submit', async (ev) => {
     ev.preventDefault();
-    try { ({ admin: me } = await api('/api/admin/login/pin', { method: 'POST', body: { pin: f.pin.value } })); shell(); route(); } catch (x) { restartOr(x, (m) => pinStep(m)); }
+    try { ({ admin: me } = await api('/api/admin/login/pin', { method: 'POST', body: { pin: f.pin.value } })); if (pendingCredential) pendingCredential.name = me.name; await saveCredential(); shell(); route(); } catch (x) { restartOr(x, (m) => pinStep(m)); }
   });
-  root.querySelector('[data-restart]').addEventListener('click', () => login());
+  root.querySelector('[data-restart]').addEventListener('click', () => { pendingCredential = null; login(); });
 }
 
 const NAV_KEY = 'cnm.os.nav';
@@ -95,8 +118,8 @@ function shell() {
     <aside class="os-nav" id="os-nav" aria-label="CNM Group OS">
       <div class="os-nav__brand"><a href="#command" class="os-nav__logo"><img src="/assets/brand/cnm-group-emblem-128.webp" alt="" width="34" height="36"><span><strong>CNM Group</strong><small>Operating system</small></span></a>
         <button class="os-icon os-nav__collapse" type="button" data-collapse aria-label="${collapsed ? 'Expand' : 'Collapse'} sidebar" aria-pressed="${collapsed}"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
-      <div class="os-nav__acct"><span class="os-avatar" aria-hidden="true">${e((me.name || me.email).slice(0, 1).toUpperCase())}</span><span class="os-nav__who"><strong>${e(me.name)}</strong><small>${e(me.email)}</small></span>
-        <button class="os-acct__out" type="button" data-logout><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M15 17l5-5-5-5M20 12H9M12 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>
+      <div class="os-nav__acct"><span class="os-avatar" aria-hidden="true">${e((me.name || me.email).slice(0, 1).toUpperCase())}</span><span class="os-nav__who"><strong>${e(me.name)}</strong><small>${e(me.email)}</small>${me.expiresAt ? `<small data-session-until>${me.remembered ? 'Kept signed in until' : 'Signed in until'} ${e(new Date(me.expiresAt).toLocaleString('en-NG', { weekday: 'short', hour: '2-digit', minute: '2-digit' }))}</small>` : ''}</span>
+        <button class="os-acct__out" type="button" data-logout><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M15 17l5-5-5-5M20 12H9M12 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>${remembered() ? '<button class="os-acct__forget" type="button" data-forget-device>Forget login details</button>' : ''}
         <button class="os-icon os-acct__close" type="button" data-nav-close aria-label="Close menu"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
       <nav>${sections.map((sec) => `<p class="os-nav__sec">${sec}</p>${items.filter((x) => x[3] === sec).map(([k, l]) => `<a href="#${k}" data-nav="${k}" title="${e(l)}">${icon(k)}<span>${e(l)}</span></a>`).join('')}`).join('')}</nav>
       <div class="os-nav__me"><span class="os-avatar" aria-hidden="true">${e((me.name || me.email).slice(0, 1).toUpperCase())}</span><span class="os-nav__who"><strong>${e(me.name)}</strong><small>${e(me.role)}${Array.isArray(me.scope) ? ` · ${me.scope.length} compan${me.scope.length === 1 ? 'y' : 'ies'}` : ' · all companies'}</small></span></div>
@@ -127,6 +150,7 @@ function shell() {
   root.querySelectorAll('[data-nav]').forEach((a) => a.addEventListener('click', () => setMobile(false)));
   document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') setMobile(false); });
   root.querySelectorAll('[data-logout]').forEach((b) => b.addEventListener('click', async () => { await api('/api/admin/logout', { method: 'POST' }); location.reload(); }));
+  root.querySelectorAll('[data-forget-device]').forEach((b) => b.addEventListener('click', () => { forgetDetails(); b.textContent = 'Login details forgotten'; b.disabled = true; }));
   root.querySelector('[data-publish]')?.addEventListener('click', async () => {
     if (!confirm('Rebuild and publish the site with the latest content?')) return;
     try { await api('/api/admin/publish', { method: 'POST' }); flash('Publishing started. Changes go live in a few minutes.'); } catch (x) { flash(x.message, false); }

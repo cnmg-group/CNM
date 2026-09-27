@@ -315,3 +315,23 @@ test('shipped admin account holds only hashes, with a PIN', async () => {
   assert.match(owner.pinHash, /^scrypt\$/);
   assert.deepEqual(Object.keys(owner).sort(), ['email', 'name', 'passwordHash', 'pinHash', 'role']);
 });
+
+test('admin session: ends with the browser by default; "keep me signed in" lasts 24 hours at most', async () => {
+  const post = (p, body, cookie) => call('admin', 'POST', p, { body, cookie });
+  const signIn = async (remember) => {
+    const a = await post('/api/admin/login', { email: 'm1@cnm.test', password: 'manager-one-pass', ...(remember == null ? {} : { remember }) });
+    const b = await post('/api/admin/login/otp', { code: a.data.devCode }, a.cookie);
+    return post('/api/admin/login/pin', { pin: TEST_PIN }, b.cookie);
+  };
+  const plain = await signIn();
+  const plainCookie = plain.headers.get('set-cookie').split(', cnm_admin_step')[0];
+  assert.doesNotMatch(plainCookie, /Max-Age/, 'a browser-session cookie by default');
+  assert.equal(plain.data.admin.remembered, false);
+  const kept = await signIn(true);
+  assert.match(kept.headers.get('set-cookie'), /cnm_admin=[^;]+;[^,]*Max-Age=86400/);
+  const me = (await call('admin', 'GET', '/api/admin/me', { cookie: kept.cookie })).data.admin;
+  assert.equal(me.remembered, true);
+  const hours = (Date.parse(me.expiresAt) - Date.now()) / 36e5;
+  assert.ok(hours > 23.9 && hours <= 24, `session ends within 24 hours (${hours})`);
+  assert.equal((await signIn('yes')).data.admin.remembered, false, 'only an explicit true remembers');
+});

@@ -7,6 +7,7 @@ const USER_COOKIE = 'cnm_session';
 const ADMIN_COOKIE = 'cnm_admin';
 const USER_TTL = 60 * 60 * 24 * 30;
 const ADMIN_TTL = 60 * 60 * 12;
+export const ADMIN_REMEMBER_TTL = 60 * 60 * 24; // "Keep me signed in": never longer than 24 hours
 
 let secretPromise;
 /** SESSION_SECRET env var; if absent (fresh staging), a random secret is generated once and kept server-side in Blobs. */
@@ -46,8 +47,9 @@ export function readCookie(req, name) {
 }
 
 const secure = (req) => new URL(req.url).protocol === 'https:';
+/** maxAge null → a browser-session cookie (gone when the browser closes). */
 export function cookie(req, name, value, maxAge, sameSite = 'Lax') {
-  return `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=${sameSite}; Max-Age=${maxAge}${secure(req) ? '; Secure' : ''}`;
+  return `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=${sameSite}${maxAge == null ? '' : `; Max-Age=${maxAge}`}${secure(req) ? '; Secure' : ''}`;
 }
 
 export async function issueUserSession(req, user) {
@@ -73,9 +75,11 @@ export async function requireUser(req) {
   return u;
 }
 
-export async function issueAdminSession(req, admin) {
-  const token = await sign({ typ: 'admin', email: admin.email, role: admin.role, name: admin.name, ...(Array.isArray(admin.companies) && admin.companies.length ? { companies: admin.companies } : {}), exp: Math.floor(Date.now() / 1000) + ADMIN_TTL });
-  return cookie(req, ADMIN_COOKIE, token, ADMIN_TTL, 'Strict');
+/** Admin session: 12 hours and gone when the browser closes, or — "Keep me signed in" — up to 24 hours on this device. */
+export async function issueAdminSession(req, admin, { remember = false } = {}) {
+  const ttl = remember ? ADMIN_REMEMBER_TTL : ADMIN_TTL;
+  const token = await sign({ typ: 'admin', email: admin.email, role: admin.role, name: admin.name, ...(Array.isArray(admin.companies) && admin.companies.length ? { companies: admin.companies } : {}), rem: remember ? 1 : 0, exp: Math.floor(Date.now() / 1000) + ttl });
+  return cookie(req, ADMIN_COOKIE, token, remember ? ttl : null, 'Strict');
 }
 export const clearAdminCookie = (req) => cookie(req, ADMIN_COOKIE, '', 0, 'Strict');
 
@@ -83,8 +87,8 @@ export const clearAdminCookie = (req) => cookie(req, ADMIN_COOKIE, '', 0, 'Stric
 // signed "step" cookie saying which step it has reached; it never grants access to anything by itself.
 const ADMIN_STEP_COOKIE = 'cnm_admin_step';
 export const ADMIN_STEP_TTL = 60 * 10;
-export async function issueAdminStep(req, { email, stage, nonce }) {
-  const token = await sign({ typ: 'admin_step', email, stage, nonce, exp: Math.floor(Date.now() / 1000) + ADMIN_STEP_TTL });
+export async function issueAdminStep(req, { email, stage, nonce, remember = false }) {
+  const token = await sign({ typ: 'admin_step', email, stage, nonce, rem: remember ? 1 : 0, exp: Math.floor(Date.now() / 1000) + ADMIN_STEP_TTL });
   return cookie(req, ADMIN_STEP_COOKIE, token, ADMIN_STEP_TTL, 'Strict');
 }
 export async function readAdminStep(req) {

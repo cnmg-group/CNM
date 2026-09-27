@@ -83,7 +83,8 @@ Separate `cnm_admin` cookie. Roles: `owner` (everything), `manager` (catalogue, 
 - Sign-in, in order (each step needs the previous one; a short-lived signed `cnm_admin_step` cookie carries progress and grants nothing by itself):
   1. `POST /api/admin/login` `{ email, password }` → emails a 6-digit code (10 minutes) → `{ step: "otp", email (masked) }`
   2. `POST /api/admin/login/otp` `{ code }` → `{ step: "pin" }` (5 tries, then start again); `POST /api/admin/login/resend` sends a new code (30 s apart)
-  3. `POST /api/admin/login/pin` `{ pin }` → sets the `cnm_admin` session (12 h) → `{ admin }` (5 tries, then start again)
+  3. `POST /api/admin/login/pin` `{ pin }` → sets the `cnm_admin` session → `{ admin }` (5 tries, then start again)
+  Session length: by default the cookie ends when the browser closes (and the token after 12 h); with `remember: true` on step 1 ("Keep me signed in") it lasts 24 hours — never longer. "Remember my login details" is client-side only: the email is kept in `localStorage` (`cnm.admin.remember`) until the admin presses Forget, and the password is offered to the browser's password manager; the page never stores a password.
   Every success and failure is written to the audit log. Without email configured a deployed site refuses to sign in (`email_not_configured`) rather than skip the code.
 - `POST /api/admin/logout`, `GET /api/admin/me`
 - `GET /api/admin/dashboard`

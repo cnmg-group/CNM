@@ -295,6 +295,8 @@ body[data-page="admin"] { --os-bg: #f6f4ef; --os-card: #fff; --os-line: #e7e3da;
 .os-login__steps li::before { content: counter(s) ". "; }
 .os-login__steps li.is-done { border-color: var(--os-up); color: var(--os-ink); }
 .os-login__steps li.is-now { border-color: var(--os-accent-ink, var(--os-accent)); color: var(--os-ink); }
+.os-login .os-check { font-weight: 500; min-height: 28px; }
+.os-acct__forget { grid-column: 1 / -1; justify-self: start; background: none; border: 0; padding: 2px 0; font: inherit; font-size: .75rem; color: inherit; opacity: .8; text-decoration: underline; cursor: pointer; }
 .os-login__links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: .8125rem; }
 .os-login__links .textlink { background: none; border: 0; padding: 4px 0; cursor: pointer; color: var(--os-ink); font: inherit; text-decoration: underline; }
 

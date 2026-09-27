@@ -57,7 +57,7 @@ const adminPayload = (u) => ({ email: u.email, role: u.role, name: u.name || u.e
 const loginAudit = async (req, context, email, action, detail = {}) => (await store('audit')).set(`${new Date().toISOString()}-${randomToken(4)}`, { admin: email, role: findAdmin(email)?.role || null, action, detail, ip: clientIp(req, context), agent: (req.headers.get('user-agent') || '').slice(0, 160) });
 
 /** Email + password are right → email a fresh 6-digit code and move the browser to the code step. */
-async function startOtp(req, u, resend = false) {
+async function startOtp(req, u, resend = false, remember = false) {
   if (!emailConfigured() && !localStore()) fail(503, 'email_not_configured', 'Sign-in codes cannot be emailed yet: email sending (RESEND_API_KEY) is not set up on this site.');
   const tokens = await store('tokens');
   const key = `admin-login/${emailKey(u.email)}`;
@@ -69,7 +69,7 @@ async function startOtp(req, u, resend = false) {
   const { sent } = await sendEmail(adminOtpEmail(u.email, code));
   if (emailConfigured() && !sent) { await tokens.delete(key); fail(502, 'email_failed', 'We could not send your sign-in code. Please try again in a moment.'); }
   return json({ step: 'otp', email: maskEmail(u.email), expiresInMinutes: OTP_TTL / 60000, resendAfterSeconds: OTP_RESEND_AFTER / 1000, ...(!emailConfigured() && localStore() ? { devCode: code } : {}) }, 200,
-    { 'Set-Cookie': await issueAdminStep(req, { email: u.email.toLowerCase(), stage: 'otp', nonce }) });
+    { 'Set-Cookie': await issueAdminStep(req, { email: u.email.toLowerCase(), stage: 'otp', nonce, remember }) });
 }
 
 /** Steps 2–4 of the sign-in: /api/admin/login (password), /login/resend, /login/otp (code), /login/pin (PIN → session). */
@@ -82,7 +82,7 @@ async function loginFlow(req, context, step) {
     const u = findAdmin(email);
     if (!(await checkPassword(u, v.str(b.password, { name: 'Password', max: 200 })))) { if (u) await loginAudit(req, context, email, 'login.password_failed'); fail(401, 'invalid_credentials', 'Email or password is incorrect.'); }
     if (!hasPin(u)) fail(403, 'pin_not_set', 'This admin account has no PIN yet. Ask the owner to set one.');
-    return startOtp(req, u);
+    return startOtp(req, u, false, b.remember === true);
   }
   await rateLimit('admin2fa', clientIp(req, context));
   const st = await readAdminStep(req);
@@ -95,7 +95,7 @@ async function loginFlow(req, context, step) {
   if (!rec || rec.nonce !== st.nonce || rec.exp < Date.now()) return restart('Your sign-in has expired. Please enter your email and password again.');
   if (step === 'resend') {
     if (st.stage !== 'otp' || rec.stage !== 'otp') fail(409, 'wrong_step', 'Your code has already been checked.');
-    return startOtp(req, u, true);
+    return startOtp(req, u, true, !!st.rem);
   }
   if (step === 'otp') {
     if (st.stage !== 'otp' || rec.stage !== 'otp') fail(409, 'wrong_step', 'Your code has already been checked. Enter your PIN.');
@@ -109,7 +109,7 @@ async function loginFlow(req, context, step) {
     }
     rec.stage = 'pin'; rec.hash = null; rec.exp = Date.now() + OTP_TTL;
     await tokens.set(key, rec);
-    return json({ step: 'pin' }, 200, { 'Set-Cookie': await issueAdminStep(req, { email: st.email, stage: 'pin', nonce: rec.nonce }) });
+    return json({ step: 'pin' }, 200, { 'Set-Cookie': await issueAdminStep(req, { email: st.email, stage: 'pin', nonce: rec.nonce, remember: !!st.rem }) });
   }
   if (step === 'pin') {
     if (st.stage !== 'pin' || rec.stage !== 'pin') fail(409, 'wrong_step', 'Enter the code from your email first.');
@@ -123,8 +123,9 @@ async function loginFlow(req, context, step) {
       fail(401, 'invalid_pin', `That PIN is incorrect. ${MAX_TRIES - rec.pinAttempts} attempts left.`);
     }
     await tokens.delete(key);
-    await loginAudit(req, context, u.email, 'login.success');
-    return json({ admin: adminPayload(u) }, 200, { 'Set-Cookie': [await issueAdminSession(req, u), clearAdminStep(req)] });
+    await loginAudit(req, context, u.email, 'login.success', { remembered: !!st.rem });
+    const expiresAt = new Date(Date.now() + (st.rem ? 24 : 12) * 36e5).toISOString();
+    return json({ admin: { ...adminPayload(u), remembered: !!st.rem, expiresAt } }, 200, { 'Set-Cookie': [await issueAdminSession(req, u, { remember: !!st.rem }), clearAdminStep(req)] });
   }
   fail(404, 'not_found', 'Unknown sign-in step.');
 }
@@ -215,7 +216,7 @@ export default handler(async (req, context) => {
     case 'me': {
       const companies = await listCompanies();
       const scope = scopeFor(admin, companies);
-      return json({ admin: { email: admin.email, role: admin.role, name: admin.name, permissions: ROLES[admin.role], scope } });
+      return json({ admin: { email: admin.email, role: admin.role, name: admin.name, permissions: ROLES[admin.role], scope, remembered: !!admin.rem, expiresAt: new Date(admin.exp * 1000).toISOString() } });
     }
 
     // ---- Command Center: group / company overview with filters and comparisons ----
