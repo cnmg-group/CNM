@@ -53,6 +53,16 @@ function delta(k, compareOn) {
   const cls = k.delta === 0 ? '' : good ? 'd--up' : 'd--down';
   return `<span class="d ${cls}">${k.delta > 0 ? '▲' : k.delta < 0 ? '▼' : '•'} ${Math.abs(k.delta)}%</span>`;
 }
+/** Long ranges read better as weekly totals (a year of daily points is noise). */
+const bucket = (series) => {
+  if (!series || series.length <= 120) return series;
+  const out = [];
+  for (let i = 0; i < series.length; i += 7) {
+    const w = series.slice(i, i + 7);
+    out.push(w.reduce((acc, d) => ({ ...acc, gross: acc.gross + d.gross, net: acc.net + d.net, revenue: acc.revenue + d.revenue, orders: acc.orders + d.orders }), { date: w[0].date, gross: 0, net: 0, revenue: 0, orders: 0 }));
+  }
+  return out;
+};
 const pill = (s) => `<span class="pill pill--${e(s)}">${e(String(s).replace(/_/g, ' '))}</span>`;
 
 let companiesCache = null;
@@ -97,8 +107,8 @@ export async function command(v, ctx) {
   <section class="os-ops" aria-label="Right now">${opsTiles.map(([key, label, href, warn]) => `<a class="os-op${warn && d.ops[key] ? ' os-op--warn' : ''}" href="${href}"><strong>${d.ops[key]}</strong><span>${label}</span></a>`).join('')}</section>
 
   <div class="os-grid os-grid--2-1">
-    <section class="os-card"><header class="os-card__h"><h2>Revenue trend</h2><div class="os-legend"><span><i class="k k--cur"></i>${e(rangeText(d.range))}</span>${compareOn ? `<span><i class="k k--prev"></i>${e(rangeText(d.compare))}</span>` : ''}</div></header>
-      ${trendChart(d.series, d.compareSeries, { key: 'revenue', label: 'Revenue per day' })}</section>
+    <section class="os-card"><header class="os-card__h"><h2>Revenue trend${d.series.length > 120 ? ' <small class="muted">weekly</small>' : ''}</h2><div class="os-legend"><span><i class="k k--cur"></i>${e(rangeText(d.range))}</span>${compareOn ? `<span><i class="k k--prev"></i>${e(rangeText(d.compare))}</span>` : ''}</div></header>
+      ${trendChart(bucket(d.series), bucket(d.compareSeries), { key: 'revenue', label: d.series.length > 120 ? 'Revenue per week' : 'Revenue per day' })}</section>
     <section class="os-card os-attn"><header class="os-card__h"><h2>Needs attention</h2><span class="os-count${d.attention.length ? ' is-warn' : ''}">${d.attention.length}</span></header>
       ${d.attention.length ? `<ul>${d.attention.slice(0, 9).map((a) => `<li class="sev sev--${a.severity}"><a href="${e(a.href)}"><span class="sev__dot"></span><span><strong>${e(a.title)}</strong><small>${e(a.detail)}${a.company && a.company !== 'group' ? ` · ${e(coOf(cos, a.company)?.name || a.company)}` : ''}</small></span></a></li>`).join('')}</ul>${d.attention.length > 9 ? `<p class="muted os-more">+ ${d.attention.length - 9} more</p>` : ''}` : '<p class="os-empty">All clear. Nothing late, nothing out of stock, no one waiting for a reply.</p>'}</section>
   </div>
@@ -109,7 +119,7 @@ export async function command(v, ctx) {
     </tbody></table></div></section>
 
   <div class="os-grid os-grid--2">
-    <section class="os-card"><header class="os-card__h"><h2>Gross vs net sales</h2></header>${grossNetBars(d.series)}
+    <section class="os-card"><header class="os-card__h"><h2>Gross vs net sales</h2>${d.series.length > 120 ? '<span class="muted">Weekly</span>' : ''}</header>${grossNetBars(bucket(d.series))}
       <dl class="os-bridge"><div><dt>Gross sales</dt><dd>${formatMoney(d.sales.gross)}</dd></div><div><dt>Discounts</dt><dd>−${formatMoney(d.sales.discounts)}</dd></div><div><dt>Refunds</dt><dd>−${formatMoney(d.sales.refunds)}</dd></div><div class="os-bridge__net"><dt>Net sales</dt><dd>${formatMoney(d.sales.net)}</dd></div><div><dt>Delivery charged</dt><dd>${formatMoney(d.sales.delivery)}</dd></div><div><dt>VAT (included)</dt><dd>${formatMoney(d.sales.vat)}</dd></div></dl></section>
     <section class="os-card"><header class="os-card__h"><h2>Funnel</h2><span class="muted">Visit → purchase${d.traffic.activeUsers ? ` · ${k.conversion.value ?? 0}% convert` : ''}</span></header>
       ${funnel([{ label: 'Active users', count: d.traffic.funnel.visits }, { label: 'Viewed a product', count: d.traffic.funnel.views }, { label: 'Added to bag', count: d.traffic.funnel.addToCart }, { label: 'Started checkout', count: d.traffic.funnel.checkout }, { label: 'Reached payment', count: d.traffic.funnel.payment }, { label: 'Purchased', count: d.sales.orders }, { label: 'Delivered', count: d.sales.delivered }])}
@@ -129,7 +139,7 @@ export async function command(v, ctx) {
     <section class="os-card os-feed"><header class="os-card__h"><h2>Live activity</h2></header>${d.feed.length ? `<ul>${d.feed.map((x) => `<li><a href="${e(x.href)}"><span class="os-feed__k os-feed__k--${e(x.kind)}"></span><span><strong>${e(x.title)}</strong><small>${e(x.detail)} · ${e(coOf(cos, x.company)?.name || 'CNM Group')}</small></span><time datetime="${e(x.at)}">${e(timeAgo(x.at))}</time></a></li>`).join('')}</ul>` : '<p class="os-empty">Nothing yet. Orders, payments and enquiries appear here as they happen.</p>'}</section>
   </div>`;
 
-  bindTrend(v, d.series, d.compareSeries, { key: 'revenue' });
+  bindTrend(v, bucket(d.series), bucket(d.compareSeries), { key: 'revenue' });
   bindFilters(v, f, 'command');
   v.querySelectorAll('[data-co]').forEach((tr) => {
     const go = () => writeFilters('command', { ...f, company: tr.dataset.co });
