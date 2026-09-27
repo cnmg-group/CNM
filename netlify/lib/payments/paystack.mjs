@@ -38,14 +38,21 @@ async function call(path, init = {}, { retries = 1 } = {}) {
 
 const channels = () => (process.env.PAYSTACK_CHANNELS ? process.env.PAYSTACK_CHANNELS.split(',').map((s) => s.trim()).filter(Boolean) : DEFAULT_CHANNELS);
 
-export async function initialize(order, { callbackUrl }) {
+// Put the shopper's chosen method first by restricting to it, as long as it's an allowed channel.
+const channelsFor = (method) => {
+  const all = channels();
+  const picked = (method || []).filter((c) => all.includes(c));
+  return picked.length ? picked : all;
+};
+
+export async function initialize(order, { callbackUrl, channels: preferred } = {}) {
   const payload = (reference) => ({
     email: order.contact.email,
     amount: Math.round(order.totals.total * 100),
     currency: 'NGN',
     reference,
     callback_url: callbackUrl,
-    channels: channels(),
+    channels: channelsFor(preferred),
     metadata: {
       order_number: order.number,
       cancel_action: callbackUrl,

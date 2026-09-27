@@ -14,7 +14,9 @@ import { listingPage } from '../src/templates/shop.mjs';
 import { productPage } from '../src/templates/product.mjs';
 import { bagPage, wishlistPage, searchPage, checkoutPage, confirmationPage } from '../src/templates/commerce.mjs';
 import { ACCOUNT_VIEWS, accountPage, loginPage, registerPage, resetPage } from '../src/templates/account.mjs';
-import { storyPage, storesIndex, storePage, servicesPage, journalIndex, articlePage, groupPage, infoPage, notFoundPage, styleguidePage, adminPage } from '../src/templates/content.mjs';
+import { storyPage, storesIndex, storePage, servicesPage, journalIndex, articlePage, infoPage, notFoundPage, styleguidePage, adminPage } from '../src/templates/content.mjs';
+import { companyPage, groupContactPage, groupHome } from '../src/templates/group.mjs';
+import { scentFinderPage } from '../src/templates/scent-finder.mjs';
 import { productPlaceholder, PLACEHOLDER_KEYS, atmosphere, heroVessel } from './placeholders.mjs';
 import { loadContent } from './content.mjs';
 
@@ -129,6 +131,9 @@ for (const p of products) {
   }), { priority: 0.8 });
 }
 
+// Scent finder (AI-assisted recommendations; rules fallback when no AI gateway is configured)
+{ const r = scentFinderPage(ctx); await write('/scent-finder/', page({ page: 'scent-finder', path: '/scent-finder/', title: 'Scent finder — find your home fragrance', current: 'finder', body: r.body, jsonld: r.jsonld, description: 'Tell us the scents you love, the room and the mood you want. The CNM Essentials scent finder suggests room sprays, Wallflowers refills and more.' }), { priority: 0.7, changefreq: 'monthly' }); }
+
 // Commerce shells (noindex)
 await write('/bag/', page({ page: 'bag', path: '/bag/', title: 'Bag', body: bagPage(ctx), noindex: true }), { sitemap: false });
 await write('/wishlist/', page({ page: 'wishlist', path: '/wishlist/', title: 'Wishlist', body: wishlistPage(ctx), noindex: true }), { sitemap: false });
@@ -155,7 +160,13 @@ for (const a of content.articles) {
   const r = articlePage(ctx, a);
   await write(`/journal/${a.slug}/`, page({ page: 'article', path: `/journal/${a.slug}/`, title: a.title, description: a.excerpt, ogType: 'article', body: r.body, jsonld: r.jsonld, noindex: a.status?.startsWith('DRAFT') }), { sitemap: !a.status?.startsWith('DRAFT'), priority: 0.6 });
 }
-{ const r = groupPage(ctx); await write('/cnm-group/', page({ page: 'group', path: '/cnm-group/', title: 'CNM Group — Energy, Retail, Impact', body: r.body, jsonld: r.jsonld, noindex: true }), { sitemap: false }); }
+// CNM Group corporate pages (group chrome). noindex: the canonical group site is cnm-group.net.
+{ const r = groupHome(ctx); await write('/cnm-group/', page({ page: 'group', chrome: 'group', current: 'overview', path: '/cnm-group/', title: 'Energy, Retail, Impact', description: content.site.group.intro, body: r.body, jsonld: r.jsonld, noindex: true }), { sitemap: false }); }
+for (const p of content.site.group.profiles.filter((x) => x.page)) {
+  const r = companyPage(ctx, p.slug);
+  await write(p.page, page({ page: 'group', chrome: 'group', current: p.slug, path: p.page, title: `${p.name} — ${p.tagline}`, description: p.text.slice(0, 155), body: r.body, jsonld: r.jsonld, noindex: true }), { sitemap: false });
+}
+{ const r = groupContactPage(ctx); await write('/cnm-group/contact/', page({ page: 'group', chrome: 'group', current: 'contact', path: '/cnm-group/contact/', title: 'Contact', description: 'Contact CNM Group about partnerships, investment, collaboration or any of our companies.', body: r.body, jsonld: r.jsonld, noindex: true }), { sitemap: false }); }
 
 // Info pages
 const pendingSection = (title, what) => `<section class="stack"><h2 class="h3">${title}</h2>${approval(what)}</section>`;
@@ -197,6 +208,7 @@ const searchDocs = [
   ...categories.map((c) => ({ type: 'category', title: c.name, url: `/shop/${c.slug}/`, text: c.intro, keywords: [c.slug.replace(/-/g, ' ')] })),
   ...collections.map((c) => ({ type: 'collection', title: c.name, url: `/collections/${c.slug}/`, text: c.intro, keywords: ['collection'] })),
   ...content.articles.map((a) => ({ type: 'article', title: a.title, url: `/journal/${a.slug}/`, text: `${a.excerpt} ${a.category}`, keywords: [] })),
+  { type: 'service', title: 'Scent finder', url: '/scent-finder/', text: 'Find your scent by room, mood and budget. Personal fragrance recommendations.', keywords: ['scent finder', 'quiz', 'recommend', 'recommendation', 'which scent', 'gift ideas'] },
   { type: 'service', title: 'Fragrance as a Service', url: '/fragrance-as-a-service/', text: content.services.lead.value, keywords: content.services.sectors.map((s) => s.name).concat(['scenting', 'commercial', 'event', 'wedding', 'hotel', 'office']) },
   ...content.stores.map((s) => ({ type: 'store', title: `${s.city} store`, url: `/stores/${s.slug}/`, text: `CNM Essentials ${s.city} store opening hours directions`, keywords: ['store', 'shop', 'location', s.region] })),
 ];

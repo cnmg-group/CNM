@@ -4,7 +4,7 @@ import { baseProducts, commerce, productsMap, stores } from '../lib/catalogue.mj
 import { randomToken } from '../lib/crypto.mjs';
 import { assertCsrf, clientIp, fail, handler, json, readJson, segments } from '../lib/http.mjs';
 import { orderNumber, saveOrder, setStatus } from '../lib/orders.mjs';
-import { activeProvider } from '../lib/payments/index.mjs';
+import { PAYMENT_METHODS, activeProvider, paymentInfo } from '../lib/payments/index.mjs';
 import { rateLimit } from '../lib/ratelimit.mjs';
 import { currentUser } from '../lib/session.mjs';
 import { store } from '../lib/store.mjs';
@@ -28,7 +28,7 @@ export default handler(async (req, context) => {
   const promoCode = body.promoCode ? v.str(body.promoCode, { name: 'Promo code', max: 40 }) : undefined;
 
   if (isQuote) {
-    return json(computeQuote({ items, products, commerce: rules, promoCode, deliveryMethod: body.deliveryMethod }));
+    return json({ ...computeQuote({ items, products, commerce: rules, promoCode, deliveryMethod: body.deliveryMethod }), payment: paymentInfo() });
   }
 
   // ---- create order ----
@@ -56,6 +56,9 @@ export default handler(async (req, context) => {
     delivery = { method: method.id, label: method.label, address };
   }
 
+  const paymentMethod = PAYMENT_METHODS.find((m) => m.id === (body.paymentMethod || 'card'));
+  if (!paymentMethod) fail(422, 'invalid', 'Please choose a payment method.');
+
   const quote = computeQuote({ items, products, commerce: rules, promoCode, deliveryMethod: method.id });
   const blocking = quote.errors.filter((e) => e.code !== 'qty_reduced');
   if (!quote.lines.length || blocking.length || quote.errors.length) {
@@ -70,7 +73,7 @@ export default handler(async (req, context) => {
     contact, delivery, notes: v.str(body.notes, { name: 'Notes', max: 300, required: false }),
     lines: quote.lines, promoCode: quote.promo?.valid ? quote.promo.code : null,
     totals: { subtotal: quote.subtotal, discount: quote.discount, delivery: quote.delivery, vat: quote.vat, vatIncluded: quote.vatIncluded, total: quote.total, currency: 'NGN' },
-    payment: { provider: activeProvider().name, reference: `${number}-${randomToken(4)}`, status: 'pending' },
+    payment: { provider: activeProvider().name, method: paymentMethod.id, reference: `${number}-${randomToken(4)}`, status: 'pending' },
     history: [{ status: 'pending_payment', at: now, by: 'customer' }],
     catalogueVersion: baseProducts.length,
   };
@@ -83,7 +86,7 @@ export default handler(async (req, context) => {
   const provider = activeProvider();
   let pay;
   try {
-    pay = await provider.initialize(order, { callbackUrl: `${siteUrl(req)}/checkout/confirmation/?n=${encodeURIComponent(number)}&t=${encodeURIComponent(order.accessToken)}` });
+    pay = await provider.initialize(order, { channels: paymentMethod.channels, callbackUrl: `${siteUrl(req)}/checkout/confirmation/?n=${encodeURIComponent(number)}&t=${encodeURIComponent(order.accessToken)}` });
   } catch (err) {
     console.error(`[checkout] ${provider.name} initialize failed`, err);
     setStatus(order, 'payment_failed', `Could not start payment: ${err.message}`);
@@ -91,7 +94,7 @@ export default handler(async (req, context) => {
     fail(502, 'payment_unavailable', 'Our payment provider is unavailable right now. Your bag has been kept — please try again shortly.');
   }
   if (pay.reference !== order.payment.reference) { order.payment.reference = pay.reference; await saveOrder(order); }
-  return json({ order: { number, accessToken: order.accessToken, total: order.totals.total, status: order.status }, payment: { mode: pay.mode, reference: pay.reference, ...(pay.authorizationUrl ? { authorizationUrl: pay.authorizationUrl } : {}) } }, 201);
+  return json({ order: { number, accessToken: order.accessToken, total: order.totals.total, status: order.status }, payment: { mode: pay.mode, method: paymentMethod.id, testMode: paymentInfo().testMode, reference: pay.reference, ...(pay.authorizationUrl ? { authorizationUrl: pay.authorizationUrl } : {}) } }, 201);
 });
 
 export const config = { path: ['/api/checkout', '/api/checkout/quote'] };

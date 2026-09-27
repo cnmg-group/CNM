@@ -2,7 +2,7 @@
 
 Status key: **DONE** · **IN PROGRESS** · **BLOCKED** · **NEEDS CNM APPROVAL**
 
-_Last updated: 2026-09-25_
+_Last updated: 2026-09-27_
 
 ## Source of truth now in the build
 
@@ -31,7 +31,9 @@ CNM supplied screenshots of **cnmessentials.com** (home, shop, about) and **cnm-
 | "Sun Kissed Vanilla": the live site says Bath & Body Works but the photo shows a Febreze pack | **NEEDS CNM APPROVAL** | Confirm the brand. |
 | Body Care, Hair Care and CNM's own products (Vitamin C Brightening Body Wash, Rosemary hair & scalp oil) | **NEEDS CNM APPROVAL** | Prices and product pages; the category pages currently say "coming soon online". |
 | Opening hours, map coordinates and photos for each store | **NEEDS CNM APPROVAL** | Admin → Stores |
-| Founder name, portrait and personal story; dated milestones | **NEEDS CNM APPROVAL** | `content/story.json` |
+| Founder portrait, biography and quote (name and title, Mrs Nkiruka Cynthia Ajah, Founder & Group CEO, are now on the CNM Group page from the brief); dated milestones | **NEEDS CNM APPROVAL** | `content/site.json → group.founder`, `content/story.json` |
+| Dedicated email/phone for CNM Spectra, CNMWorX and CNM Foundation | **NEEDS CNM APPROVAL** | Their forms currently go to the CNM Group inbox and Admin → Enquiries |
+| Enable Netlify AI Gateway for the scent finder | **NEEDS CNM APPROVAL** | One switch in Netlify (see `docs/INTEGRATIONS.md` §5). It uses the rules matcher until then. |
 | Instagram and WhatsApp links | **NEEDS CNM APPROVAL** | Icons exist on the live site; URLs not visible in the screenshots |
 | Delivery fees, returns policy, VAT treatment, payment provider (the live site lists Visa, Mastercard and PayPal) | **NEEDS CNM APPROVAL** | `content/commerce.json`; Paystack is integrated and ready |
 | Original product photo files | **NEEDS CNM APPROVAL** | Replace the enhanced screenshot crops for full clarity |
@@ -53,10 +55,11 @@ CNM supplied screenshots of **cnmessentials.com** (home, shop, about) and **cnm-
 | Commerce | PDP: gallery + zoom + swipe, qty, stock, add/buy now, accordions, related, recently viewed, share, back-in-stock | DONE |
 | Commerce | Wishlist: guest + account sync + merge on sign-in, move to bag, share | DONE |
 | Commerce | Bag drawer + bag page, promo codes, delivery estimate, server-side totals | DONE |
-| Commerce | Checkout Contact → Delivery → Payment → Review → Confirmation; Paystack + staging simulator; failure/retry | DONE |
+| Commerce | Checkout Contact → Delivery → Payment (Card / Bank transfer / USSD) → Review → Confirmation; Paystack + staging simulator; failure/retry; mobile collapsible summary + sticky actions; live keys blocked outside approved production | DONE |
+| Commerce | AI scent finder (`/scent-finder/`): scents, room, mood, budget → matching products via Netlify AI Gateway, grounded + validated, with rules fallback | DONE (gateway to enable) |
 | Commerce | Order numbers, confirmation email, order history, tracking status | DONE |
 | Account | Register, sign in, email-code (OTP) sign-in, reset, profile, addresses, orders, preferences, sign out everywhere | DONE |
-| Content | Our Story (brand and group copy, mission, vision, values), Stores (real NAP), For Business / Lease-to-Own + enquiry, Journal, CNM Group hub (Retail · Energy · Impact with all four companies) | DONE (founder and hours **NEEDS CNM APPROVAL**) |
+| Content | Our Story (brand and group copy, mission, vision, values), Stores (real NAP), For Business / Lease-to-Own + enquiry, Journal, CNM Group hub with its own group header/footer and "Visit store" (Retail · Energy · Impact, leadership), company pages for Spectra (consultation form), CNMWorX (project/tender form), Foundation (partner/volunteer form), group contact page | DONE (founder and hours **NEEDS CNM APPROVAL**) |
 | Mobile | Expo iOS + Android app with the original logo, real catalogue and palette (tabs, shop, brand filter, search, PDP, wishlist, bag, checkout, account, push, deep links, biometrics) | DONE (typecheck + 69 tests; not yet device-tested) |
 | Mobile | App Store and Play Store submission | **NEEDS CNM APPROVAL** (accounts) |
 | Admin | Dashboard, orders, customers, inventory/pricing, discounts, content/merchandising, stores, SEO/redirects, enquiries, subscribers, media, analytics, users/roles, audit log, publish | DONE |
@@ -69,7 +72,8 @@ CNM supplied screenshots of **cnmessentials.com** (home, shop, about) and **cnm-
 | Integrations | Resend email (sign-in codes, orders), Supabase database adapter + SQL migration, Paystack payment adapter (initialize, verify, webhooks, refunds) | DONE (needs keys in Netlify: see `docs/INTEGRATIONS.md`) |
 | Sign-in | Passwordless email code (OTP) as the default sign-in; new customers are created on first code | DONE |
 | Security | Signed HttpOnly sessions, CSRF, rate limits, validation, server-side pricing, RBAC, webhook HMAC, CSP/HSTS | DONE |
-| Testing | 28 unit/integration tests, 27 Playwright E2E tests (desktop + mobile) | DONE (all passing) |
+| Testing | 38 unit/integration tests, 34 Playwright E2E runs (desktop + mobile), 69 mobile app tests | DONE (all passing) |
+| Visual QA | CNM Group, company, contact and scent-finder pages checked at 360 / 390 / 768 / 1024 / 1440 px (no horizontal scroll) | DONE |
 | Staging | Netlify config; staging is noindexed with a staging banner and payment simulator | DONE (deploy needs Netlify access, see `docs/DEPLOYMENT.md`) |
 | Visual QA | 69 screenshots, desktop + mobile, `docs/visual-review/index.html` | DONE (with real CNM assets) |
 | Production | Connect cnmessentials.com | Waiting for final CNM approval |

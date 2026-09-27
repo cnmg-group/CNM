@@ -213,7 +213,7 @@ const VIEWS = {
   async enquiries(v) {
     const { enquiries } = await api('/api/admin/enquiries', { loader: false });
     v.innerHTML = `<h1 class="h2">Service enquiries</h1>${enquiries.map((q) => `<div class="card-a"><div class="row-a"><strong>${e(q.name)}${q.company ? ` · ${e(q.company)}` : ''}</strong><span>${formatDate(q.createdAt)}</span></div>
-      <p class="muted">${e(q.sector === 'group' ? `CNM Group · ${q.subject || 'General Enquiry'}` : q.sector)}${q.eventDate ? ` · ${e(q.eventDate)}` : ''}${q.location ? ` · ${e(q.location)}` : ''} · <a class="textlink" href="mailto:${e(q.email)}">${e(q.email)}</a>${q.phone ? ` · ${e(q.phone)}` : ''}</p><p>${e(q.message)}</p>
+      <p class="muted">${e(q.sector === 'group' ? `CNM Group${q.division && q.division !== 'group' ? ` · ${q.division}` : ''} · ${q.subject || 'General Enquiry'}` : q.sector)}${q.interest ? ` · ${e(q.interest)}` : ''}${q.timeline ? ` · ${e(q.timeline)}` : ''}${q.company ? ` · ${e(q.company)}` : ''}${q.eventDate ? ` · ${e(q.eventDate)}` : ''}${q.location ? ` · ${e(q.location)}` : ''} · <a class="textlink" href="mailto:${e(q.email)}">${e(q.email)}</a>${q.phone ? ` · ${e(q.phone)}` : ''}</p><p>${e(q.message)}</p>
       <label>Status <select data-enq="${e(q.id)}">${['new', 'contacted', 'quoted', 'won', 'lost'].map((s) => `<option${s === q.status ? ' selected' : ''}>${s}</option>`).join('')}</select></label></div>`).join('') || '<p class="muted">No enquiries yet.</p>'}`;
     v.addEventListener('change', async (ev) => { const s = ev.target.closest('[data-enq]'); if (!s) return; try { await api(`/api/admin/enquiries/${s.dataset.enq}`, { method: 'PATCH', body: { status: s.value } }); flash('Enquiry updated'); } catch (x) { flash(x.message, false); } });
   },

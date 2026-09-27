@@ -45,6 +45,13 @@ export function homePage(ctx) {
   </div>
 </section>
 
+<section class="section section--cream section--tight" aria-labelledby="finder-title">
+  <div class="container finder-cta">
+    <div><span class="label muted">Not sure where to start?</span><h2 id="finder-title" class="h2">Find your scent in four questions</h2><p class="lead" style="max-width:36rem">Tell us the scents you love, the room and the mood. We’ll suggest pieces from the range.</p></div>
+    <a class="btn btn--green" href="/scent-finder/" data-track="scent_finder_cta">Try the scent finder</a>
+  </div>
+</section>
+
 <section class="section section--tight" aria-labelledby="room-title">
   <div class="container">
     <div class="section-head"><div><span class="label muted">Room &amp; home fragrance</span><h2 id="room-title" class="h2">Room sprays &amp; odour eliminators</h2></div>

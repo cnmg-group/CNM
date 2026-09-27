@@ -1,5 +1,6 @@
 import { escapeHtml } from '../shared/format.mjs';
 import { icon } from '../shared/icons.mjs';
+import { groupFooter, groupHeader } from './group.mjs';
 
 export const approval = (what, detail = '') =>
   `<div class="approval" role="note"><strong>Needs CNM approval</strong>${escapeHtml(what)}${detail ? ` <span>${escapeHtml(detail)}</span>` : ''}</div>`;
@@ -17,7 +18,7 @@ function megaMenu(ctx) {
   const feature = ctx.categories.find((c) => c.banner);
   return `<div class="mega" id="mega-shop" data-mega>
   <div class="container mega__grid">
-    <div><h3 class="label">Shop</h3><ul><li><a href="/shop/">Shop all</a></li><li><a href="/gifts/">Gift options</a></li><li><a href="/fragrance-as-a-service/">Lease-to-Own diffusers</a></li><li><a href="/stores/">Stores</a></li></ul></div>
+    <div><h3 class="label">Shop</h3><ul><li><a href="/shop/">Shop all</a></li><li><a href="/gifts/">Gift options</a></li><li><a href="/scent-finder/">Scent finder</a></li><li><a href="/fragrance-as-a-service/">Lease-to-Own diffusers</a></li><li><a href="/stores/">Stores</a></li></ul></div>
     <div><h3 class="label">Categories</h3><ul>${cats}</ul></div>
     <div><h3 class="label">Brands</h3><ul>${brands}</ul></div>
     ${feature ? `<a class="mega__feature" href="/shop/${feature.slug}/" style="padding:0;position:relative;overflow:hidden"><img src="${feature.banner}" alt="${escapeHtml(feature.name)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0"></a>` : ''}
@@ -39,6 +40,7 @@ function header(ctx, mode, current) {
       <button class="icon-btn menu-toggle" type="button" data-open="mobile-menu" aria-controls="mobile-menu" aria-expanded="false" aria-label="Open menu">${icon('menu')}</button>
       <nav aria-label="Primary"><ul class="primary-nav">
         <li><button type="button" data-mega-toggle aria-expanded="false" aria-controls="mega-shop"${cur('shop')}>Shop</button></li>
+        <li><a href="/scent-finder/"${cur('finder')}>Scent finder</a></li>
         <li><a href="/fragrance-as-a-service/"${cur('services')}>For business</a></li>
         <li><a href="/our-story/"${cur('story')}>Our story</a></li>
         <li><a href="/stores/"${cur('stores')}>Stores</a></li>
@@ -62,6 +64,7 @@ function mobileMenu(ctx) {
   <div class="mobile-menu__top">${logo(ctx)}<button class="icon-btn" type="button" data-close aria-label="Close menu">${icon('close')}</button></div>
   <nav aria-label="Mobile"><ul>
     <li><details open><summary>Shop ${icon('plus', 'sr-only')}</summary><ul><li><a href="/shop/">Shop all</a></li>${cats}<li><a href="/gifts/">Gift options</a></li></ul></details></li>
+    <li><a href="/scent-finder/">Scent finder</a></li>
     <li><a href="/fragrance-as-a-service/">For business</a></li>
     <li><a href="/our-story/">Our story</a></li>
     <li><a href="/stores/">Stores</a></li>
@@ -133,7 +136,7 @@ function footer(ctx) {
         </form>
         <p style="font-size:.75rem;opacity:.7">By subscribing you agree to receive marketing emails. Unsubscribe any time. See our <a class="textlink" href="/privacy/">privacy notice</a>.</p>
       </div>
-      <div><h2>Shop</h2><ul><li><a href="/shop/">Shop all</a></li>${cats}</ul></div>
+      <div><h2>Shop</h2><ul><li><a href="/shop/">Shop all</a></li>${cats}<li><a href="/scent-finder/">Scent finder</a></li></ul></div>
       <div><h2>Customer service</h2><ul><li><a href="/privacy/">Privacy policy</a></li><li><a href="/terms/">Terms &amp; conditions</a></li><li><a href="/delivery-returns/">Return policy</a></li><li><a href="/faqs/">FAQ</a></li><li><a href="/account/orders/">Track an order</a></li></ul></div>
       <div><h2>CNM</h2><ul><li><a href="/our-story/">About us</a></li><li><a href="/stores/">Stores</a></li><li><a href="/fragrance-as-a-service/">For business</a></li><li><a href="/journal/">Journal</a></li><li><a href="/cnm-group/">CNM Group</a></li>${social}</ul></div>
       <div><h2>Contact us</h2><ul>
@@ -164,7 +167,9 @@ export function renderPage(ctx, o) {
   const ov = ctx.seo?.[o.path];
   if (ov?.title) o = { ...o, title: ov.title };
   if (ov?.description) o = { ...o, description: ov.description };
-  const title = o.title ? `${o.title} | CNM Essentials` : 'CNM Essentials — Refresh your space. Indulge your senses.';
+  const group = o.chrome === 'group';
+  const brand = group ? 'CNM Group' : 'CNM Essentials';
+  const title = o.title ? `${o.title} | ${brand}` : 'CNM Essentials — Refresh your space. Indulge your senses.';
   const description = o.description || 'CNM Essentials — luxury room sprays, Wallflowers diffusers and refills, body care and home fragrance. Shop online or visit us in Lekki, Lagos and Garki, Abuja.';
   const noindex = ctx.staging || o.noindex;
   const og = o.ogImage ? `${ctx.siteUrl}${o.ogImage}` : `${ctx.siteUrl}/assets/og-default.png`;
@@ -180,7 +185,7 @@ export function renderPage(ctx, o) {
 <link rel="canonical" href="${url}">
 ${noindex ? '<meta name="robots" content="noindex, nofollow">' : '<meta name="robots" content="index, follow, max-image-preview:large">'}
 <meta name="theme-color" content="#23221e">
-<meta property="og:site_name" content="CNM Essentials">
+<meta property="og:site_name" content="${brand}">
 <meta property="og:type" content="${o.ogType || 'website'}">
 <meta property="og:title" content="${escapeHtml(o.title || 'CNM Essentials')}">
 <meta property="og:description" content="${escapeHtml(description)}">
@@ -199,16 +204,16 @@ ${o.head || ''}
 ${ld}
 <script type="module" src="${ctx.assets.js}"></script>
 </head>
-<body data-page="${o.page}"${ctx.ga ? ` data-ga="${escapeHtml(ctx.ga)}"` : ''}>
+<body data-page="${o.page}"${group ? ' data-chrome="group"' : ''}${ctx.ga ? ` data-ga="${escapeHtml(ctx.ga)}"` : ''}>
 <a class="skip-link" href="#main">Skip to content</a>
 ${ctx.staging ? `<div class="staging-bar">Staging preview — products, prices and imagery from cnmessentials.com; stock, delivery fees and policies await CNM approval. No real payments are taken.</div>` : ''}
-${ctx.announcement && mode !== 'checkout' ? `<div class="announce-bar">${ctx.announcement.href ? `<a href="${escapeHtml(ctx.announcement.href)}">${escapeHtml(ctx.announcement.message)}</a>` : escapeHtml(ctx.announcement.message)}</div>` : ''}
-${header(ctx, mode, o.current)}
-${mode === 'checkout' ? '' : mobileMenu(ctx)}
+${ctx.announcement && mode !== 'checkout' && !group ? `<div class="announce-bar">${ctx.announcement.href ? `<a href="${escapeHtml(ctx.announcement.href)}">${escapeHtml(ctx.announcement.message)}</a>` : escapeHtml(ctx.announcement.message)}</div>` : ''}
+${group ? groupHeader(ctx, o.current) : header(ctx, mode, o.current)}
+${mode === 'checkout' || group ? '' : mobileMenu(ctx)}
 <main id="main" tabindex="-1">
 ${o.body}
 </main>
-${mode === 'checkout' ? '' : footer(ctx)}
+${mode === 'checkout' ? '' : group ? groupFooter(ctx) : footer(ctx)}
 ${overlays()}
 </body>
 </html>`;

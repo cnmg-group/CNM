@@ -199,6 +199,7 @@ const PAGES = {
   auth: () => import('./pages/auth.js'),
   services: () => import('./pages/services.js'),
   group: () => import('./pages/services.js'),
+  'scent-finder': () => import('./pages/scent-finder.js'),
 };
 const pageKey = document.body.dataset.page;
 PAGES[pageKey]?.().then((m) => m.init?.()).catch((err) => console.error('[cnm] page init failed', err));

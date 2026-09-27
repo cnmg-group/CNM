@@ -1,5 +1,6 @@
 import { escapeHtml } from '../shared/format.mjs';
 import { icon } from '../shared/icons.mjs';
+import { PAYMENT_METHODS } from '../shared/payment-methods.mjs';
 import { breadcrumbs, butterflySVG } from './layout.mjs';
 
 const skeletonLines = (n = 2) =>
@@ -45,7 +46,8 @@ export function checkoutPage(ctx) {
   const steps = ['Contact', 'Delivery', 'Payment', 'Review'];
   return `<div class="container">
   <div class="checkout" data-checkout>
-    <div>
+    <button class="co-summary-toggle" type="button" data-summary-toggle aria-expanded="false" aria-controls="co-summary-card"><span>${icon('bag')} <span data-summary-toggle-label>Show order summary</span></span><strong data-summary-total></strong></button>
+    <div class="checkout__main">
       <ol class="steps" data-steps>${steps.map((s, i) => `<li${i === 0 ? ' aria-current="step"' : ''}>${s}</li>`).join('')}</ol>
       <div class="alert alert--err" data-checkout-error role="alert" hidden></div>
 
@@ -75,8 +77,11 @@ export function checkoutPage(ctx) {
 
       <form class="step-panel" data-step="payment" novalidate hidden>
         <h2>Payment</h2>
-        <label class="radio-card"><input type="radio" name="paymentMethod" value="card" checked><span class="rc-main"><strong>Card, bank transfer or USSD</strong><span class="muted" style="font-size:.8125rem">You'll complete payment securely on our payment provider's page. CNM never sees or stores your card details.</span></span></label>
-        <p class="muted" style="font-size:.8125rem">Payment provider: Paystack (needs CNM approval). In staging, a simulated payment step lets you test both success and failure.</p>
+        <fieldset class="pay-methods-list" data-pay-methods><legend class="sr-only">Payment method</legend>
+        ${PAYMENT_METHODS.map((m, i) => `<label class="radio-card"><input type="radio" name="paymentMethod" value="${m.id}"${i === 0 ? ' checked' : ''} required><span class="rc-main"><strong>${escapeHtml(m.label)}</strong><span class="muted" style="font-size:.8125rem">${escapeHtml(m.detail)}</span></span>${icon(m.id === 'card' ? 'lock' : m.id === 'ussd' ? 'phone' : 'store')}</label>`).join('')}
+        </fieldset>
+        <p class="muted" style="font-size:.8125rem;display:flex;gap:8px;align-items:flex-start">${icon('lock')} <span>You’ll complete payment on our payment provider’s secure page. CNM never sees or stores your card details.</span></p>
+        <div class="sim-pay" data-pay-mode-note${ctx.staging ? '' : ' hidden'}><strong class="label">Staging — no real payments</strong><p style="margin:0" data-pay-mode-text>This preview uses a payment simulator or Paystack test mode. No money is taken and no real card is charged.</p></div>
         <div class="step-nav"><button class="textlink" type="button" data-back>Back</button><button class="btn" type="submit">Review order</button></div>
       </form>
 
@@ -97,7 +102,7 @@ export function checkoutPage(ctx) {
       </div>
     </div>
 
-    <aside class="summary-card" aria-labelledby="co-summary">
+    <aside class="summary-card co-summary" id="co-summary-card" aria-labelledby="co-summary" data-co-summary>
       <h2 id="co-summary" class="label">Order summary</h2>
       <div class="mini-lines" data-co-lines>${skeletonLines(1)}</div>
       <form class="promo" data-promo-form novalidate><label for="co-promo" class="sr-only">Promo code</label><input id="co-promo" name="code" placeholder="Promo code" autocomplete="off"><button class="btn btn--ghost" type="submit">Apply</button></form>

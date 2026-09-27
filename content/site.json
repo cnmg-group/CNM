@@ -104,8 +104,10 @@
             "name": "CNM Spectra",
             "tagline": "See clearly. Look extraordinary.",
             "logo": "/assets/brand/cnm-spectra-logo.jpg",
-            "url": "https://www.cnm-group.net",
-            "text": "A premium eyewear brand offering prescription frames, sunglasses, contact lenses and accessories."
+            "url": "/cnm-group/spectra/",
+            "text": "A premium eyewear brand offering prescription frames, sunglasses, contact lenses and accessories.",
+            "slug": "spectra",
+            "internalPage": true
           }
         ]
       },
@@ -118,8 +120,10 @@
             "name": "CNMWorX Limited",
             "tagline": "Engineering the future, one project at a time.",
             "logo": "/assets/brand/cnmworx-logo.jpg",
-            "url": "https://www.cnm-group.net",
-            "text": "ISO 9001:2015-certified engineering and technical services: industrial and process automation, instrumentation, power electronics and ICT."
+            "url": "/cnm-group/cnmworx/",
+            "text": "ISO 9001:2015-certified engineering and technical services: industrial and process automation, instrumentation, power electronics and ICT.",
+            "slug": "cnmworx",
+            "internalPage": true
           }
         ]
       },
@@ -132,8 +136,10 @@
             "name": "CNM Foundation",
             "tagline": "Zero percent of zero is zero — so we give everything.",
             "logo": "/assets/brand/cnm-foundation-logo.jpg",
-            "url": "https://www.cnm-group.net",
-            "text": "Education, women's economic empowerment, youth development and community health across Nigeria and the African diaspora."
+            "url": "/cnm-group/foundation/",
+            "text": "Education, women's economic empowerment, youth development and community health across Nigeria and the African diaspora.",
+            "slug": "foundation",
+            "internalPage": true
           }
         ]
       }
@@ -205,7 +211,8 @@
         "places": [
           "Lagos",
           "Abuja"
-        ]
+        ],
+        "slug": "essentials"
       },
       {
         "name": "CNM Spectra",
@@ -241,7 +248,9 @@
         "places": [
           "Lagos",
           "Abuja"
-        ]
+        ],
+        "slug": "spectra",
+        "page": "/cnm-group/spectra/"
       },
       {
         "name": "CNMWorX Limited",
@@ -277,7 +286,9 @@
         ],
         "places": [
           "ISO 9001:2015 Certified"
-        ]
+        ],
+        "slug": "cnmworx",
+        "page": "/cnm-group/cnmworx/"
       },
       {
         "name": "CNM Foundation",
@@ -314,9 +325,18 @@
         "places": [
           "Lagos, Nigeria",
           "African Diaspora Engagement"
-        ]
+        ],
+        "slug": "foundation",
+        "page": "/cnm-group/foundation/"
       }
-    ]
+    ],
+    "founder": {
+      "name": "Mrs Nkiruka Cynthia Ajah",
+      "title": "Founder & Group CEO",
+      "status": "FROM_CNM_BRIEF",
+      "portrait": null,
+      "quote": null
+    }
   },
   "motto": {
     "value": "Creating serenity, pioneering comfort.",

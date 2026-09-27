@@ -106,3 +106,27 @@ test('supabase store: upsert, get, list by prefix (escaping _), delete, secret-k
   await legacy.get('k');
   assert.equal(seen.at(-1).Authorization, 'Bearer eyJhbGciOi.jwt');
 });
+
+test('live Paystack key is ignored outside the approved production deploy', () => {
+  const warn = console.warn; console.warn = () => {};
+  try {
+    process.env.PAYSTACK_SECRET_KEY = 'sk_live_abc';
+    assert.equal(activeProvider().name, 'simulated');
+    process.env.CONTEXT = 'deploy-preview';
+    assert.equal(activeProvider().name, 'simulated');
+    process.env.CONTEXT = 'production';
+    assert.equal(activeProvider().name, 'simulated', 'production without launch approval stays simulated');
+    process.env.CNM_LAUNCH_APPROVED = 'true';
+    assert.equal(activeProvider().name, 'paystack');
+  } finally { console.warn = warn; delete process.env.CONTEXT; delete process.env.CNM_LAUNCH_APPROVED; }
+});
+
+test('paystack.initialize narrows channels to the shopper’s chosen method', async () => {
+  process.env.PAYSTACK_SECRET_KEY = 'sk_test_abc';
+  const calls = mockFetch(() => ({ body: { status: true, data: { authorization_url: 'https://checkout.paystack.com/x', access_code: 'x' } } }));
+  await paystack.initialize(order, { callbackUrl: 'https://x.test/', channels: ['ussd'] });
+  assert.deepEqual(calls[0].body.channels, ['ussd']);
+  process.env.PAYSTACK_CHANNELS = 'card';
+  await paystack.initialize(order, { callbackUrl: 'https://x.test/', channels: ['ussd'] });
+  assert.deepEqual(calls[1].body.channels, ['card'], 'falls back to allowed channels');
+});

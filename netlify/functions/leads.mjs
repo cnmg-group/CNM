@@ -7,6 +7,7 @@ import { rateLimit } from '../lib/ratelimit.mjs';
 import { store } from '../lib/store.mjs';
 import * as v from '../lib/validate.mjs';
 
+const DIVISIONS = ['group', 'essentials', 'spectra', 'cnmworx', 'foundation'];
 const SECTORS = ['events', 'weddings', 'corporate', 'hospitality', 'retail', 'offices', 'activations', 'machines', 'group', 'other'];
 
 export default handler(async (req, context) => {
@@ -27,6 +28,9 @@ export default handler(async (req, context) => {
         company: v.str(b.company, { name: 'Company', max: 120, required: false }), sector: v.oneOf(b.sector, SECTORS, 'Project type'),
         eventDate: v.str(b.eventDate, { name: 'Date', max: 10, required: false }), location: v.str(b.location, { name: 'Location', max: 160, required: false }),
         subject: v.str(b.subject, { name: 'Subject', max: 60, required: false }),
+        division: b.division ? v.oneOf(b.division, DIVISIONS, 'Company') : undefined,
+        interest: v.str(b.interest, { name: 'Interest', max: 80, required: false }),
+        timeline: v.str(b.timeline, { name: 'Timeline', max: 60, required: false }),
         message: v.str(b.message, { name: 'Message', min: 10, max: 3000 }),
       };
       await leads.set(`enquiry/${e.id}`, e);

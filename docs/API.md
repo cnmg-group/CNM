@@ -14,7 +14,7 @@ Login/register return `token` in the body **only** when the request carries `X-C
 
 Sessions are HMAC-SHA256 signed (`SESSION_SECRET`), stateless, and include a per-user `sessionVersion` so "log out everywhere" and password resets invalidate all sessions.
 
-Rate limits (per IP, fixed window): auth 10/min, checkout 20/min, enquiry/newsletter 5/min, admin login 5/min. Exceeding returns `429`.
+Rate limits (per IP, fixed window): auth 10/min, checkout 20/min, enquiry/newsletter 5/min, admin login 5/min, scent finder 8/min. Exceeding returns `429`.
 
 ## Static data (built at deploy time)
 
@@ -53,8 +53,10 @@ Rate limits (per IP, fixed window): auth 10/min, checkout 20/min, enquiry/newsle
 
 - `POST /api/checkout/quote` `{ items: [{ id, qty }], promoCode?, deliveryMethod? }` → `{ lines, subtotal, discount, delivery, vat, total, currency, promo: { code, valid, message }, deliveryMethods }`
   Totals are always recomputed on the server from the catalogue plus live overrides. Client prices are never trusted.
-- `POST /api/checkout` `{ items, contact: { email, phone, firstName, lastName }, delivery: { method, address? , storeSlug? }, promoCode?, notes? }`
-  → `{ order: { number, accessToken, total, status }, payment: { mode: "paystack"|"simulated", authorizationUrl?, reference } }`
+  The quote also returns `payment: { provider: "paystack"|"simulated", testMode, methods: [{ id, label, detail }] }`.
+- `POST /api/checkout` `{ items, contact: { email, phone, firstName, lastName }, delivery: { method, address? , storeSlug? }, paymentMethod?: "card"|"bank_transfer"|"ussd", promoCode?, notes? }`
+  → `{ order: { number, accessToken, total, status }, payment: { mode: "paystack"|"simulated", method, testMode, authorizationUrl?, reference } }`
+  `paymentMethod` defaults to `card` and opens Paystack on that channel. A live Paystack key is only used on the approved production deploy.
 - `POST /api/payments/simulate` `{ number, accessToken, outcome: "success"|"failure" }` — only when no payment secret is configured (staging).
 - `GET /api/payments/verify?reference=` — confirms a Paystack payment on return from the hosted page.
 - `POST /api/payments/paystack-webhook` — Paystack webhook, verified with `x-paystack-signature` (HMAC-SHA512 of the raw body).
@@ -64,9 +66,15 @@ Order statuses: `pending_payment → paid → processing → dispatched → deli
 
 ## Leads
 
-- `POST /api/enquiry` `{ name, email, phone?, company?, sector, eventDate?, location?, message, consent: true }`
+- `POST /api/enquiry` `{ name, email, phone?, company?, sector, eventDate?, location?, subject?, division?: "group"|"essentials"|"spectra"|"cnmworx"|"foundation", interest?, timeline?, message, consent: true }`
 - `POST /api/newsletter` `{ email, consent: true, source? }`
 - `POST /api/back-in-stock` `{ email, productId }`
+
+## Scent finder
+
+- `POST /api/recommend` `{ families?: string[], room?, moods?: string[] (max 3), budget?: "any"|"u15"|"u20"|"u35", notes?: string (≤280) }`
+  → `{ source: "ai"|"rules", model?, fallback?, summary, tip, picks: [{ id, reason }] }` (max 4 picks, always real, in-stock, in-budget products).
+  Vocabularies are in `src/shared/scent-match.mjs`. The AI path runs through the Netlify AI Gateway; see `docs/INTEGRATIONS.md`.
 
 ## Admin — `/api/admin/*`
 

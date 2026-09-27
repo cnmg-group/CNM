@@ -6,6 +6,7 @@ import { api } from '../api.js';
 import * as S from '../store.js';
 import { formData, setBusy, validate } from '../ui.js';
 import { fetchQuote, totalsHTML } from './quote.js';
+import { PAYMENT_METHODS } from '../../shared/payment-methods.mjs';
 
 const STEPS = ['contact', 'delivery', 'payment', 'review'];
 const SAVE_KEY = 'cnm.checkout';
@@ -14,7 +15,7 @@ export async function init() {
   const root = document.querySelector('[data-checkout]');
   const errBox = root.querySelector('[data-checkout-error]');
   const state = { step: 'contact', contact: {}, delivery: {}, payment: { method: 'card' }, promoCode: sessionStorage.getItem('cnm.promo') || '', quote: null, ...JSON.parse(sessionStorage.getItem(SAVE_KEY) || '{}') };
-  const save = () => sessionStorage.setItem(SAVE_KEY, JSON.stringify({ contact: state.contact, delivery: state.delivery, promoCode: state.promoCode }));
+  const save = () => sessionStorage.setItem(SAVE_KEY, JSON.stringify({ contact: state.contact, delivery: state.delivery, payment: state.payment, promoCode: state.promoCode }));
   const { byId } = await S.catalogue();
   const items = () => S.getBag().filter((l) => byId.has(l.id)).map(({ id, qty }) => ({ id, qty }));
 
@@ -37,6 +38,17 @@ export async function init() {
   const fill = (form, data) => Object.entries(data || {}).forEach(([k, v]) => { const f = form.elements[k]; if (f && typeof v === 'string') f.value = v; });
   fill(root.querySelector('[data-step="contact"]'), state.contact);
   fill(root.querySelector('[data-step="delivery"]'), state.delivery);
+  const payRadio = root.querySelector(`[name="paymentMethod"][value="${state.payment?.method}"]`);
+  if (payRadio) payRadio.checked = true;
+
+  // Mobile: collapsible order summary above the steps
+  const summary = root.querySelector('[data-co-summary]');
+  const summaryToggle = root.querySelector('[data-summary-toggle]');
+  summaryToggle.addEventListener('click', () => {
+    const open = summary.classList.toggle('is-open');
+    summaryToggle.setAttribute('aria-expanded', String(open));
+    root.querySelector('[data-summary-toggle-label]').textContent = open ? 'Hide order summary' : 'Show order summary';
+  });
 
   const promoForm = root.querySelector('[data-promo-form]');
   const promoMsg = root.querySelector('[data-promo-msg]');
@@ -52,6 +64,14 @@ export async function init() {
       return `<div class="mini-line"><div class="mini-line__media"><img src="${productImages(p)[0].src}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"><span class="mini-line__qty">${l.qty}</span></div><span>${escapeHtml(l.name)}</span><span>${formatMoney(l.lineTotal)}</span></div>`;
     }).join('');
     root.querySelector('[data-totals]').innerHTML = totalsHTML(q);
+    root.querySelector('[data-summary-total]').textContent = formatMoney(q.total);
+    const note = root.querySelector('[data-pay-mode-note]');
+    if (q.payment?.testMode) {
+      note.hidden = false;
+      root.querySelector('[data-pay-mode-text]').textContent = q.payment.provider === 'simulated'
+        ? 'This preview uses a payment simulator. After you place the order you can choose a successful or failed payment. No money is taken.'
+        : 'Paystack is in test mode. Use Paystack test cards or accounts. No real money is taken.';
+    }
     if (state.promoCode) { promoMsg.textContent = q.promo?.message || ''; promoMsg.className = `msg ${q.promo?.valid ? 'msg--ok' : 'msg--err'}`; }
     if (q.errors.length) showError(q.errors.map((e) => e.message).join(' '));
     renderMethods();
@@ -117,6 +137,7 @@ export async function init() {
   root.querySelector('[data-step="payment"]').addEventListener('submit', (e) => {
     e.preventDefault();
     state.payment = { method: e.currentTarget.paymentMethod.value };
+    save();
     track('add_payment_info', { currency: 'NGN', value: state.quote?.total, payment_type: state.payment.method });
     go('review');
   });
@@ -129,7 +150,8 @@ export async function init() {
     root.querySelector('[data-review]').innerHTML = `
       <div class="review-block"><div class="head"><strong>Contact</strong><button class="textlink" type="button" data-edit="contact">Edit</button></div><span>${escapeHtml(c.firstName)} ${escapeHtml(c.lastName)}</span><span class="muted">${escapeHtml(c.email)} · ${escapeHtml(c.phone)}</span></div>
       <div class="review-block"><div class="head"><strong>Delivery</strong><button class="textlink" type="button" data-edit="delivery">Edit</button></div><span>${escapeHtml(m?.label || '')} — ${escapeHtml(m?.eta || '')}</span><span class="muted">${pickup ? `Collect from ${escapeHtml(root.querySelector(`#a-store option[value="${d.storeSlug}"]`)?.textContent || d.storeSlug)}` : `${escapeHtml(d.line1)}${d.line2 ? `, ${escapeHtml(d.line2)}` : ''}, ${escapeHtml(d.city)}, ${escapeHtml(d.state)}`}</span></div>
-      <div class="review-block"><div class="head"><strong>Payment</strong><button class="textlink" type="button" data-edit="payment">Edit</button></div><span>Card, bank transfer or USSD via secure payment page</span></div>`;
+      <div class="review-block"><div class="head"><strong>Payment</strong><button class="textlink" type="button" data-edit="payment">Edit</button></div><span>${escapeHtml(PAYMENT_METHODS.find((x) => x.id === state.payment.method)?.label || 'Card')}</span><span class="muted">Paid on our provider’s secure page${state.quote?.payment?.testMode ? ' · staging: no real payment' : ''}</span></div>
+      <div class="review-block"><div class="head"><strong>Items</strong><span class="muted">${state.quote?.lines.reduce((n, l) => n + l.qty, 0) || 0}</span></div>${(state.quote?.lines || []).map((l) => `<span style="display:flex;justify-content:space-between;gap:12px"><span>${l.qty} × ${escapeHtml(l.name)}</span><span>${formatMoney(l.lineTotal)}</span></span>`).join('')}<span style="display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:8px;margin-top:4px"><strong>Total</strong><strong>${formatMoney(state.quote?.total || 0)}</strong></span></div>`;
     root.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => go(b.dataset.edit)));
   }
 
@@ -147,6 +169,7 @@ export async function init() {
           contact: { email: state.contact.email, phone: state.contact.phone, firstName: state.contact.firstName, lastName: state.contact.lastName, marketing: !!state.contact.marketing },
           delivery: d.method === 'store-pickup' ? { method: d.method, storeSlug: d.storeSlug } : { method: d.method, address: { line1: d.line1, line2: d.line2, city: d.city, state: d.state, country: 'NG' } },
           notes: d.notes,
+          paymentMethod: state.payment.method,
         },
       });
       sessionStorage.setItem('cnm.lastOrder', JSON.stringify({ number: res.order.number, token: res.order.accessToken }));

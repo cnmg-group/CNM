@@ -12,7 +12,7 @@ const DIST = path.join(ROOT, 'dist');
 const PORT = Number(process.env.PORT || 8888);
 const LATENCY = Number(process.env.CNM_API_LATENCY || 0); // simulate slow networks in tests
 
-const FUNCTIONS = ['auth', 'account', 'checkout', 'payments', 'orders', 'catalogue-live', 'leads', 'events', 'admin', 'media'];
+const FUNCTIONS = ['auth', 'account', 'checkout', 'payments', 'orders', 'catalogue-live', 'leads', 'events', 'admin', 'media', 'recommend'];
 const routes = [];
 for (const name of FUNCTIONS) {
   const mod = await import(pathToFileURL(path.join(ROOT, 'netlify/functions', `${name}.mjs`)).href);
