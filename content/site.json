@@ -214,7 +214,8 @@
         ],
         "slug": "essentials",
         "image": "/assets/stores/cnm-essentials-store-interior.webp",
-        "imageAlt": "Inside a CNM Essentials store"
+        "imageAlt": "Inside a CNM Essentials store",
+        "menuLabel": "Fragrance & Lifestyle"
       },
       {
         "name": "CNM Spectra",
@@ -255,7 +256,8 @@
         "page": "/cnm-group/spectra/",
         "image": "/assets/group/spectra.webp",
         "imageAlt": "Blue tortoiseshell eyeglass frames",
-        "imagePosition": "center 80%"
+        "imagePosition": "center 80%",
+        "menuLabel": "Eyewear"
       },
       {
         "name": "CNMWorX Limited",
@@ -296,7 +298,8 @@
         "page": "/cnm-group/cnmworx/",
         "image": "/assets/group/cnmworx.webp",
         "imageAlt": "An engineer at a plant control panel",
-        "imagePosition": "30% center"
+        "imagePosition": "30% center",
+        "menuLabel": "Engineering & Energy"
       },
       {
         "name": "CNM Foundation",
@@ -336,8 +339,10 @@
         ],
         "slug": "foundation",
         "page": "/cnm-group/foundation/",
-        "image": null,
-        "imageAlt": null
+        "image": "/assets/group/foundation.webp",
+        "imageAlt": "A teacher reading with a smiling schoolgirl",
+        "imagePosition": "center 30%",
+        "menuLabel": "Social Impact"
       }
     ],
     "founder": {

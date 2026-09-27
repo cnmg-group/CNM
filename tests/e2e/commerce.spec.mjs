@@ -207,7 +207,9 @@ test('CNM Group: Retail routes to the store; company pages; contact form sends a
   await expect(page.locator('.group-store')).toHaveAttribute('href', '/');
   if (isMobile) {
     await page.locator('.group-menu summary').click();
-    await page.locator('.group-menu__panel a', { hasText: 'CNMWorX' }).click();
+    await expect(page.locator('.gmenu')).toBeVisible();
+    await expect(page.locator('.gmenu__sub', { hasText: 'Engineering & Energy' })).toBeVisible();
+    await page.locator('.gmenu__list a', { hasText: 'CNMWorX' }).click();
   } else {
     await page.locator('.group-nav a', { hasText: 'CNMWorX' }).click();
   }

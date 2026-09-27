@@ -978,3 +978,34 @@ body[data-chrome="group"] .group-footer { background: var(--g-navy); }
   .company-hero__media > .company-hero__logo:first-child { width: 120px; }
 }
 @media (max-width: 480px) { .gbtn { width: 100%; } .gpanel .gbtn, .gquote .gbtn { width: auto; } }
+
+/* ---------- CNM Group full-screen menu ---------- */
+.group-menu .gm-close { display: none; }
+.group-menu[open] .gm-open { display: none; }
+.group-menu[open] .gm-close { display: inline-flex; }
+.group-menu summary { position: relative; z-index: 2; }
+.gmenu { position: fixed; left: 0; right: 0; bottom: 0; top: calc(var(--header-h) + env(safe-area-inset-top, 0px)); z-index: 1; background: var(--g-navy, #0b1120); color: var(--g-cream, #f3ecdd); overflow-y: auto; padding: clamp(24px, 6vh, 56px) var(--gutter) max(32px, env(safe-area-inset-bottom)); display: grid; align-content: start; gap: 40px; }
+.gmenu__list { display: grid; gap: clamp(18px, 3.2vh, 30px); }
+.gmenu__list a { display: grid; gap: 8px; }
+.gmenu__name { font-family: var(--serif); font-size: clamp(2.2rem, 10vw, 3.4rem); line-height: 1; }
+.gmenu__sub { font-size: .75rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--g-gold, #d4b06a); }
+.gmenu__list a[aria-current="page"] .gmenu__name { font-style: italic; color: var(--g-gold, #d4b06a); }
+.gmenu__list a:hover .gmenu__name { color: var(--g-gold, #d4b06a); }
+.gmenu__store { justify-self: start; }
+@media (prefers-reduced-motion: no-preference) { .group-menu[open] .gmenu__list li { animation: gmenuIn .5s var(--ease) both; } .group-menu[open] .gmenu__list li:nth-child(2) { animation-delay: .04s; } .group-menu[open] .gmenu__list li:nth-child(3) { animation-delay: .08s; } .group-menu[open] .gmenu__list li:nth-child(4) { animation-delay: .12s; } .group-menu[open] .gmenu__list li:nth-child(5) { animation-delay: .16s; } .group-menu[open] .gmenu__list li:nth-child(6) { animation-delay: .2s; } }
+@keyframes gmenuIn { from { opacity: 0; transform: translateY(12px); } }
+
+/* ---------- CNM Group footer ---------- */
+.gfooter { background: #080d19; color: var(--g-cream, #f3ecdd); padding: clamp(48px, 7vw, 96px) 0 32px; }
+.gfooter__grid { display: grid; grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr)); gap: 40px 32px; }
+.gfooter__brand { display: grid; gap: 20px; align-content: start; }
+.gfooter__logo img { width: 128px; height: auto; background: #fff; padding: 6px; display: block; }
+.gfooter__tagline { font-family: var(--serif); font-style: italic; font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.2; margin: 0; max-width: 22ch; }
+.gfooter__motto { margin: 0; color: rgba(243,236,221,.6); font-size: .875rem; }
+.gfooter h2 { font-size: .75rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--g-gold, #d4b06a); margin: 0 0 18px; }
+.gfooter ul { display: grid; gap: 12px; color: rgba(243,236,221,.82); }
+.gfooter a:hover { color: var(--g-gold, #d4b06a); }
+.gfooter__addr { font-size: .875rem; color: rgba(243,236,221,.6); }
+.gfooter__bottom { margin-top: clamp(40px, 6vw, 72px); padding-top: 24px; border-top: 1px solid rgba(243,236,221,.14); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: .75rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(243,236,221,.55); }
+@media (max-width: 960px) { .gfooter__grid { grid-template-columns: 1fr 1fr; } .gfooter__brand { grid-column: 1 / -1; } }
+@media (max-width: 560px) { .gfooter__grid { grid-template-columns: 1fr; } }

@@ -15,15 +15,21 @@ const GROUP_NAV = [
 export function groupHeader(ctx, current) {
   const g = ctx.site.group;
   const links = GROUP_NAV.map((n) => `<li><a href="${n.href}"${n.key === current ? ' aria-current="page"' : ''}>${n.label}</a></li>`).join('');
+  const menu = [
+    { href: '/cnm-group/', name: 'Home', key: 'overview' },
+    ...g.profiles.map((p) => ({ href: p.page || '/', name: p.name, sub: p.menuLabel, key: p.slug })),
+    { href: '/cnm-group/contact/', name: 'Contact', key: 'contact' },
+  ].map((m) => `<li><a href="${m.href}"${m.key === current ? ' aria-current="page"' : ''}><span class="gmenu__name">${escapeHtml(m.name)}</span>${m.sub ? `<span class="gmenu__sub">${escapeHtml(m.sub)}</span>` : ''}</a></li>`).join('');
   return `<header class="group-header" data-group-header>
   <div class="container group-header__row">
-    <a class="group-logo" href="/cnm-group/" aria-label="CNM Group — overview"><img src="${g.logo}" alt="" width="480" height="480"><span>CNM Group</span></a>
+    <a class="group-logo" href="/cnm-group/" aria-label="CNM Group — home"><img src="${g.logo}" alt="" width="480" height="480"><span>CNM Group</span></a>
     <nav aria-label="CNM Group"><ul class="group-nav">${links}</ul></nav>
     <div class="group-header__right">
       <a class="btn btn--green group-store" href="/" data-track="group_visit_store">${icon('bag')} <span>Visit store</span></a>
       <details class="group-menu" data-group-menu>
-        <summary class="icon-btn" aria-label="Open CNM Group menu">${icon('menu')}</summary>
-        <div class="group-menu__panel"><ul>${links}<li><a href="/">CNM Essentials store ${icon('arrow')}</a></li></ul></div>
+        <summary class="icon-btn" aria-label="Menu"><span class="gm-open">${icon('menu')}</span><span class="gm-close">${icon('close')}</span></summary>
+        <div class="gmenu"><nav aria-label="CNM Group menu"><ul class="gmenu__list">${menu}</ul></nav>
+          <a class="gbtn gbtn--gold gmenu__store" href="/">Visit the CNM Essentials store ${icon('arrow')}</a></div>
       </details>
     </div>
   </div>
@@ -32,35 +38,32 @@ export function groupHeader(ctx, current) {
 
 export function groupFooter(ctx) {
   const g = ctx.site.group;
-  const companies = g.profiles.map((p) => `<li><a href="${p.page || '/'}">${escapeHtml(p.name)}</a></li>`).join('');
-  return `<footer class="site-footer group-footer">
+  const HQ = { 'Lagos, Nigeria': 'Group HQ', 'Dallas, Texas': 'US operations' };
+  return `<footer class="gfooter">
   <div class="container">
-    <div class="footer-grid">
-      <div class="stack">
-        <a class="group-logo group-logo--light" href="/cnm-group/"><img src="${g.logo}" alt="" width="480" height="480" loading="lazy"><span>CNM Group</span></a>
-        <p style="max-width:28rem">${escapeHtml(g.motto)}</p>
-        <p class="muted" style="max-width:28rem">${escapeHtml(g.about)}</p>
+    <div class="gfooter__grid">
+      <div class="gfooter__brand">
+        <a class="gfooter__logo" href="/cnm-group/" aria-label="CNM Group — home"><img src="${g.logo}" alt="" width="480" height="480" loading="lazy"></a>
+        <p class="gfooter__tagline">Creating sustainable businesses that transcend industries.</p>
+        <p class="gfooter__motto">${escapeHtml(g.motto)}</p>
       </div>
-      <div><h2>Companies</h2><ul>${companies}</ul></div>
-      <div><h2>Divisions</h2><ul>${g.divisions.map((d) => `<li><a href="/cnm-group/#companies">${escapeHtml(d.name)}</a></li>`).join('')}</ul></div>
-      <div><h2>Group</h2><ul><li><a href="/cnm-group/#leadership">Leadership</a></li><li><a href="/cnm-group/contact/">Contact</a></li><li><a href="${g.url}" rel="noopener">cnm-group.net</a></li><li><a href="/privacy/">Privacy</a></li></ul></div>
-      <div><h2>Contact</h2><ul>
-        <li style="display:flex;gap:8px">${icon('mail')}<a href="mailto:${g.contact.email}">${escapeHtml(g.contact.email)}</a></li>
-        <li style="display:flex;gap:8px">${icon('phone')}<a href="tel:${g.contact.phone.replace(/\s/g, '')}">${escapeHtml(g.contact.phone)}</a></li>
-        <li style="display:flex;gap:8px">${icon('pin')}<span>${escapeHtml(g.contact.address)}</span></li>
+      <div><h2>Companies</h2><ul>${g.profiles.map((p) => `<li><a href="${p.page || '/'}">${escapeHtml(p.name)}</a></li>`).join('')}</ul></div>
+      <div><h2>Offices</h2><ul>${g.ecosystem.locations.map(([c]) => `<li>${escapeHtml(c)}${HQ[c] ? ` — ${HQ[c]}` : ''}</li>`).join('')}<li><a href="/cnm-group/contact/">Contact the Group</a></li></ul></div>
+      <div><h2>Get in touch</h2><ul>
+        <li><a href="mailto:${g.contact.email}">${escapeHtml(g.contact.email)}</a></li>
+        <li><a href="tel:${g.contact.phone.replace(/\s/g, '')}">${escapeHtml(g.contact.phone)}</a></li>
+        <li class="gfooter__addr">${escapeHtml(g.contact.address)}</li>
       </ul></div>
     </div>
-    <div class="footer-bottom">
+    <div class="gfooter__bottom">
       <span>© ${new Date().getFullYear()} CNM Group. All rights reserved.</span>
-      <span><a href="/">Shop CNM Essentials</a> · <a href="/privacy/">Privacy</a> · <button type="button" data-consent-open class="textlink" style="font-size:inherit;color:inherit">Cookie settings</button></span>
+      <span><a href="/privacy/">Privacy</a> · <button type="button" data-consent-open class="textlink" style="font-size:inherit;color:inherit">Cookie settings</button></span>
     </div>
   </div>
 </footer>`;
 }
 
 /* ---------------- Overview ---------------- */
-const DIVISION_OF = { essentials: 'Retail', spectra: 'Retail', cnmworx: 'Energy', foundation: 'Impact' };
-
 function companyPanel(p, i) {
   const href = p.page || '/';
   const cta = p.internal ? 'Visit the store' : 'Explore';
@@ -70,7 +73,7 @@ function companyPanel(p, i) {
   return `<a class="gpanel${p.image ? '' : ' gpanel--plain'}" href="${href}" data-track="group_company" data-company="${p.slug}">
     <span class="gpanel__media">${media}</span>
     <span class="gpanel__copy">
-      <span class="gpanel__eyebrow">${String(i + 1).padStart(2, '0')} — ${escapeHtml(DIVISION_OF[p.slug])} · ${escapeHtml(p.sector)}</span>
+      <span class="gpanel__eyebrow">${String(i + 1).padStart(2, '0')} — ${escapeHtml(p.menuLabel || p.sector)}</span>
       <span class="gpanel__name">${escapeHtml(p.name)}</span>
       <span class="gpanel__tag">${escapeHtml(p.tagline)}</span>
       <span class="gbtn gbtn--line">${cta} ${icon('arrow')}</span>

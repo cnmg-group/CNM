@@ -218,3 +218,14 @@ const PAGES = {
 const pageKey = document.body.dataset.page;
 PAGES[pageKey]?.().then((m) => m.init?.()).catch((err) => console.error('[cnm] page init failed', err));
 
+
+// ---------- CNM Group full-screen menu: lock scroll while open, Escape closes ----------
+const groupMenu = document.querySelector('[data-group-menu]');
+if (groupMenu) {
+  groupMenu.addEventListener('toggle', () => {
+    document.documentElement.style.overflow = groupMenu.open ? 'hidden' : '';
+    if (groupMenu.open) groupMenu.querySelector('.gmenu').style.top = `${Math.max(0, document.querySelector('[data-group-header]').getBoundingClientRect().bottom)}px`;
+    groupMenu.querySelector('summary').setAttribute('aria-label', groupMenu.open ? 'Close menu' : 'Menu');
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && groupMenu.open) { groupMenu.open = false; groupMenu.querySelector('summary').focus(); } });
+}
