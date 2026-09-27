@@ -1,4 +1,4 @@
-# CNM Essentials — Netlify configuration (base directory: cnm-essentials)
+# CNM Group websites — Netlify configuration (repository root; no base directory needed)
 [build]
   command = "npm ci && npm run build"
   publish = "dist"

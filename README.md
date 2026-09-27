@@ -1,6 +1,16 @@
-# CNM Essentials — digital commerce platform
+# CNM Group websites
 
-Editorial brand site, luxury e-commerce, customer accounts, admin/operations, APIs and iOS/Android app for **CNM Essentials**, the retail division of CNM Group (Energy · Retail · Impact).
+One codebase for **CNMGroup.com** and every CNM company website:
+
+| Path | Website |
+| --- | --- |
+| `/` | CNM Group hub: founder, companies, about, contact |
+| `/essentials/` | CNM Essentials: luxury e-commerce, accounts, admin, APIs, iOS/Android app |
+| `/spectra/` | CNM Spectra: eyewear, eye care, appointment booking |
+| `/cnmworx/` | CNMWorX Limited: engineering services, proposals and tenders |
+| `/foundation/` | CNM Foundation: programmes, volunteering, donation pledges |
+
+Every company site has a **Back to CNM Group** button.
 
 > **Staging build.** The original CNM logo, the 20 products, prices, photography, campaign banners, store addresses and copy come from cnmessentials.com and cnm-group.net. Anything not yet confirmed (stock, delivery fees, founder story, opening hours) is marked **Needs CNM approval**; nothing has been invented. Import the rest of the catalogue with `scripts/import-catalogue.mjs` (see `PROGRESS.md`).
 
@@ -8,7 +18,6 @@ Editorial brand site, luxury e-commerce, customer accounts, admin/operations, AP
 
 ## Quick start
 ```bash
-cd cnm-essentials
 npm install
 npm run dev        # build + serve on http://localhost:8888
 ```
