@@ -2,7 +2,7 @@ import { escapeHtml } from '../shared/format.mjs';
 import { icon } from '../shared/icons.mjs';
 import { groupFooter, groupHeader } from './group.mjs';
 import { companyFooter, companyHeader, SITES } from './company.mjs';
-import { backBar } from './kit.mjs';
+import { backBar, themeToggle } from './kit.mjs';
 
 export const approval = (what, detail = '') =>
   `<div class="approval" role="note"><strong>Needs CNM approval</strong>${escapeHtml(what)}${detail ? ` <span>${escapeHtml(detail)}</span>` : ''}</div>`;
@@ -36,7 +36,7 @@ function header(ctx, mode, current) {
   if (mode === 'checkout') {
     return `<header class="site-header checkout-header"><div class="container site-header__row">
       <div><a class="link" href="/bag/">${icon('arrowLeft')} Back to bag</a></div>${logo(ctx)}
-      <div class="site-header__right"><span class="label muted" style="display:inline-flex;gap:6px;align-items:center">${icon('lock', 'sr-lock')} Secure checkout</span></div>
+      <div class="site-header__right">${themeToggle()}<span class="label muted" style="display:inline-flex;gap:6px;align-items:center">${icon('lock', 'sr-lock')} Secure checkout</span></div>
     </div></header>`;
   }
   const cur = (k) => (current === k ? ' aria-current="page"' : '');
@@ -54,6 +54,7 @@ function header(ctx, mode, current) {
     </div>
     ${logo(ctx)}
     <div class="site-header__right">
+      ${themeToggle()}
       <button class="icon-btn" type="button" data-open="search" aria-label="Search" aria-controls="search-overlay" aria-expanded="false">${icon('search')}</button>
       <a class="icon-btn hide-sm" href="/account/" aria-label="Account" data-account-link>${icon('user')}</a>
       <a class="icon-btn" href="/wishlist/" aria-label="Wishlist">${icon('heart')}<span class="badge-count" data-wish-count></span></a>
@@ -250,6 +251,7 @@ ${noindex ? '<meta name="robots" content="noindex, nofollow">' : '<meta name="ro
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preload" href="/assets/fonts/hanken-grotesk-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/instrument-serif-400.woff2" as="font" type="font/woff2" crossorigin>
+<script src="/assets/theme.js"></script>
 <link rel="stylesheet" href="${ctx.assets.css}">
 ${o.head || ''}
 ${ld}

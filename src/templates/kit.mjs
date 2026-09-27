@@ -78,3 +78,9 @@ export function backBar(current) {
 
 export const mailto = (email) => `<a class="textlink" href="mailto:${email}">${escapeHtml(email)}</a>`;
 export const tel = (phone) => `<a class="textlink" href="tel:${phone.replace(/\s/g, '')}">${escapeHtml(phone)}</a>`;
+
+/** Light/dark switch (sun ↔ moon). Behaviour in motion.js; the theme is applied early by /assets/theme.js. */
+export const themeToggle = (cls = '') => `<button class="icon-btn theme-toggle${cls ? ` ${cls}` : ''}" type="button" data-theme-toggle aria-label="Switch to dark mode" title="Light / dark mode">
+  <svg class="tt-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"/></svg>
+  <svg class="tt-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+</button>`;

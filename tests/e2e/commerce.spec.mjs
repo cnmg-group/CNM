@@ -521,3 +521,32 @@ test('Back to CNM Group navigation: switcher on phones, tabs on desktop, floatin
   await expect(page).toHaveURL(/\/$/);
   await expect(page.locator('.ghero__portrait')).toBeVisible();
 });
+
+test('light and dark mode: switch, remember, and swap to the light-lettered logo', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto('/shop/');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  const lightBg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  await page.locator('.site-header [data-theme-toggle]').click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor)).not.toBe(lightBg);
+  await expect(page.locator('.site-header .logo .logo__on-dark')).toBeVisible();
+  await expect(page.locator('.site-header [data-theme-toggle]')).toHaveAttribute('aria-label', 'Switch to light mode');
+  // The choice follows the visitor across CNMGroup.com and every company site
+  for (const path of ['/', '/spectra/', '/cnmworx/', '/foundation/', '/checkout/']) {
+    await page.goto(path);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect(page.locator('[data-theme-toggle]').first()).toBeVisible();
+  }
+  await page.locator('[data-theme-toggle]').first().click();
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+});
+
+test('dark mode follows the device setting until the visitor chooses', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.emulateMedia({ colorScheme: 'light' });
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+});

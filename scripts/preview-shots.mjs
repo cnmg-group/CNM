@@ -1,6 +1,7 @@
 // Captures review screenshots (desktop 1440 px, phone 390 px) of key pages from a running dev server.
 // Usage: node scripts/preview-shots.mjs <outDir> [key,key,...]
 //   BASE=http://localhost:8888 CHROME_PATH=/path/to/chrome node scripts/preview-shots.mjs ./shots group,spectra
+//   THEME=dark captures the dark mode
 import { chromium } from 'playwright';
 import { mkdir } from 'node:fs/promises';
 
@@ -20,7 +21,7 @@ await mkdir(out, { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
 for (const [dev, vp, dsf] of [['desktop', { width: 1440, height: 900 }, 1], ['mobile', { width: 390, height: 844 }, 2]]) {
   const ctx = await browser.newContext({ viewport: vp, deviceScaleFactor: dsf });
-  await ctx.addInitScript(() => { try { localStorage.setItem('cnm.consent', 'denied'); } catch {} });
+  await ctx.addInitScript((theme) => { try { localStorage.setItem('cnm.consent', 'denied'); if (theme) localStorage.setItem('cnm.theme', theme); } catch {} }, process.env.THEME || '');
   const pg = await ctx.newPage();
   for (const [key, path, action] of PAGES) {
     await pg.setViewportSize(vp);
@@ -40,6 +41,8 @@ for (const [dev, vp, dsf] of [['desktop', { width: 1440, height: 900 }, 1], ['mo
     // Load lazy images, then grow the viewport to the page height (fixed/overlay headers render once, at the top).
     await pg.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 700) { scrollTo(0, y); await new Promise((r) => setTimeout(r, 40)); } scrollTo(0, 0); });
     const h = Math.min(MAX_H, await pg.evaluate(() => document.documentElement.scrollHeight));
+    // Pages with a full-screen hero (shop home) would stretch if the viewport grows: pin the hero to one screen first.
+    await pg.evaluate((vh) => document.querySelectorAll('.hero').forEach((el) => { el.style.minHeight = `${vh}px`; }), vp.height);
     await pg.setViewportSize({ width: vp.width, height: h });
     await pg.waitForLoadState('networkidle');
     await pg.waitForTimeout(1400); // let scroll reveals finish

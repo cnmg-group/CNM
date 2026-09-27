@@ -4,7 +4,7 @@
 import { escapeHtml } from '../shared/format.mjs';
 import { icon } from '../shared/icons.mjs';
 import { approval, breadcrumbs } from './layout.mjs';
-import { enquiryForm, field, mailto, message, phoneInput, photo, select, tel } from './kit.mjs';
+import { enquiryForm, field, mailto, message, phoneInput, photo, select, tel, themeToggle } from './kit.mjs';
 
 const GROUP_HOME = { name: 'CNM Group', path: '/' };
 
@@ -28,6 +28,7 @@ export function groupHeader(ctx, current) {
     <a class="group-logo" href="/" aria-label="CNM Group — home"><img src="${g.logo}" alt="" width="1600" height="1488"></a>
     <nav aria-label="CNM Group"><ul class="group-nav">${links}</ul></nav>
     <div class="group-header__right">
+      ${themeToggle()}
       <a class="btn group-store" href="/essentials/shop/" data-track="group_visit_store">${icon('bag')} <span>Shop</span></a>
       <details class="group-menu" data-group-menu>
         <summary class="icon-btn" aria-label="Menu"><span class="gm-open">${icon('menu')}</span><span class="gm-close">${icon('close')}</span></summary>

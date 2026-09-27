@@ -76,8 +76,9 @@ CNM supplied screenshots of **cnmessentials.com** (home, shop, about) and **cnm-
 | Integrations | Resend email (sign-in codes, orders), Supabase database adapter + SQL migration, Paystack payment adapter (initialize, verify, webhooks, refunds) | DONE (needs keys in Netlify: see `docs/INTEGRATIONS.md`) |
 | Sign-in | Passwordless email code (OTP) as the default sign-in; new customers are created on first code | DONE |
 | Experience | Motion & interaction on every site: scroll reveals, parallax photos, smart header (hides on scroll down, returns on scroll up), reading progress bar, back-to-top, count-up stats, smooth page transitions, instant-feeling navigation (prefetch on hover), “Continue exploring” next-page cards, Companies and section dropdowns, product Quick View pop-up, newsletter pop-up (once per visitor, never at checkout), gold group ticker; all respect “reduce motion” | DONE |
+| Experience | Light and dark mode on every site (sun/moon switch in each header; follows the device until chosen; remembered across CNMGroup.com and all company sites; no flash on load); each company keeps its identity after dark | DONE |
 | Security | Signed HttpOnly sessions, CSRF, rate limits, validation, server-side pricing, RBAC, webhook HMAC, CSP/HSTS | DONE |
-| Testing | 38 unit/integration tests, 49 Playwright E2E runs (desktop + mobile), 69 mobile app tests | DONE (all passing) |
+| Testing | 38 unit/integration tests, 55 Playwright E2E runs (desktop + mobile), 69 mobile app tests | DONE (all passing) |
 | Visual QA | CNM Group, company, contact and scent-finder pages checked at 360 / 390 / 768 / 1024 / 1440 px (no horizontal scroll) | DONE |
 | Staging | Netlify config; staging is noindexed with a staging banner and payment simulator | DONE (deploy needs Netlify access, see `docs/DEPLOYMENT.md`) |
 | Visual QA | 69 screenshots, desktop + mobile, `docs/visual-review/index.html` | DONE (with real CNM assets) |

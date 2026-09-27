@@ -5,7 +5,7 @@ import { icon } from '../shared/icons.mjs';
 import { breadcrumbs } from './layout.mjs';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { backBar, COMPANY_LINKS, mailto, photo, tel } from './kit.mjs';
+import { backBar, COMPANY_LINKS, mailto, photo, tel, themeToggle } from './kit.mjs';
 
 // Use the cut-out logo when it has been generated; otherwise fall back to the original file.
 const PUBLIC = fileURLToPath(new URL('../../public', import.meta.url));
@@ -48,6 +48,7 @@ export function companyHeader(ctx, key, current) {
     <a class="co-logo" href="${s.home}" aria-label="${escapeHtml(s.name)} — home"><img src="${s.logo}" alt="${escapeHtml(s.name)}" height="56"></a>
     <nav aria-label="${escapeHtml(s.name)}"><ul class="co-nav">${links}</ul></nav>
     <div class="co-header__right">
+      ${themeToggle()}
       <a class="btn site-btn co-cta" href="${s.cta[1]}"${current === 'cta' ? ' aria-current="page"' : ''}>${escapeHtml(s.cta[0])}</a>
       <details class="co-menu" data-co-menu>
         <summary class="icon-btn" aria-label="Menu"><span class="gm-open">${icon('menu')}</span><span class="gm-close">${icon('close')}</span></summary>

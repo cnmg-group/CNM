@@ -67,7 +67,7 @@ function initScroll() {
   document.body.append(top);
 
   const header = document.querySelector('.co-header, .group-header, .site-header:not(.checkout-header)');
-  const parallax = reduce ? [] : [...document.querySelectorAll('.co-hero__media img, .gpanel__media > img, .ghero__portrait img, .split__media > img, [data-parallax]')];
+  const parallax = reduce ? [] : [...document.querySelectorAll('.co-hero__media img, .gpanel__media > img, .split__media > img, [data-parallax]')];
   let lastY = scrollY;
   let ticking = false;
 
@@ -192,6 +192,20 @@ function initBackPill() {
   new IntersectionObserver(([en]) => pill.classList.toggle('is-on', !en.isIntersecting), { threshold: 0 }).observe(bar);
 }
 
+/* ---------- light / dark switch ---------- */
+function initThemeToggle() {
+  const root = document.documentElement;
+  const label = () => (root.dataset.theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  const buttons = document.querySelectorAll('[data-theme-toggle]');
+  buttons.forEach((b) => b.setAttribute('aria-label', label()));
+  buttons.forEach((b) => b.addEventListener('click', () => {
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    if (!reduce) { root.classList.add('theme-anim'); setTimeout(() => root.classList.remove('theme-anim'), 500); }
+    if (window.cnmSetTheme) window.cnmSetTheme(next); else root.dataset.theme = next;
+    buttons.forEach((x) => x.setAttribute('aria-label', label()));
+  }));
+}
+
 export function initMotion() {
   root.classList.add('has-motion');
   initReveals();
@@ -202,4 +216,5 @@ export function initMotion() {
   initImageFade();
   initDropdowns();
   initBackPill();
+  initThemeToggle();
 }
