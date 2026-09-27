@@ -13,7 +13,7 @@
 //   Conversion       paid orders ÷ active users
 // Days are bucketed in Africa/Lagos time (UTC+1, no daylight saving).
 
-export const PAID = ['paid', 'processing', 'dispatched', 'delivered', 'refunded'];
+export const PAID = ['paid', 'processing', 'dispatched', 'delivered', 'returned', 'refunded'];
 export const AWAITING_FULFILMENT = ['paid', 'processing'];
 const LAGOS_OFFSET = 3600e3;
 const DAY = 864e5;
@@ -46,8 +46,15 @@ export function orderLocation(o, stores = []) {
   const st = stores.find((s) => s.slug === o.delivery?.storeSlug);
   return st?.region || st?.city || 'Pickup';
 }
-export const refundOf = (o) => (o.status === 'refunded' || o.payment?.refund ? Number(o.payment?.refund?.amount ?? o.totals.total) : 0);
-const refundDay = (o) => dayKey(o.payment?.refund?.at || o.history?.findLast?.((h) => h.status === 'refunded')?.at || o.updatedAt || o.createdAt);
+/** Money returned on an order, as dated entries (partial refunds from Operations, or the older single refund). */
+export function refundEntries(o) {
+  const list = (o.refunds || []).filter((r) => r.status === 'succeeded').map((r) => ({ amount: Number(r.amount), at: r.completedAt || r.requestedAt, ref: r.providerRef }));
+  const legacy = o.payment?.refund;
+  if (legacy && !list.some((r) => r.ref && r.ref === legacy.id) && !(o.refunds || []).length) list.push({ amount: Number(legacy.amount ?? o.totals.total), at: legacy.at || o.history?.findLast?.((h) => h.status === 'refunded')?.at || o.updatedAt || o.createdAt });
+  else if (!list.length && o.status === 'refunded') list.push({ amount: o.totals.total, at: o.history?.findLast?.((h) => h.status === 'refunded')?.at || o.updatedAt || o.createdAt });
+  return list;
+}
+export const refundOf = (o) => refundEntries(o).reduce((s, r) => s + r.amount, 0);
 const statusAt = (o, status) => o.history?.findLast?.((h) => h.status === status)?.at || null;
 const hoursSince = (iso, now) => (now - Date.parse(iso)) / 36e5;
 /** "52 h" under two days, then "37 days". */
@@ -70,8 +77,9 @@ export function salesFor(orders, r) {
   const delivery = paid.reduce((s, o) => s + (o.totals.delivery || 0), 0);
   const vat = paid.reduce((s, o) => s + (o.totals.vat || 0), 0);
   const collected = paid.reduce((s, o) => s + (o.totals.total || 0), 0);
-  const refundedOrders = orders.filter((o) => refundOf(o) > 0 && inRange(refundDay(o), r));
-  const refunds = refundedOrders.reduce((s, o) => s + refundOf(o), 0);
+  const refundHits = orders.flatMap((o) => refundEntries(o)).filter((x) => inRange(dayKey(x.at), r));
+  const refundedOrders = orders.filter((o) => refundEntries(o).some((x) => inRange(dayKey(x.at), r)));
+  const refunds = refundHits.reduce((s, x) => s + x.amount, 0);
   const units = paid.reduce((s, o) => s + o.lines.reduce((n, l) => n + l.qty, 0), 0);
   return {
     gross: round(gross), discounts: round(discounts), refunds: round(refunds), net: round(gross - discounts - refunds),
@@ -112,10 +120,10 @@ function series(orders, r, days) {
     map[d].orders += 1;
   }
   for (const o of orders) {
-    const amt = refundOf(o);
-    if (!amt) continue;
-    const d = refundDay(o);
-    if (map[d]) { map[d].net -= amt; map[d].revenue -= amt; }
+    for (const x of refundEntries(o)) {
+      const d = dayKey(x.at);
+      if (map[d]) { map[d].net -= x.amount; map[d].revenue -= x.amount; }
+    }
   }
   return list.map((d) => ({ ...map[d], gross: round(map[d].gross), net: round(map[d].net), revenue: round(map[d].revenue) }));
 }
@@ -193,6 +201,7 @@ export function commandCenter(data, q) {
   const ops = {
     awaitingPayment: awaitingPayment.length, toFulfil: toFulfil.length, inTransit: inTransit.length,
     lateFulfil: lateFulfil.length, lateDelivery: lateDelivery.length, lowStock: stock.length, outOfStock: stock.filter((s) => s.stock === 0).length,
+    exceptions: live.filter((o) => o.shipment?.exception && !o.shipment.exception.resolvedAt).length,
     newLeads: newLeads.length, leadsInRange: leadsIn.filter((e) => inRange(dayKey(e.createdAt), r)).length,
   };
 
@@ -205,6 +214,11 @@ export function commandCenter(data, q) {
     ...staleLeads.map((e) => ({ severity: 'medium', kind: 'stale_lead', company: e.companyId, title: `${e.name} is waiting for a reply`, detail: `${e.subject || e.interest || 'Enquiry'} · ${age(hoursSince(e.createdAt, now))} ago`, href: '#enquiries' })),
     ...stalePayment.map((o) => ({ severity: 'low', kind: 'stale_payment', company: orderCompany(o), title: `${o.number} awaiting payment`, detail: `Started ${age(hoursSince(o.createdAt, now))} ago`, href: `#orders/${encodeURIComponent(o.number)}` })),
   ];
+  for (const o of live) {
+    const ex = o.shipment?.exception;
+    if (ex && !ex.resolvedAt) attention.push({ severity: 'high', kind: 'delivery_exception', company: orderCompany(o), title: `${o.number}: delivery problem`, detail: `${ex.kind.replace(/_/g, ' ')}${ex.note ? ` · ${ex.note}` : ''} · open ${age(hoursSince(ex.openedAt, now))}`, href: `#orders/${encodeURIComponent(o.number)}` });
+    for (const rf of (o.refunds || []).filter((x) => x.status === 'requested')) attention.push({ severity: 'medium', kind: 'refund_approval', company: orderCompany(o), title: `Refund of ₦${Math.round(rf.amount).toLocaleString('en-NG')} awaiting approval`, detail: `${o.number} · requested by ${rf.requestedBy} · ${age(hoursSince(rf.requestedAt, now))} ago`, href: `#orders/${encodeURIComponent(o.number)}` });
+  }
   if (cur.paymentFailed) attention.push({ severity: 'low', kind: 'payment_failures', company: q.company === 'all' ? 'group' : q.company, title: `${cur.paymentFailed} failed payment${cur.paymentFailed === 1 ? '' : 's'} in range`, detail: 'Check the payment provider dashboard for declines', href: '#orders?status=payment_failed' });
   const rank = { high: 0, medium: 1, low: 2 };
   attention.sort((a, b) => rank[a.severity] - rank[b.severity]);

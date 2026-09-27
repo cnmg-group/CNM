@@ -22,7 +22,7 @@ export const ROLES = {
 const CONTENT_KEYS = ['homepage', 'seo', 'redirects', 'stores', 'announcements'];
 const TRANSITIONS = {
   pending_payment: ['cancelled'], payment_failed: ['cancelled'], paid: ['processing', 'cancelled', 'refunded'],
-  processing: ['dispatched', 'cancelled', 'refunded'], dispatched: ['delivered'], delivered: ['refunded'], cancelled: [], refunded: [],
+  processing: ['dispatched', 'cancelled', 'refunded'], dispatched: ['delivered', 'returned'], delivered: ['refunded'], returned: ['refunded'], cancelled: [], refunded: [],
 };
 
 /** Admin accounts come from the ADMIN_USERS env var (JSON). A staging-only bootstrap owner can be enabled with ADMIN_STAGING_PASSWORD. */

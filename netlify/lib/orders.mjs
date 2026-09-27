@@ -8,7 +8,7 @@ export function orderNumber(date = new Date()) {
   return `CNM-${d}-${r}`;
 }
 
-export const STATUSES = ['pending_payment', 'paid', 'processing', 'dispatched', 'delivered', 'payment_failed', 'cancelled', 'refunded'];
+export const STATUSES = ['pending_payment', 'paid', 'processing', 'dispatched', 'delivered', 'returned', 'payment_failed', 'cancelled', 'refunded'];
 
 export async function saveOrder(order) {
   const s = await store('orders');
@@ -63,6 +63,19 @@ export async function commitStock(order, baseProducts) {
     const cur = inv.products[l.id]?.stock ?? base?.stock?.quantity;
     if (cur == null) continue;
     inv.products[l.id] = { ...(inv.products[l.id] || {}), stock: Math.max(0, cur - l.qty) };
+  }
+  await s.set('inventory', inv);
+}
+
+/** Put items back into stock (cancelled before dispatch, or a return that passed inspection). */
+export async function restock(lines, baseProducts) {
+  const s = await store('config');
+  const inv = (await s.get('inventory')) || { products: {} };
+  for (const l of lines) {
+    const base = baseProducts.find((p) => p.id === l.id);
+    const cur = inv.products[l.id]?.stock ?? base?.stock?.quantity;
+    if (cur == null) continue;
+    inv.products[l.id] = { ...(inv.products[l.id] || {}), stock: cur + l.qty };
   }
   await s.set('inventory', inv);
 }

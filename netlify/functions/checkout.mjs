@@ -3,6 +3,7 @@ import { computeQuote } from '../../src/shared/pricing.mjs';
 import { baseProducts, commerce, productsMap, stores } from '../lib/catalogue.mjs';
 import { randomToken } from '../lib/crypto.mjs';
 import { assertCsrf, clientIp, fail, handler, json, readJson, segments } from '../lib/http.mjs';
+import { parseContact, parseDelivery } from '../lib/order-input.mjs';
 import { orderNumber, saveOrder, setStatus } from '../lib/orders.mjs';
 import { PAYMENT_METHODS, activeProvider, paymentInfo } from '../lib/payments/index.mjs';
 import { rateLimit } from '../lib/ratelimit.mjs';
@@ -32,29 +33,9 @@ export default handler(async (req, context) => {
   }
 
   // ---- create order ----
-  const c = body.contact || {};
-  const contact = {
-    email: v.email(c.email), phone: v.phone(c.phone),
-    firstName: v.str(c.firstName, { name: 'First name', max: 80 }), lastName: v.str(c.lastName, { name: 'Last name', max: 80 }),
-    marketing: v.bool(c.marketing),
-  };
-  const d = body.delivery || {};
-  const method = rules.deliveryMethods.find((m) => m.id === d.method);
-  if (!method) fail(422, 'invalid', 'Please choose a delivery method.');
-  let delivery;
-  if (method.id === 'store-pickup') {
-    const st = stores.find((s) => s.slug === d.storeSlug);
-    if (!st) fail(422, 'invalid', 'Please choose a store for collection.');
-    delivery = { method: method.id, label: method.label, storeSlug: st.slug };
-  } else {
-    const a = d.address || {};
-    const address = {
-      line1: v.str(a.line1, { name: 'Address', max: 200 }), line2: v.str(a.line2, { name: 'Address line 2', max: 200, required: false }),
-      city: v.str(a.city, { name: 'City', max: 80 }), state: v.str(a.state, { name: 'State', max: 40 }), country: 'NG',
-    };
-    if (!method.regions.includes('*') && !method.regions.includes(address.state)) fail(422, 'region', `${method.label} isn't available for ${address.state}. Please choose another delivery method.`);
-    delivery = { method: method.id, label: method.label, address };
-  }
+  const contact = parseContact(body.contact);
+  const delivery = parseDelivery(body.delivery, rules, stores);
+  const method = { id: delivery.method };
 
   const paymentMethod = PAYMENT_METHODS.find((m) => m.id === (body.paymentMethod || 'card'));
   if (!paymentMethod) fail(422, 'invalid', 'Please choose a payment method.');
