@@ -36,6 +36,7 @@ export async function ordersView(v, ctx) {
   <nav class="os-tabs" aria-label="Order status">${STATUS_TABS.map(([k, t]) => `<a href="#orders?${new URLSearchParams({ ...Object.fromEntries(query), status: k })}" aria-current="${f.status === k ? 'true' : 'false'}">${t} <small>${tabCount(k)}</small></a>`).join('')}</nav>
   <form class="os-filters" data-of aria-label="Filter orders">
     <label class="os-f os-f--grow"><span>Search</span><input name="q" value="${e(f.q)}" placeholder="Order number, name, email, phone, product, tracking…" autocomplete="off"></label>
+    <details class="os-more-filters" data-more-filters><summary>More filters${[f.company, f.channel, f.shipment, f.location, f.payment].filter((x) => x !== 'all').length + (f.from ? 1 : 0) + (f.to ? 1 : 0) + (f.exception ? 1 : 0) ? ` <small>${[f.company, f.channel, f.shipment, f.location, f.payment].filter((x) => x !== 'all').length + (f.from ? 1 : 0) + (f.to ? 1 : 0) + (f.exception ? 1 : 0)}</small>` : ''}</summary><div class="os-more-filters__body">
     ${sel('company', 'Company', [['all', 'All companies'], ...cos.companies.map((c) => [c.id, c.name])], f.company)}
     ${sel('channel', 'Channel', [['all', 'All'], ['web', 'Website'], ['app', 'App'], ['manual', 'Manual'], ['pos', 'In store']], f.channel)}
     ${sel('shipment', 'Delivery stage', [['all', 'All'], ...Object.entries(SHIP_LABEL)], f.shipment)}
@@ -43,6 +44,7 @@ export async function ordersView(v, ctx) {
     ${sel('payment', 'Payment', [['all', 'All'], ...Object.entries(PAY_LABEL)], f.payment)}
     <label class="os-f"><span>From</span><input type="date" name="from" value="${e(f.from)}"></label><label class="os-f"><span>To</span><input type="date" name="to" value="${e(f.to)}"></label>
     <label class="os-check"><input type="checkbox" name="exception"${f.exception ? ' checked' : ''}> Delivery problems only</label>
+    </div></details>
   </form>
   <div class="os-bulk" data-bulk hidden><span data-bulk-n></span><button class="os-btn os-btn--ghost" type="button" data-bulk-pack>Mark packed</button><button class="os-btn os-btn--ghost" type="button" data-bulk-slips>Print packing slips</button><button class="os-btn os-btn--quiet" type="button" data-bulk-clear>Clear</button></div>
   <section class="os-card os-card--flush"><div class="os-table-wrap"><table class="os-orders"><thead><tr><th class="cb"><input type="checkbox" data-all aria-label="Select all"></th><th>Order</th><th>Customer</th><th class="num">Total</th><th>Status</th><th>Delivery</th><th>Location</th><th>Placed</th></tr></thead><tbody data-rows>${rowsHTML(d.orders)}</tbody></table></div>
@@ -50,6 +52,7 @@ export async function ordersView(v, ctx) {
   ${d.next ? `<div class="os-more-row"><button class="os-btn os-btn--ghost" type="button" data-more="${e(d.next)}">Load more</button></div>` : ''}</section>`;
 
   const form = v.querySelector('[data-of]');
+  if (matchMedia('(min-width: 641px)').matches) v.querySelector('[data-more-filters]').open = true; // phones: collapsed so orders come first
   const apply = () => {
     const fd = new FormData(form);
     const nq = new URLSearchParams();

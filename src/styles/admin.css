@@ -585,3 +585,14 @@ body[data-page="admin"] { --os-bg: #f6f4ef; --os-card: #fff; --os-line: #e7e3da;
 .doc__meta dd { white-space: nowrap; }
 .doc__meta { flex: none; }
 :root[data-theme="dark"] body[data-page="admin"] .os-tabs a[aria-current="true"] small { background: rgba(11, 17, 32, .16); color: #0b1120; }
+
+/* Orders filters: everything inline on wide screens; on phones the extra filters fold under “More filters”. */
+.os-more-filters { display: block; flex: 1 1 100%; }
+.os-more-filters > summary { display: none; }
+.os-more-filters__body { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+@media (max-width: 640px) {
+  .os-more-filters { display: block; width: 100%; }
+  .os-more-filters > summary { display: flex; align-items: center; gap: 8px; min-height: 40px; font-size: .8125rem; font-weight: 600; cursor: pointer; color: var(--os-ink); }
+  .os-more-filters > summary small { padding: 1px 8px; border-radius: 999px; background: var(--os-navy); color: #fff; font-size: .6875rem; }
+  .os-more-filters[open] .os-more-filters__body { display: grid; gap: 10px; margin-top: 8px; }
+}
