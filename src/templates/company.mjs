@@ -3,23 +3,29 @@
 import { escapeHtml } from '../shared/format.mjs';
 import { icon } from '../shared/icons.mjs';
 import { breadcrumbs } from './layout.mjs';
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { backBar, COMPANY_LINKS, mailto, photo, tel } from './kit.mjs';
+
+// Use the cut-out logo when it has been generated; otherwise fall back to the original file.
+const PUBLIC = fileURLToPath(new URL('../../public', import.meta.url));
+const logo = (base) => (existsSync(`${PUBLIC}${base}.webp`) ? `${base}.webp` : `${base}.jpg`);
 
 export const SITES = {
   spectra: {
-    key: 'spectra', name: 'CNM Spectra', home: '/spectra/', logo: '/assets/brand/cnm-spectra-logo.webp',
+    key: 'spectra', name: 'CNM Spectra', home: '/spectra/', logo: logo('/assets/brand/cnm-spectra-logo'),
     blurb: 'Premium eyewear from CNM Group. See better, feel better, look your best.',
     nav: [['eyewear', 'Eyewear', '/spectra/eyewear/'], ['eye-care', 'Eye care', '/spectra/eye-care/'], ['about', 'About', '/spectra/about/'], ['contact', 'Visit & contact', '/spectra/contact/']],
     cta: ['Book an appointment', '/spectra/book/'],
   },
   cnmworx: {
-    key: 'cnmworx', name: 'CNMWorX Limited', home: '/cnmworx/', logo: '/assets/brand/cnmworx-logo.webp',
+    key: 'cnmworx', name: 'CNMWorX Limited', home: '/cnmworx/', logo: logo('/assets/brand/cnmworx-logo'),
     blurb: 'ISO 9001:2015-certified engineering and technical services from CNM Group.',
     nav: [['services', 'Services', '/cnmworx/services/'], ['industries', 'Industries', '/cnmworx/industries/'], ['quality', 'Quality', '/cnmworx/quality/'], ['about', 'About', '/cnmworx/about/'], ['contact', 'Contact', '/cnmworx/contact/']],
     cta: ['Request a proposal', '/cnmworx/request/'],
   },
   foundation: {
-    key: 'foundation', name: 'CNM Foundation', home: '/foundation/', logo: '/assets/brand/cnm-foundation-logo.webp',
+    key: 'foundation', name: 'CNM Foundation', home: '/foundation/', logo: logo('/assets/brand/cnm-foundation-logo'),
     blurb: 'The social impact and philanthropic arm of CNM Group.',
     nav: [['programmes', 'Programmes', '/foundation/programmes/'], ['get-involved', 'Get involved', '/foundation/get-involved/'], ['about', 'About', '/foundation/about/'], ['contact', 'Contact', '/foundation/contact/']],
     cta: ['Donate', '/foundation/donate/'],
@@ -123,5 +129,5 @@ export const contactBlock = (ctx) => {
 export const orgLd = (ctx, key, extra = {}) => {
   const p = profileOf(ctx, key);
   const s = SITES[key];
-  return { '@context': 'https://schema.org', '@type': 'Organization', name: p.name, ...(p.fullName ? { legalName: p.fullName } : {}), url: `${ctx.siteUrl}${s.home}`, logo: `${ctx.siteUrl}${s.logo.replace(/\.webp$/, '.png')}`, slogan: p.tagline, description: p.text, parentOrganization: { '@type': 'Organization', name: 'CNM Group', url: ctx.siteUrl }, ...extra };
+  return { '@context': 'https://schema.org', '@type': 'Organization', name: p.name, ...(p.fullName ? { legalName: p.fullName } : {}), url: `${ctx.siteUrl}${s.home}`, logo: `${ctx.siteUrl}${s.logo}`, slogan: p.tagline, description: p.text, parentOrganization: { '@type': 'Organization', name: 'CNM Group', url: ctx.siteUrl }, ...extra };
 };

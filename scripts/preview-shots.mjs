@@ -8,9 +8,11 @@ const out = process.argv[2] || 'preview-shots';
 const only = process.argv[3]?.split(',');
 const base = process.env.BASE || 'http://localhost:8888';
 const PAGES = [
-  ['home', '/'], ['shop', '/shop/'], ['product', '/products/midnight-vanilla-room-spray/'], ['scent-finder', '/scent-finder/', 'finder'],
-  ['checkout', '/checkout/', 'checkout'], ['signin', '/shop/', 'auth'], ['group', '/cnm-group/'], ['spectra', '/cnm-group/spectra/'],
-  ['cnmworx', '/cnm-group/cnmworx/'], ['foundation', '/cnm-group/foundation/'], ['contact', '/cnm-group/contact/'],
+  ['group', '/'], ['about', '/about/'], ['contact', '/contact/'],
+  ['home', '/essentials/'], ['shop', '/shop/'], ['product', '/products/midnight-vanilla-room-spray/'], ['scent-finder', '/scent-finder/', 'finder'],
+  ['checkout', '/checkout/', 'checkout'], ['signin', '/shop/', 'auth'],
+  ['spectra', '/spectra/'], ['spectra-book', '/spectra/book/'], ['cnmworx', '/cnmworx/'], ['cnmworx-request', '/cnmworx/request/'],
+  ['foundation', '/foundation/'], ['foundation-donate', '/foundation/donate/'],
 ].filter(([k]) => !only || only.includes(k));
 const MAX_H = 8000;
 
