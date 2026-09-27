@@ -7,16 +7,16 @@ import { icon } from '../shared/icons.mjs';
 
 // Photos are stored at 2000 px for sharp high-density screens, with a 1000 px copy for phones.
 const PUBLIC = fileURLToPath(new URL('../../public', import.meta.url));
-export const srcset = (src, sizes) => {
+export const srcset = (src, sizes, full = 2000) => {
   if (!src?.endsWith('.webp')) return '';
   const small = src.replace(/\.webp$/, '-1000.webp');
-  return existsSync(PUBLIC + small) ? ` srcset="${small} 1000w, ${src} 2000w" sizes="${sizes}"` : '';
+  return existsSync(PUBLIC + small) ? ` srcset="${small} 1000w, ${src} ${full}w" sizes="${sizes}"` : '';
 };
 
 /** <img> for a photo: sharp source set, explicit size, optional focal point. */
 export function photo(src, alt, { sizes = '100vw', width = 2000, height = 1530, position, lazy = true, cls = '', priority = false } = {}) {
   if (!src) return '';
-  return `<img${cls ? ` class="${cls}"` : ''} src="${src}"${srcset(src, sizes)} alt="${escapeHtml(alt || '')}" width="${width}" height="${height}"${lazy && !priority ? ' loading="lazy"' : ''}${priority ? ' fetchpriority="high"' : ''} decoding="async"${position ? ` style="object-position:${position}"` : ''}>`;
+  return `<img${cls ? ` class="${cls}"` : ''} src="${src}"${srcset(src, sizes, width)} alt="${escapeHtml(alt || '')}" width="${width}" height="${height}"${lazy && !priority ? ' loading="lazy"' : ''}${priority ? ' fetchpriority="high"' : ''} decoding="async"${position ? ` style="object-position:${position}"` : ''}>`;
 }
 
 export const field = (id, label, input, hint = '') => `<div class="field"><label for="${id}">${label}</label>${input}${hint ? `<span class="hint">${hint}</span>` : ''}</div>`;

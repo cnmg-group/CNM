@@ -256,10 +256,39 @@
         ],
         "slug": "spectra",
         "page": "/spectra/",
-        "image": "/assets/group/spectra.webp",
-        "imageAlt": "Blue tortoiseshell eyeglass frames",
-        "imagePosition": "center 80%",
-        "menuLabel": "Eyewear"
+        "image": "/assets/group/spectra-hero.webp",
+        "imageAlt": "A woman in dark sunglasses inside an eyewear boutique",
+        "imagePosition": "center 30%",
+        "menuLabel": "Eyewear",
+        "imageWidth": 1744,
+        "imageHeight": 1882,
+        "banner": {
+          "words": [
+            "Vision",
+            "Eyewear",
+            "Eye care"
+          ],
+          "tagline": "A clearer tomorrow",
+          "pillars": [
+            [
+              "glasses",
+              "Prescription glasses"
+            ],
+            [
+              "sunglasses",
+              "Sunglasses"
+            ],
+            [
+              "lens",
+              "Contact lenses"
+            ],
+            [
+              "eye",
+              "Eye care services"
+            ]
+          ],
+          "status": "FROM_CNM_BANNER"
+        }
       },
       {
         "name": "CNMWorX Limited",
@@ -298,10 +327,39 @@
         ],
         "slug": "cnmworx",
         "page": "/cnmworx/",
-        "image": "/assets/group/cnmworx.webp",
-        "imageAlt": "An engineer at a plant control panel",
-        "imagePosition": "30% center",
-        "menuLabel": "Engineering & Energy"
+        "image": "/assets/group/cnmworx-hero.webp",
+        "imageAlt": "An engineer in a hard hat and safety vest overlooking a construction site",
+        "imagePosition": "center 20%",
+        "menuLabel": "Engineering & Energy",
+        "imageWidth": 1744,
+        "imageHeight": 1882,
+        "banner": {
+          "words": [
+            "Engineer",
+            "Build",
+            "Innovate"
+          ],
+          "tagline": "Solutions for a stronger tomorrow",
+          "pillars": [
+            [
+              "hardhat",
+              "Construction services"
+            ],
+            [
+              "building",
+              "Infrastructure development"
+            ],
+            [
+              "gear",
+              "Engineering solutions"
+            ],
+            [
+              "bulb",
+              "Innovation & project management"
+            ]
+          ],
+          "status": "FROM_CNM_BANNER"
+        }
       },
       {
         "name": "CNM Foundation",
@@ -341,10 +399,39 @@
         ],
         "slug": "foundation",
         "page": "/foundation/",
-        "image": "/assets/group/foundation.webp",
-        "imageAlt": "A teacher reading with a smiling schoolgirl",
-        "imagePosition": "center 30%",
-        "menuLabel": "Social Impact"
+        "image": "/assets/group/foundation-hero.webp",
+        "imageAlt": "A smiling schoolgirl holding her books",
+        "imagePosition": "center 25%",
+        "menuLabel": "Social Impact",
+        "imageWidth": 1544,
+        "imageHeight": 1882,
+        "banner": {
+          "words": [
+            "Education",
+            "Opportunity",
+            "Community"
+          ],
+          "tagline": "People today. Brighter tomorrows.",
+          "pillars": [
+            [
+              "cap",
+              "Scholarships & education"
+            ],
+            [
+              "people",
+              "Youth empowerment"
+            ],
+            [
+              "book",
+              "Skills development"
+            ],
+            [
+              "heart",
+              "Stronger communities"
+            ]
+          ],
+          "status": "FROM_CNM_BANNER"
+        }
       }
     ],
     "founder": {

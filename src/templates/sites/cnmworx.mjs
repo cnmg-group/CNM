@@ -3,7 +3,7 @@
 import { escapeHtml } from '../../shared/format.mjs';
 import { icon } from '../../shared/icons.mjs';
 import { approval } from '../layout.mjs';
-import { cards, contactBlock, coHero, ctaBand, orgLd, pageHead, profileOf, sectionHead } from '../company.mjs';
+import { cards, contactBlock, coHero, ctaBand, orgLd, pageHead, pillarsStrip, profileOf, sectionHead } from '../company.mjs';
 import { enquiryForm, field, message, phoneInput, select } from '../kit.mjs';
 
 const K = 'cnmworx';
@@ -40,11 +40,12 @@ export function cnmworxPages(ctx) {
   pages.push({
     path: '/cnmworx/', current: 'home', title: 'CNMWorX Limited — engineering, automation & control', description: p.text.slice(0, 155),
     body: `${coHero({
-      eyebrow: `CNMWorX Limited · ${p.sector}`, title: 'Engineering the future, <em>one project at a time.</em>', lead: p.text,
-      image: p.image, imageAlt: p.imageAlt, position: p.imagePosition,
+      eyebrow: `CNMWorX · ${p.banner.words.join(' · ')}`, title: 'Engineering the future, <em>one project at a time.</em>', lead: p.text,
+      image: p.image, imageAlt: p.imageAlt, position: p.imagePosition, width: p.imageWidth, height: p.imageHeight,
       ctas: [['Request a proposal', '/cnmworx/request/'], ['Our services', '/cnmworx/services/', true]],
-      note: `<p class="co-badge">${icon('check')} ISO 9001:2015 certified</p>`,
+      note: `<p class="co-note">${escapeHtml(p.banner.tagline)}</p><p class="co-badge">${icon('check')} ISO 9001:2015 certified</p>`,
     })}
+${pillarsStrip(p)}
 <section class="co-trust" aria-label="Credentials"><div class="container"><ul>${TRUST.map((t) => `<li>${escapeHtml(t)}</li>`).join('')}</ul></div></section>
 <section class="co-section" aria-labelledby="wx-svc"><div class="container">
   ${sectionHead('Services', 'Multidisciplinary engineering, <em>end to end</em>', '', 'wx-svc')}

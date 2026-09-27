@@ -256,6 +256,8 @@ test('every company site has its own pages and a Back to CNM Group button', asyn
     }
     await page.goto(paths[0]);
     await expect(page.locator('.co-logo img')).toBeVisible();
+    await expect(page.locator('.co-pillars__list li')).toHaveCount(4);
+    await expect(page.locator('.co-pillars__tagline')).toHaveText({ spectra: 'A clearer tomorrow', cnmworx: 'Solutions for a stronger tomorrow', foundation: 'People today. Brighter tomorrows.' }[site]);
     await page.locator('.backbar__home').click();
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('h1')).toContainText('transcend');

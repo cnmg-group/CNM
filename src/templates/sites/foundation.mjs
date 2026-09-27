@@ -3,7 +3,7 @@
 import { escapeHtml } from '../../shared/format.mjs';
 import { icon } from '../../shared/icons.mjs';
 import { approval } from '../layout.mjs';
-import { cards, contactBlock, coHero, ctaBand, orgLd, pageHead, profileOf, sectionHead } from '../company.mjs';
+import { cards, contactBlock, coHero, ctaBand, orgLd, pageHead, pillarsStrip, profileOf, sectionHead } from '../company.mjs';
 import { enquiryForm, field, message, phoneInput, select } from '../kit.mjs';
 
 const K = 'foundation';
@@ -23,10 +23,12 @@ export function foundationPages(ctx) {
   pages.push({
     path: '/foundation/', current: 'home', title: 'CNM Foundation — education, empowerment and community health', description: p.text.slice(0, 155),
     body: `${coHero({
-      eyebrow: p.fullName, title: 'Zero percent of zero is zero — <em>so we give everything.</em>', lead: p.text,
-      image: p.image, imageAlt: p.imageAlt, position: p.imagePosition,
+      eyebrow: `CNM Foundation · ${p.banner.words.join(' · ')}`, title: 'Zero percent of zero is zero — <em>so we give everything.</em>', lead: p.text,
+      image: p.image, imageAlt: p.imageAlt, position: p.imagePosition, width: p.imageWidth, height: p.imageHeight,
       ctas: [['Donate', '/foundation/donate/'], ['Get involved', '/foundation/get-involved/', true]],
+      note: `<p class="co-note">${escapeHtml(p.banner.tagline)}</p>`,
     })}
+${pillarsStrip(p)}
 <section class="co-section" aria-labelledby="fd-prog"><div class="container">
   ${sectionHead('Our programmes', 'Where we <em>invest</em>', '', 'fd-prog')}
   ${cards(PROGRAMMES.map((x) => ({ title: x.title, text: x.text, href: `/foundation/programmes/#${x.id}` })))}

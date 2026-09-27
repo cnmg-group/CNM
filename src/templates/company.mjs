@@ -89,7 +89,7 @@ export function crumbsFor(ctx, key, trail) {
 }
 
 /** Full-bleed photo hero with copy beside it (desktop) or below it (phone). No text is laid over artwork. */
-export function coHero({ eyebrow, title, lead, image, imageAlt, position, ctas = [], note = '' }) {
+export function coHero({ eyebrow, title, lead, image, imageAlt, position, width = 2000, height = 1530, ctas = [], note = '' }) {
   return `<section class="co-hero" aria-labelledby="co-hero-h"><div class="container co-hero__grid">
   <div class="co-hero__copy">
     ${eyebrow ? `<span class="co-eyebrow">${escapeHtml(eyebrow)}</span>` : ''}
@@ -98,7 +98,7 @@ export function coHero({ eyebrow, title, lead, image, imageAlt, position, ctas =
     ${ctas.length ? `<div class="co-ctas">${ctas.map(([label, href, ghost]) => `<a class="btn site-btn${ghost ? ' site-btn--ghost' : ''}" href="${href}">${escapeHtml(label)}</a>`).join('')}</div>` : ''}
     ${note}
   </div>
-  ${image ? `<div class="co-hero__media">${photo(image, imageAlt, { sizes: '(max-width: 960px) 100vw, 55vw', position, priority: true })}</div>` : ''}
+  ${image ? `<div class="co-hero__media" style="--ar:${width} / ${height}">${photo(image, imageAlt, { sizes: '(max-width: 960px) 100vw, 50vw', position, priority: true, width, height })}</div>` : ''}
 </div></section>`;
 }
 
@@ -144,4 +144,31 @@ export function labelFor(key, current) {
   if (current === 'home') return `${s.name} home`;
   if (current === 'cta') return s.cta[0];
   return s.nav.find(([k]) => k === current)?.[1] || s.name;
+}
+
+/* Icons for the company pillars (from the CNM banners): 24px, stroke-based. */
+const PILLAR_ICONS = {
+  glasses: '<circle cx="6.5" cy="13" r="3.5"/><circle cx="17.5" cy="13" r="3.5"/><path d="M10 13h4M3 13 2 9M21 13l1-4"/>',
+  sunglasses: '<path d="M2 10h20M3 10c0 4 1.5 6 4.5 6S11 14 11 10M13 10c0 4 1.5 6 4.5 6S21 14 21 10" /><path d="M11 10.5h2"/>',
+  lens: '<ellipse cx="12" cy="12" rx="8" ry="5" transform="rotate(-30 12 12)"/><path d="M8.5 13.5c2-3 5-4.5 7.5-4"/>',
+  eye: '<path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+  hardhat: '<path d="M3 17h18M5 17v-2a7 7 0 0 1 14 0v2M10 8V5h4v3M8 10.5 9 8M16 10.5 15 8"/>',
+  building: '<path d="M4 21V5l8-3v19M12 9h8v12M3 21h18M7 8h2M7 12h2M7 16h2M15 13h2M15 17h2"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
+  bulb: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3Z"/>',
+  cap: '<path d="m2 9 10-5 10 5-10 5L2 9Z"/><path d="M6 11v5c3 2 9 2 12 0v-5M22 9v6"/>',
+  people: '<circle cx="12" cy="8" r="3"/><circle cx="5" cy="10" r="2.2"/><circle cx="19" cy="10" r="2.2"/><path d="M6.5 20a5.5 5.5 0 0 1 11 0M1.5 19a4 4 0 0 1 5-3.5M22.5 19a4 4 0 0 0-5-3.5"/>',
+  book: '<path d="M12 6c-2-1.5-5-2-9-2v14c4 0 7 .5 9 2 2-1.5 5-2 9-2V4c-4 0-7 .5-9 2Z"/><path d="M12 6v14"/>',
+  heart: '<path d="M12 20s-8-4.6-8-10.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8 2.5C20 15.4 12 20 12 20Z"/>',
+};
+const pillarIcon = (k) => `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PILLAR_ICONS[k] || ''}</svg>`;
+
+/** The company's three words, tagline and four pillars, as supplied on the CNM banners. */
+export function pillarsStrip(p) {
+  const b = p.banner;
+  if (!b) return '';
+  return `<section class="co-pillars" aria-label="${escapeHtml(b.words.join(', '))}"><div class="container">
+  <div class="co-pillars__head"><p class="co-pillars__words">${b.words.map((w) => `<span>${escapeHtml(w)}</span>`).join('')}</p><p class="co-pillars__tagline">${escapeHtml(b.tagline)}</p></div>
+  <ul class="co-pillars__list">${b.pillars.map(([k, label]) => `<li><span class="co-pillars__icon">${pillarIcon(k)}</span><span>${escapeHtml(label)}</span></li>`).join('')}</ul>
+</div></section>`;
 }

@@ -71,10 +71,11 @@ export function groupFooter(ctx) {
 function companyPanel(p, i) {
   const cta = p.internal ? 'Shop CNM Essentials' : `Visit ${p.name.replace(' Limited', '')}`;
   const media = p.image
-    ? photo(p.image, p.imageAlt, { sizes: '(max-width: 960px) 100vw, 50vw', position: p.imagePosition })
+    ? photo(p.image, p.imageAlt, { sizes: '(max-width: 960px) 100vw, 50vw', position: p.imagePosition, width: p.imageWidth || 2000, height: p.imageHeight || 1530 })
     : `<span class="gpanel__logo"><img src="${p.logo}" alt="" loading="lazy" width="200" height="200"></span>`;
   return `<a class="gpanel${p.image ? '' : ' gpanel--plain'}" href="${p.page}" data-track="group_company" data-company="${p.slug}">
     <span class="gpanel__media">${media}</span>
+    ${p.image ? `<span class="gpanel__badge"><img src="${p.logo}" alt="${escapeHtml(p.name)} logo" loading="lazy"></span>` : ''}
     <span class="gpanel__copy">
       <span class="gpanel__eyebrow">${String(i + 1).padStart(2, '0')} — ${escapeHtml(p.menuLabel || p.sector)}</span>
       <span class="gpanel__name">${escapeHtml(p.name)}</span>

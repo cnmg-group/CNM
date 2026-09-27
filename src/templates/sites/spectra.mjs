@@ -2,7 +2,7 @@
 import { escapeHtml } from '../../shared/format.mjs';
 import { icon } from '../../shared/icons.mjs';
 import { approval } from '../layout.mjs';
-import { cards, contactBlock, coHero, ctaBand, orgLd, pageHead, profileOf, sectionHead } from '../company.mjs';
+import { cards, contactBlock, coHero, ctaBand, orgLd, pageHead, pillarsStrip, profileOf, sectionHead } from '../company.mjs';
 import { enquiryForm, field, message, phoneInput, select } from '../kit.mjs';
 
 const K = 'spectra';
@@ -36,11 +36,12 @@ export function spectraPages(ctx) {
     path: '/spectra/', current: 'home', title: 'CNM Spectra — premium eyewear in Lagos & Abuja',
     description: p.text.slice(0, 155),
     body: `${coHero({
-      eyebrow: `CNM Spectra · ${p.sector}`, title: `See clearly. <em>Look extraordinary.</em>`, lead: p.text,
-      image: p.image, imageAlt: p.imageAlt, position: p.imagePosition,
+      eyebrow: `CNM Spectra · ${p.banner.words.join(' · ')}`, title: `See clearly. <em>Look extraordinary.</em>`, lead: p.text,
+      image: p.image, imageAlt: p.imageAlt, position: p.imagePosition, width: p.imageWidth, height: p.imageHeight,
       ctas: [['Book an appointment', '/spectra/book/'], ['Explore eyewear', '/spectra/eyewear/', true]],
-      note: `<p class="co-note">${escapeHtml(LOGO_TAGLINE)}</p>`,
+      note: `<p class="co-note">${escapeHtml(p.banner.tagline)}. ${escapeHtml(LOGO_TAGLINE)}</p>`,
     })}
+${pillarsStrip(p)}
 <section class="co-section" aria-labelledby="sp-range">
   <div class="container">${sectionHead('The range', 'Eyewear for how you see <em>and</em> how you’re seen', '', 'sp-range')}
   ${cards(RANGE.map((r) => ({ title: r.title, text: r.text, href: `/spectra/eyewear/#${r.id}`, cta: 'See the range' })))}</div>
