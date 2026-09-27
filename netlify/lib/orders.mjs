@@ -40,7 +40,10 @@ export const summary = (o) => ({ number: o.number, status: o.status, total: o.to
 /** Public (customer-facing) view of an order: no internal notes, no payment secrets. */
 export const publicOrder = (o) => ({
   number: o.number, status: o.status, createdAt: o.createdAt, lines: o.lines, totals: o.totals, promoCode: o.promoCode,
-  delivery: o.delivery, contact: { firstName: o.contact.firstName, lastName: o.contact.lastName, email: o.contact.email },
+  delivery: o.delivery, contact: { firstName: o.contact.firstName, lastName: o.contact.lastName, email: o.contact.email, phone: o.contact.phone },
+  notes: o.notes || '',
+  // For the customer's receipt: method, status and reference only (never provider secrets).
+  payment: o.payment ? { method: o.payment.method, status: o.payment.status, reference: o.payment.reference, paidAt: o.payment.paidAt || null, channel: o.payment.channel || null, test: o.payment.provider === 'simulated' } : null,
   history: o.history.map(({ status, at }) => ({ status, at })),
 });
 

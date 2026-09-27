@@ -1,3 +1,4 @@
+import { receiptHead } from './commerce.mjs';
 import { butterflySVG } from './layout.mjs';
 
 export const ACCOUNT_VIEWS = [
@@ -11,7 +12,7 @@ export const ACCOUNT_VIEWS = [
 
 const NAV = ACCOUNT_VIEWS.filter((v) => !v.hideNav);
 
-export function accountPage(view) {
+export function accountPage(view, ctx) {
   const nav = NAV.map((v) => `<a href="${v.path}"${v.view === view || (view === 'order' && v.view === 'orders') ? ' aria-current="page"' : ''}>${v.title === 'Account' ? 'Overview' : v.title}</a>`).join('');
   return `<div class="container">
   <div class="account" data-account data-view="${view}">
@@ -21,6 +22,7 @@ export function accountPage(view) {
       <div class="skeleton" style="height:40px;width:40%"></div><div class="skeleton" style="height:120px"></div>
     </section>
   </div>
+  ${view === 'order' && ctx ? receiptHead(ctx) : ''}
 </div>`;
 }
 

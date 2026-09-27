@@ -100,6 +100,25 @@ test('guest checkout: payment failure, retry, confirmation and order tracking', 
   await expect(page.locator('.order-num')).toContainText(/CNM-\d{6}-/);
   await expect(page.locator('.status-track')).toBeVisible();
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('cnm.bag')))).toEqual([]);
+  // Receipt / order slip: company logo and details, customer, delivery, lines, totals and payment
+  const receipt = page.locator('.receipt');
+  await expect(receipt.locator('.receipt__logo')).toBeVisible();
+  await expect(receipt.locator('.receipt__type')).toHaveText('Receipt');
+  for (const text of ['CNM Essentials', 'A CNM Group company', 'cnmessentials@cnm-group.net', 'Ada Obi', '+2348012345678', '1 Test Road', 'Ikoyi, Lagos', 'White Tea & Sage', 'Card', 'Amount paid', 'Test payment']) {
+    await expect(receipt).toContainText(text);
+  }
+  await expect(receipt).toContainText(/CNM-\d{6}-/);
+  await expect(page.locator('[data-print-receipt]').first()).toBeVisible();
+  // Printing shows only the slip
+  await page.emulateMedia({ media: 'print' });
+  await expect(receipt).toBeVisible();
+  await expect(page.locator('.confirm-hero')).toBeHidden();
+  await expect(page.locator('.cnmnav')).toBeHidden();
+  if (process.env.RECEIPT_OUT) {
+    await page.pdf({ path: `${process.env.RECEIPT_OUT}/receipt.pdf`, format: 'A4', printBackground: true });
+    await page.emulateMedia({ media: 'screen' });
+    await receipt.screenshot({ path: `${process.env.RECEIPT_OUT}/receipt-screen.png` });
+  }
 });
 
 test('account: register, checkout signed in, see order history, preferences', async ({ page }) => {

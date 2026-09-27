@@ -116,10 +116,36 @@ export function checkoutPage(ctx) {
 </div>`;
 }
 
-export function confirmationPage() {
+/**
+ * Company header for the printable receipt / order slip (confirmation page and account order view).
+ * Everything comes from content/: logo, stores, email, phone and website. The client fills in the order.
+ */
+export function receiptHead(ctx) {
+  const stores = (ctx.stores || []).filter((st) => st.verified !== false);
+  const email = ctx.site.contact?.email?.value || stores[0]?.email;
+  const phone = ctx.site.contact?.phone?.value || stores[0]?.phone;
+  const web = (ctx.site.productionUrl || '').replace(/^https?:\/\//, '');
+  const storeMap = Object.fromEntries(stores.map((st) => [st.slug, { name: st.name, address: [st.address, st.city].filter(Boolean).join(', ') }]));
+  return `<template data-receipt-head>
+  <div class="receipt__brand">
+    <img class="receipt__logo" src="/assets/brand/cnm-logo-on-light.svg" alt="CNM Essentials" width="220" height="120">
+    <div class="receipt__co">
+      <strong>${escapeHtml(ctx.site.legalName?.value || ctx.site.name)}</strong>
+      <span>A CNM Group company</span>
+      ${stores.map((st) => `<span>${escapeHtml(st.address)}, ${escapeHtml(st.city)}</span>`).join('')}
+      <span>${escapeHtml(email || '')}${phone ? ` · ${escapeHtml(phone)}` : ''}${web ? ` · ${escapeHtml(web)}` : ''}</span>
+    </div>
+  </div>
+</template>
+<script type="application/json" data-receipt-stores>${JSON.stringify(storeMap).replace(/</g, '\\u003c')}</script>
+<script type="application/json" data-receipt-contact>${JSON.stringify({ email, phone, web, group: (ctx.site.groupUrl || '').replace(/^https?:\/\//, '') }).replace(/</g, '\\u003c')}</script>`;
+}
+
+export function confirmationPage(ctx) {
   return `<div class="container container--narrow" data-confirmation>
   <div class="cnm-loader cnm-loader--inline" data-inline-loader hidden><div>${butterflySVG()}<div class="cnm-loader__label">Confirming your order</div></div></div>
   <div data-confirm-body hidden></div>
+  ${receiptHead(ctx)}
 </div>`;
 }
 

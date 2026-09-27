@@ -1603,3 +1603,59 @@ html[style*="overflow: hidden"] .cnmnav > * { pointer-events: none; }
 /* Shop filter/sort bar: always sits directly under the header (and staging bar), rising when the header hides */
 .toolbar { top: calc(var(--header-offset, 0px) + var(--header-h)); transition: top .35s var(--ease); }
 body:has(.site-header.is-hidden) .toolbar { top: var(--header-offset, 0px); }
+
+/* ---------- Receipt / order slip (screen card + print) ---------- */
+.receipt { --r-ink: #1c1b18; --r-mute: #6b675f; --r-line: #e4e0d6; margin-top: var(--s6, 40px); padding: clamp(20px, 4vw, 44px); background: #fff; color: var(--r-ink); border: 1px solid var(--r-line); box-shadow: 0 24px 60px -30px rgba(0, 0, 0, .25); font-size: .875rem; line-height: 1.55; }
+.receipt h3 { margin: 0 0 6px; font-size: .625rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--r-mute); }
+.receipt p { margin: 0; }
+.receipt__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; padding-bottom: 20px; border-bottom: 2px solid var(--r-ink); }
+.receipt__brand { display: flex; gap: 18px; align-items: flex-start; }
+.receipt__logo { width: 104px; height: auto; flex: none; }
+.receipt__co { display: grid; gap: 1px; font-size: .75rem; color: var(--r-mute); }
+.receipt__co strong { font-size: .9375rem; color: var(--r-ink); letter-spacing: .02em; }
+.receipt__doc { text-align: right; flex: none; }
+.receipt__type { display: block; font-family: var(--serif); font-size: 1.75rem; line-height: 1.1; margin-bottom: 10px; }
+.receipt__doc dl, .receipt__totals { margin: 0; display: grid; gap: 3px; }
+.receipt__doc dl div, .receipt__totals div { display: flex; justify-content: space-between; gap: 18px; }
+.receipt__doc dt, .receipt__totals dt { color: var(--r-mute); }
+.receipt__doc dd, .receipt__totals dd { margin: 0; font-variant-numeric: tabular-nums; }
+.receipt__parties { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--r-line); }
+.receipt__ref { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .75rem; color: var(--r-mute); word-break: break-all; }
+.receipt__lines { width: 100%; border-collapse: collapse; margin: 8px 0 0; }
+.receipt__lines th { padding: 12px 0 8px; font-size: .625rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--r-mute); text-align: left; border-bottom: 1px solid var(--r-line); }
+.receipt__lines td { padding: 10px 0; border-bottom: 1px solid var(--r-line); vertical-align: top; }
+.receipt__lines .num { text-align: right; padding-left: 12px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.receipt__foot { display: flex; justify-content: space-between; gap: 24px; padding: 16px 0 20px; }
+.receipt__count { color: var(--r-mute); }
+.receipt__totals { min-width: min(300px, 100%); }
+.receipt__vat { font-size: .75rem; }
+.receipt__grand { margin: 6px 0 2px; padding-top: 8px; border-top: 2px solid var(--r-ink); font-size: 1.0625rem; font-weight: 600; }
+.receipt__grand dt { color: var(--r-ink) !important; }
+.receipt__thanks { display: grid; gap: 4px; padding-top: 16px; border-top: 1px dashed var(--r-line); font-size: .75rem; color: var(--r-mute); text-align: center; }
+.receipt__thanks strong { color: var(--r-ink); }
+.receipt__group { margin-top: 6px !important; letter-spacing: .12em; text-transform: uppercase; font-size: .625rem; }
+.receipt-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 18px; }
+@media (max-width: 640px) {
+  .receipt__head { flex-direction: column; }
+  .receipt__doc { text-align: left; width: 100%; }
+  .receipt__parties { grid-template-columns: 1fr; gap: 14px; }
+  .receipt__foot { flex-direction: column; }
+  .receipt__lines th:nth-child(3), .receipt__lines td:nth-child(3) { display: none; }
+}
+/* the slip keeps its paper look in dark mode too */
+:root[data-theme="dark"] .receipt { border-color: #2c2a25; }
+
+@media print {
+  @page { margin: 12mm; }
+  html, body { background: #fff !important; }
+  body * { visibility: hidden !important; }
+  .receipt, .receipt * { visibility: visible !important; }
+  .receipt { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; border: 0; box-shadow: none; font-size: 10.5pt; }
+  .receipt__head { flex-direction: row !important; }
+  .receipt__doc { text-align: right !important; width: auto !important; }
+  .receipt__parties { grid-template-columns: repeat(3, 1fr) !important; }
+  .receipt__foot { flex-direction: row !important; }
+  .receipt__lines th:nth-child(3), .receipt__lines td:nth-child(3) { display: table-cell !important; }
+  .receipt__lines tr { break-inside: avoid; }
+  .cnmnav, .to-top, .scroll-progress, .no-print { display: none !important; }
+}

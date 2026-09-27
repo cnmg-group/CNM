@@ -4,7 +4,7 @@ import { api } from '../api.js';
 import { paintWish } from '../render.js';
 import * as S from '../store.js';
 import { formData, setBusy, toast, validate } from '../ui.js';
-import { orderDetailHTML } from './confirmation.js';
+import { bindReceipt, receiptHTML, trackHTML } from './confirmation.js';
 
 const NG_STATES = ['Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno', 'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT', 'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 'Kwara', 'Lagos', 'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo', 'Plateau', 'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara'];
 const pill = (s) => `<span class="pill pill--${s}">${s.replace(/_/g, ' ')}</span>`;
@@ -58,8 +58,9 @@ async function order(panel) {
   const n = new URLSearchParams(location.search).get('n');
   try {
     const { order: o } = await api(`/api/account/orders/${encodeURIComponent(n)}`, { loader: false });
-    panel.innerHTML = `<a class="textlink muted" href="/account/orders/">← All orders</a><h1 class="h2" style="font-family:var(--serif)">Order ${escapeHtml(o.number)}</h1><p class="muted">Placed ${formatDate(o.createdAt)} · ${pill(o.status)}</p>${orderDetailHTML(o)}
+    panel.innerHTML = `<a class="textlink muted" href="/account/orders/">← All orders</a><h1 class="h2" style="font-family:var(--serif)">Order ${escapeHtml(o.number)}</h1><p class="muted">Placed ${formatDate(o.createdAt)} · ${pill(o.status)}</p>${['payment_failed', 'cancelled', 'refunded'].includes(o.status) ? '' : trackHTML(o.status)}${receiptHTML(o)}
     ${o.history?.length ? `<h2 class="label">History</h2><ul>${o.history.map((h) => `<li style="padding:6px 0;border-bottom:1px solid var(--line)">${formatDate(h.at)} — ${pill(h.status)} ${h.note ? escapeHtml(h.note) : ''}</li>`).join('')}</ul>` : ''}`;
+    bindReceipt(panel);
   } catch (e) {
     panel.innerHTML = `<p class="alert alert--err">${escapeHtml(e.message)}</p>`;
   }

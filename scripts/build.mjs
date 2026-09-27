@@ -149,7 +149,7 @@ await write('/checkout/confirmation/', page({ page: 'confirmation', path: '/chec
 await write('/account/login/', page({ page: 'auth', path: '/account/login/', title: 'Sign in', body: loginPage(), noindex: true }), { sitemap: false });
 await write('/account/register/', page({ page: 'auth', path: '/account/register/', title: 'Create account', body: registerPage(), noindex: true }), { sitemap: false });
 await write('/account/reset/', page({ page: 'auth', path: '/account/reset/', title: 'Reset password', body: resetPage(), noindex: true }), { sitemap: false });
-for (const v of ACCOUNT_VIEWS) await write(v.path, page({ page: 'account', path: v.path, title: v.title, body: accountPage(v.view), noindex: true }), { sitemap: false });
+for (const v of ACCOUNT_VIEWS) await write(v.path, page({ page: 'account', path: v.path, title: v.title, body: accountPage(v.view, ctx), noindex: true }), { sitemap: false });
 
 // Brand & content
 { const r = storyPage(ctx); await write('/our-story/', page({ page: 'story', path: '/our-story/', header: 'overlay', title: 'Our story', current: 'story', body: r.body, jsonld: r.jsonld }), { priority: 0.7, changefreq: 'monthly' }); }
