@@ -42,7 +42,7 @@ for (const [dev, vp, dsf] of [['desktop', { width: 1440, height: 900 }, 1], ['mo
     const h = Math.min(MAX_H, await pg.evaluate(() => document.documentElement.scrollHeight));
     await pg.setViewportSize({ width: vp.width, height: h });
     await pg.waitForLoadState('networkidle');
-    await pg.waitForTimeout(500);
+    await pg.waitForTimeout(1400); // let scroll reveals finish
     await pg.screenshot({ path: `${out}/${key}-${dev}.png` });
   }
   await ctx.close();
