@@ -140,10 +140,16 @@ function renderOrder(v, d, ctx) {
         ${['failed_attempt', 'rescheduled'].includes(s.status) ? `<p class="os-note-line">Attempts: ${s.attempts}${s.eta ? ` · new date ${e(day(s.eta))}` : ''}</p>` : ''}
         ${A.canFulfil ? `<form class="os-form os-ship-form" data-ship-details>
           <label>Courier<select name="courier"><option value="">Choose…</option>${d.couriers.map((c) => `<option value="${e(c.id)}"${c.id === s.courier ? ' selected' : ''}>${e(c.name)}</option>`).join('')}</select></label>
-          <label>Tracking number<input name="trackingNumber" value="${e(s.trackingNumber || '')}" maxlength="60"></label>
-          <label>Estimated delivery<input type="date" name="eta" value="${e(s.eta || '')}"></label>
-          <label>Promised by<input type="date" name="promisedBy" value="${e(s.promisedBy || '')}"></label>
+          <label data-k="courier">Waybill / tracking number<input name="trackingNumber" value="${e(s.trackingNumber || '')}" maxlength="60"></label>
+          <label data-k="rider">Rider name<input name="riderName" value="${e(s.rider?.name || '')}" maxlength="80"></label>
+          <label data-k="rider">Rider phone<input name="riderPhone" type="tel" value="${e(s.rider?.phone || '')}" maxlength="30"></label>
+          <label data-k="courier rider">Estimated delivery<input type="date" name="eta" value="${e(s.eta || '')}"></label>
+          <label data-k="courier rider">Promised by<input type="date" name="promisedBy" value="${e(s.promisedBy || '')}"></label>
+          <label data-k="courier rider">We paid (₦)<input name="costAmount" type="number" min="0" step="50" value="${s.cost ? e(s.cost.amount) : ''}" placeholder="What CNM paid"></label>
+          <label data-k="courier rider">Paid by<select name="costMethod">${[['cash', 'Cash'], ['bank_transfer', 'Bank transfer'], ['pos_card', 'POS card'], ['account', 'Courier account']].map(([k, t]) => `<option value="${k}"${(s.cost?.method || 'cash') === k ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
           <button class="os-btn os-btn--ghost" type="submit">Save delivery details</button></form>` : `<p class="os-note-line">${courierName ? `${e(courierName)}${s.trackingNumber ? ` · ${e(s.trackingNumber)}` : ''}` : ''}${o.trackingLink ? ` · <a class="textlink" href="${e(o.trackingLink)}" target="_blank" rel="noopener">Track ↗</a>` : ''}</p>`}
+        ${s.rider?.name || s.rider?.phone ? `<p class="os-note-line">Rider: <strong>${e(s.rider.name || '')}</strong>${s.rider.phone ? ` · <a class="textlink" href="tel:${e(s.rider.phone)}">${e(s.rider.phone)}</a>` : ''}</p>` : ''}
+        ${s.cost ? `<p class="os-note-line">Delivery: customer paid ${o.totals.delivery ? money(o.totals.delivery) : 'nothing (free)'} · CNM paid ${money(s.cost.amount)} (${e(label(s.cost.method))}) · <strong class="${(o.totals.delivery || 0) - s.cost.amount < 0 ? 'os-neg' : ''}">${(o.totals.delivery || 0) - s.cost.amount < 0 ? 'cost ' : 'margin '}${money(Math.abs((o.totals.delivery || 0) - s.cost.amount))}</strong></p>` : ''}
         ${o.trackingLink && A.canFulfil ? `<p class="os-note-line"><a class="textlink" href="${e(o.trackingLink)}" target="_blank" rel="noopener">Open ${e(courierName)} tracking ↗</a></p>` : ''}
         ${A.canFulfil && A.shipment.length ? `<div class="os-ship-actions">${A.shipment.map((st) => `<button type="button" class="os-btn${['failed_attempt', 'returned_to_sender', 'lost'].includes(st) ? ' os-btn--ghost' : ''}" data-ship-to="${st}">${e(SHIP_ACTION[st] || label(st))}</button>`).join('')}${!openEx && s.status !== 'awaiting_fulfilment' ? '<button type="button" class="os-btn os-btn--quiet" data-open="exception">Report a problem</button>' : ''}</div>` : ''}
         ${s.pod ? `<div class="os-pod"><strong>Proof of delivery</strong><span>${e(when(s.pod.at))}${s.pod.recipient ? ` · received by ${e(s.pod.recipient)}` : ''}${s.pod.note ? ` · ${e(s.pod.note)}` : ''}</span>${s.pod.photoUrl ? `<a class="textlink" href="${e(s.pod.photoUrl)}" target="_blank" rel="noopener">Photo ↗</a>` : ''}</div>` : ''}
@@ -156,11 +162,13 @@ function renderOrder(v, d, ctx) {
       </section>` : ''}
 
       ${A.returns || (o.returns || []).length ? `<section class="os-card"><header class="os-card__h"><h2>Returns</h2></header>
-        ${(o.returns || []).length ? `<ul class="os-list">${o.returns.map((rt) => `<li><div><strong class="os-mono">${e(rt.rma)}</strong> ${pill(rt.status)} <small>${e(label(rt.kind))} · ${e(label(rt.reason))} · ${money(rt.value)}${rt.restocked ? ' · restocked' : ''}</small><small>${rt.lines.map((l) => `${l.qty} × ${e(l.name)}`).join(', ')}${rt.note ? ` · ${e(rt.note)}` : ''}</small></div>
+        ${(o.returns || []).length ? `<ul class="os-list">${o.returns.map((rt) => `<li><div><strong class="os-mono">${e(rt.rma)}</strong> ${pill(rt.status)} <small>${e(label(rt.kind))} · ${e(label(rt.reason))} · ${money(rt.value)}${rt.restocked ? ' · restocked' : ''}${rt.outsidePolicy ? ' · <strong class="os-neg">accepted outside policy</strong>' : ''}</small><small>${rt.lines.map((l) => `${l.qty} × ${e(l.name)}`).join(', ')}${rt.note ? ` · ${e(rt.note)}` : ''}</small></div>
           <div class="os-row-actions">${(A.returnNext[rt.rma] || []).filter((x) => x !== 'refunded').map((x) => `<button class="os-btn os-btn--ghost" type="button" data-rt="${e(rt.rma)}" data-rt-to="${x}">${x === 'inspected' ? 'Inspected' : x === 'credited' ? 'Store credit given' : x[0].toUpperCase() + x.slice(1)}</button>`).join('')}${rt.status === 'inspected' && rt.kind === 'refund' && A.refund ? `<button class="os-btn" type="button" data-rt-refund="${e(rt.rma)}" data-value="${Math.min(rt.value, d.refundable)}">Refund ${money(Math.min(rt.value, d.refundable))}</button>` : ''}</div></li>`).join('')}</ul>` : ''}
         ${A.returns ? `<details class="os-disclose"><summary>Start a return</summary><form class="os-form" data-return>
+          ${d.returnWindow?.days != null ? `<p class="os-policy ${d.returnWindow.changeOfMindOpen ? 'is-ok' : 'is-late'}">Delivered ${d.returnWindow.days === 0 ? 'today' : `${d.returnWindow.days} day${d.returnWindow.days === 1 ? '' : 's'} ago`}. Change of mind (unopened items): ${d.returnWindow.changeOfMindOpen ? `within the ${d.returnWindow.changeOfMindDays}-day window` : `outside the ${d.returnWindow.changeOfMindDays}-day window`}. Damaged, faulty or wrong items: ${d.returnWindow.problemOpen ? `within the ${d.returnWindow.reportProblemHours}-hour reporting window` : `reported after ${d.returnWindow.reportProblemHours} hours`}.</p>` : ''}
           <fieldset class="os-checks"><legend>Items</legend>${o.lines.map((l) => `<label>${e(l.name)} <input type="number" name="qty:${e(l.id)}" min="0" max="${l.qty}" value="0" style="width:64px"> of ${l.qty}</label>`).join('')}</fieldset>
           <div class="os-inline-grid"><label>Reason<select name="reason">${RETURN_REASONS.map((x) => `<option value="${x}">${e(label(x))}</option>`).join('')}</select></label><label>Customer wants<select name="kind"><option value="refund">A refund</option><option value="exchange">An exchange</option><option value="store_credit">Store credit</option></select></label><label class="os-span2">Note<input name="note" maxlength="500"></label></div>
+          <label class="os-check"><input type="checkbox" name="override" value="1"> Accept outside the policy (give the reason in the note)</label>
           <button class="os-btn" type="submit">Open return</button></form></details>` : ''}
       </section>` : ''}
 
@@ -213,7 +221,22 @@ function bindOrder(v, d, ctx) {
     try { const r = await api(`/api/ops/orders/${n}/resend`, { method: 'POST', body: { kind: b.dataset.resend } }); ctx.flash(r.note || 'Email sent to the customer.', !r.note); } catch (x) { ctx.flash(x.message, false); }
   }));
   v.querySelector('[data-note]')?.addEventListener('submit', (ev) => { ev.preventDefault(); const text = ev.currentTarget.text.value; run(() => api(`/api/ops/orders/${n}/notes`, { method: 'POST', body: { text } }), 'Note added.'); });
-  v.querySelector('[data-ship-details]')?.addEventListener('submit', (ev) => { ev.preventDefault(); const body = Object.fromEntries(new FormData(ev.currentTarget)); if (!body.courier) delete body.courier; run(() => api(`/api/ops/orders/${n}/shipment`, { method: 'PATCH', body }), 'Delivery details saved.'); });
+  const shipForm = v.querySelector('[data-ship-details]');
+  if (shipForm) {
+    // Show the fields that fit the chosen courier: waybill for couriers like GIG, rider name and phone for a booked rider.
+    const kindOf = () => d.couriers.find((c) => c.id === shipForm.courier.value)?.kind || (shipForm.courier.value ? 'courier' : '');
+    const syncKind = () => { const k = kindOf(); shipForm.querySelectorAll('[data-k]').forEach((el) => { el.hidden = !k || !el.dataset.k.split(' ').includes(k); }); };
+    shipForm.courier.addEventListener('change', syncKind); syncKind();
+    shipForm.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const f = Object.fromEntries(new FormData(shipForm));
+      const body = { trackingNumber: f.trackingNumber, eta: f.eta, promisedBy: f.promisedBy };
+      if (f.courier) body.courier = f.courier;
+      if (kindOf() === 'rider') { body.rider = { name: f.riderName, phone: f.riderPhone }; body.trackingNumber = ''; }
+      if (f.costAmount !== '' && f.costAmount != null) body.cost = { amount: Number(f.costAmount), method: f.costMethod };
+      run(() => api(`/api/ops/orders/${n}/shipment`, { method: 'PATCH', body }), 'Delivery details saved.');
+    });
+  }
   v.querySelector('[data-resolve]')?.addEventListener('submit', (ev) => { ev.preventDefault(); const resolution = ev.currentTarget.resolution.value; run(() => api(`/api/ops/orders/${n}/exception`, { method: 'PATCH', body: { resolution } }), 'Problem resolved.'); });
 
   v.querySelectorAll('[data-ship-to]').forEach((b) => b.addEventListener('click', () => {
@@ -255,7 +278,7 @@ function bindOrder(v, d, ctx) {
       const fd = new FormData(retForm);
       const lines = [...fd].filter(([k, val]) => k.startsWith('qty:') && Number(val) > 0).map(([k, val]) => ({ id: k.slice(4), qty: Number(val) }));
       if (!lines.length) { ctx.flash('Choose at least one item to return.', false); return; }
-      run(() => api(`/api/ops/orders/${n}/returns`, { method: 'POST', body: { lines, reason: fd.get('reason'), kind: fd.get('kind'), note: fd.get('note') }, headers: { 'Idempotency-Key': idem } }), 'Return opened.');
+      run(() => api(`/api/ops/orders/${n}/returns`, { method: 'POST', body: { lines, reason: fd.get('reason'), kind: fd.get('kind'), note: fd.get('note'), override: fd.get('override') === '1' }, headers: { 'Idempotency-Key': idem } }), 'Return opened.');
     });
   }
   v.querySelectorAll('[data-rt]').forEach((b) => b.addEventListener('click', () => {
@@ -278,6 +301,7 @@ export async function fulfilmentView(v, ctx) {
   v.innerHTML = `<header class="os-head"><div><p class="os-eyebrow">Operations</p><h1 class="os-title">Fulfilment</h1><p class="os-sub">Everything paid and not yet delivered, by delivery stage. Delivery performance covers the last 30 days.</p></div>
     <div class="os-head__actions"><a class="os-btn os-btn--ghost" href="#ops-settings">Couriers &amp; refunds</a></div></header>
   <section class="os-kpis os-kpis--6">${[['Delivery success', pct(st.successRate), 'delivered ÷ completed'], ['First attempt', pct(st.firstAttemptRate), 'delivered without a failed try'], ['On time', pct(st.onTimeRate), 'vs promised-by date'], ['Average time', hrs(st.avgHours), 'payment → delivered'], ['Slowest 10%', hrs(st.p90Hours), 'p90 payment → delivered'], ['Open problems', String(st.openExceptions), 'delivery exceptions']].map(([t, val, sub], i) => `<article class="os-kpi${i === 5 && st.openExceptions ? ' os-kpi--warn' : ''}"><h3>${t}</h3><strong>${val}</strong><p><span class="muted">${sub}</span></p></article>`).join('')}</section>
+  ${st.costRecorded ? `<p class="os-note-line">Delivery costs recorded on ${st.costRecorded} shipment${st.costRecorded === 1 ? '' : 's'} (last 30 days): customers paid ${money(st.deliveryCharged)}, CNM paid couriers and riders ${money(st.deliveryCost)} (${st.deliveryCharged - st.deliveryCost >= 0 ? 'margin' : 'cost'} ${money(Math.abs(st.deliveryCharged - st.deliveryCost))}).</p>` : '<p class="os-note-line">Record what CNM pays GIG or a rider on each order to see delivery cost against what customers are charged.</p>'}
   ${d.exceptions.length ? `<section class="os-card"><header class="os-card__h"><h2>Delivery problems</h2><span class="os-count is-warn">${d.exceptions.length}</span></header><ul class="os-list">${d.exceptions.map((o) => `<li><div><a class="os-mono" href="#orders/${encodeURIComponent(o.number)}">${e(o.number)}</a> <strong>${e(label(o.exception.kind))}</strong><small>${e(o.customer)} · ${e(o.location)} · ${e(o.exception.note || '')} · ${e(ago(o.exception.openedAt))} ago</small></div><a class="os-btn os-btn--ghost" href="#orders/${encodeURIComponent(o.number)}">Resolve</a></li>`).join('')}</ul></section>` : ''}
   <div class="os-board">${d.columns.filter((c) => c.orders.length || ['awaiting_fulfilment', 'packed', 'handed_over', 'out_for_delivery'].includes(c.status)).map((c) => `<section class="os-col"><header><h2>${e(c.label)}</h2><span class="os-count">${c.orders.length}</span></header>
     ${c.orders.map((o) => `<a class="os-tile${o.exception ? ' has-problem' : ''}" href="#orders/${encodeURIComponent(o.number)}"><span class="os-mono">${e(o.number)}</span><strong>${e(o.customer)}</strong><small>${e(o.location)} · ${o.items} item${o.items === 1 ? '' : 's'} · ${money(o.total)}</small><small>${o.courier ? `${e(o.courier)}${o.tracking ? ` · ${e(o.tracking)}` : ''} · ` : ''}${e(ago(o.createdAt))} old</small></a>`).join('') || '<p class="os-empty">Nothing here.</p>'}</section>`).join('')}</div>
@@ -400,11 +424,11 @@ export async function opsSettingsView(v, ctx) {
   const [{ couriers }, cfg] = await Promise.all([api('/api/ops/couriers', { loader: false }), api('/api/ops/settings', { loader: false })]);
   const isOwner = ctx.me.role === 'owner';
   const canEdit = ['owner', 'manager'].includes(ctx.me.role);
-  const row = (c = {}) => `<tr><td><input name="name" value="${e(c.name || '')}" required maxlength="60"${canEdit ? '' : ' disabled'}><input type="hidden" name="id" value="${e(c.id || '')}"></td><td><input name="trackingUrl" value="${e(c.trackingUrl || '')}" placeholder="https://…{tracking}"${canEdit ? '' : ' disabled'}></td><td><input type="checkbox" name="active"${c.active === false ? '' : ' checked'}${canEdit ? '' : ' disabled'}></td><td class="os-mono os-small">${c.id ? e(`/api/couriers/${c.id}/webhook`) : '—'}</td>${canEdit ? '<td><button type="button" class="os-link-btn" data-del aria-label="Remove">×</button></td>' : ''}</tr>`;
+  const row = (c = {}) => `<tr><td><input name="name" value="${e(c.name || '')}" required maxlength="60"${canEdit ? '' : ' disabled'}><input type="hidden" name="id" value="${e(c.id || '')}"></td><td><select name="kind"${canEdit ? '' : ' disabled'}>${[['courier', 'Courier (waybill)'], ['rider', 'Booked rider'], ['pickup', 'Customer collects']].map(([k, t]) => `<option value="${k}"${(c.kind || 'courier') === k ? ' selected' : ''}>${t}</option>`).join('')}</select></td><td><input name="trackingUrl" value="${e(c.trackingUrl || '')}" placeholder="https://…{tracking}"${canEdit ? '' : ' disabled'}></td><td><input type="checkbox" name="active"${c.active === false ? '' : ' checked'}${canEdit ? '' : ' disabled'}></td><td class="os-mono os-small">${c.id ? e(`/api/couriers/${c.id}/webhook`) : '—'}</td>${canEdit ? '<td><button type="button" class="os-link-btn" data-del aria-label="Remove">×</button></td>' : ''}</tr>`;
   v.innerHTML = `<header class="os-head"><div><p class="os-eyebrow">Settings</p><h1 class="os-title">Couriers &amp; refunds</h1><p class="os-sub">Add the couriers CNM uses. A tracking link template turns tracking numbers into links for staff and customers.</p></div></header>
   <form class="os-card os-form" data-couriers><header class="os-card__h"><h2>Couriers</h2></header>
-    <div class="os-table-wrap"><table class="os-cos os-edit"><thead><tr><th>Name</th><th>Tracking link template</th><th>Active</th><th>Webhook address</th>${canEdit ? '<th></th>' : ''}</tr></thead><tbody>${couriers.map(row).join('')}</tbody></table></div>
-    <p class="muted os-small">Webhooks: each courier signs updates with the secret in the <code>COURIER_WEBHOOK_SECRET_&lt;ID&gt;</code> environment variable (for example <code>COURIER_WEBHOOK_SECRET_IN_HOUSE</code>). Tracking links are only shown when CNM adds a template, so nothing is guessed.</p>
+    <div class="os-table-wrap"><table class="os-cos os-edit"><thead><tr><th>Name</th><th>Type</th><th>Tracking link template</th><th>Active</th><th>Webhook address</th>${canEdit ? '<th></th>' : ''}</tr></thead><tbody>${couriers.map(row).join('')}</tbody></table></div>
+    <p class="muted os-small">Webhooks: each courier signs updates with the secret in the <code>COURIER_WEBHOOK_SECRET_&lt;ID&gt;</code> environment variable (for example <code>COURIER_WEBHOOK_SECRET_GIG</code>). Tracking links are only shown when CNM adds a template, so nothing is guessed.</p>
     ${canEdit ? '<div class="os-row-actions"><button class="os-btn os-btn--ghost" type="button" data-add>Add courier</button><button class="os-btn" type="submit">Save couriers</button></div>' : ''}</form>
   <form class="os-card os-form" data-thr style="max-width:560px"><header class="os-card__h"><h2>Refund approvals</h2></header>
     <label>Refunds above this amount need a second manager to approve (₦)<input name="t" type="number" min="0" step="1000" value="${cfg.refundApprovalThreshold}"${isOwner ? '' : ' disabled'}></label>
@@ -415,7 +439,7 @@ export async function opsSettingsView(v, ctx) {
   tb.addEventListener('click', (ev) => ev.target.closest('[data-del]')?.closest('tr').remove());
   v.querySelector('[data-couriers]').addEventListener('submit', async (ev) => {
     ev.preventDefault();
-    const list = [...tb.querySelectorAll('tr')].map((tr) => ({ id: tr.querySelector('[name=id]').value || undefined, name: tr.querySelector('[name=name]').value, trackingUrl: tr.querySelector('[name=trackingUrl]').value, active: tr.querySelector('[name=active]').checked }));
+    const list = [...tb.querySelectorAll('tr')].map((tr) => ({ id: tr.querySelector('[name=id]').value || undefined, name: tr.querySelector('[name=name]').value, kind: tr.querySelector('[name=kind]').value, trackingUrl: tr.querySelector('[name=trackingUrl]').value, active: tr.querySelector('[name=active]').checked }));
     try { await api('/api/ops/couriers', { method: 'PUT', body: { couriers: list } }); ctx.flash('Couriers saved.'); opsSettingsView(v, ctx); } catch (x) { ctx.flash(x.message, false); }
   });
   v.querySelector('[data-thr]').addEventListener('submit', async (ev) => {

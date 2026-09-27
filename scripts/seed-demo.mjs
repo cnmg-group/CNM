@@ -56,7 +56,7 @@ for (let d = DAYS; d >= 0; d--) {
     // Delivery record for anything past packing (couriers are CNM's own riders in demo data)
     const shipStatus = { processing: 'packed', dispatched: rnd() < 0.5 ? 'in_transit' : 'out_for_delivery', delivered: 'delivered', refunded: 'delivered' }[status];
     const shipment = method === 'pickup' || !shipStatus ? null : {
-      id: `SHP-${number.slice(4)}`, courier: 'in-house', trackingNumber: `RDR-${String(n).padStart(5, '0')}`, status: shipStatus, eta: iso(t + 72 * 36e5).slice(0, 10), promisedBy: iso(t + 96 * 36e5).slice(0, 10),
+      id: `SHP-${number.slice(4)}`, courier: n % 3 ? 'gig' : 'rider', trackingNumber: `RDR-${String(n).padStart(5, '0')}`, status: shipStatus, eta: iso(t + 72 * 36e5).slice(0, 10), promisedBy: iso(t + 96 * 36e5).slice(0, 10),
       attempts: history.some((h) => h.status === 'delivery_failed') ? 1 : 0, exception: null, pod: null,
       events: history.filter((h) => ['processing', 'dispatched', 'delivered'].includes(h.status)).map((h) => ({ status: { processing: 'packed', dispatched: 'handed_over', delivered: 'delivered' }[h.status], at: h.at, by: 'ops@cnm.local', source: 'admin', note: '' })),
     };

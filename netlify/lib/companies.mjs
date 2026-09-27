@@ -65,6 +65,10 @@ export function validateCompany(b, { creating }) {
   const dl = list(b.deliveryOptions, DELIVERY_OPTION_IDS, 'Delivery options'); if (dl) out.deliveryOptions = dl;
   const dm = domains(b.domains); if (dm) out.domains = dm;
   const ad = emails(b.admins); if (ad) out.admins = ad;
+  // Legal details for invoices — entered by CNM, never guessed. Empty string clears a value.
+  if (b.legalName != null) out.legalName = b.legalName === '' ? null : v.str(b.legalName, { name: 'Registered company name', max: 120 });
+  if (b.rcNumber != null) out.rcNumber = b.rcNumber === '' ? null : (/^(RC|BN|IT)?\s?-?\s?\d{3,9}$/i.test(String(b.rcNumber).trim()) ? String(b.rcNumber).trim().toUpperCase().replace(/^(RC|BN|IT)\s?-?\s?/, '$1 ') : fail(422, 'invalid', 'RC number should look like “RC 1234567” (CAC registration number).'));
+  if (b.taxId != null) out.taxId = b.taxId === '' ? null : (/^[0-9][0-9-]{7,19}$/.test(String(b.taxId).trim()) ? String(b.taxId).trim() : fail(422, 'invalid', 'TIN should be digits (and hyphens), for example 12345678-0001.'));
   if (creating) { out.paymentMethods ||= []; out.deliveryOptions ||= []; out.domains ||= []; out.admins ||= []; out.logo ??= null; }
   return out;
 }

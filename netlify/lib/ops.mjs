@@ -12,11 +12,16 @@ const now = () => new Date().toISOString();
 const r2 = (n) => Math.round(n * 100) / 100;
 
 /* ------------------------------------------------------------------ couriers (configurable, no invented URLs) */
-// CNM adds the couriers it actually uses (name + optional tracking-link template with {tracking}).
+// The couriers CNM uses (confirmed by CNM): GIG Logistics, and a dispatch rider booked per delivery and paid manually.
+// kind: 'courier' (waybill/tracking number), 'rider' (booked per delivery: rider name + phone), 'pickup' (customer collects).
+// Tracking-link templates are only added by CNM (with {tracking}); nothing is guessed.
 export const DEFAULT_COURIERS = [
-  { id: 'in-house', name: 'CNM delivery riders', trackingUrl: null, active: true },
-  { id: 'pickup', name: 'Collected in store', trackingUrl: null, active: true },
+  { id: 'gig', name: 'GIG Logistics', kind: 'courier', trackingUrl: null, active: true },
+  { id: 'rider', name: 'Dispatch rider', kind: 'rider', trackingUrl: null, active: true },
+  { id: 'pickup', name: 'Collected in store', kind: 'pickup', trackingUrl: null, active: true },
 ];
+export const COURIER_KINDS = ['courier', 'rider', 'pickup'];
+export const COST_METHODS = ['cash', 'bank_transfer', 'pos_card', 'account'];
 export async function listCouriers() {
   const doc = await (await store('config')).get('couriers');
   return doc?.couriers?.length ? doc.couriers : DEFAULT_COURIERS;
@@ -28,7 +33,7 @@ export async function saveCouriers(list) {
     const id = String(c.id || name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30);
     const t = c.trackingUrl ? String(c.trackingUrl).trim() : '';
     if (t && !(/^https:\/\/[^\s"'<>]+$/.test(t) && t.includes('{tracking}'))) fail(422, 'invalid', `Tracking link for ${name} must be an https URL containing {tracking}.`);
-    return { id, name, trackingUrl: t || null, active: c.active !== false };
+    return { id, name, kind: COURIER_KINDS.includes(c.kind) ? c.kind : 'courier', trackingUrl: t || null, active: c.active !== false };
   });
   if (new Set(out.map((c) => c.id)).size !== out.length) fail(422, 'invalid', 'Courier names must be unique.');
   await (await store('config')).set('couriers', { couriers: out });
@@ -75,7 +80,15 @@ export function updateShipmentDetails(order, b, couriers, by) {
   const day = (x, name) => (x === '' || x == null ? null : /^\d{4}-\d{2}-\d{2}$/.test(x) ? x : fail(422, 'invalid', `${name} must be a date.`));
   if ('eta' in b) s.eta = day(b.eta, 'Estimated delivery');
   if ('promisedBy' in b) s.promisedBy = day(b.promisedBy, 'Promised-by date');
-  s.events.push({ status: 'details_updated', at: now(), by, source: 'admin', note: [s.courier && `courier ${s.courier}`, s.trackingNumber && `tracking ${s.trackingNumber}`, s.eta && `ETA ${s.eta}`].filter(Boolean).join(' · ') });
+  // Booked dispatch rider: who is carrying it (so staff can call them).
+  if (b.rider) s.rider = { name: v.str(b.rider.name, { name: 'Rider name', max: 80, required: false }) || null, phone: v.str(b.rider.phone, { name: 'Rider phone', max: 30, required: false }) || null };
+  // What CNM paid for this delivery (paid manually to GIG or the rider), for delivery cost vs charge.
+  if (b.cost && b.cost.amount !== '' && b.cost.amount != null) {
+    const amount = Math.round(Number(b.cost.amount) * 100) / 100;
+    if (!(amount >= 0 && amount <= 5_000_000)) fail(422, 'invalid', 'Delivery cost must be an amount in naira.');
+    s.cost = { amount, method: v.oneOf(b.cost.method || 'cash', COST_METHODS, 'Paid by'), note: v.str(b.cost.note, { name: 'Cost note', max: 120, required: false }) || null, recordedBy: by, at: now() };
+  }
+  s.events.push({ status: 'details_updated', at: now(), by, source: 'admin', note: [s.courier && `courier ${s.courier}`, s.trackingNumber && `tracking ${s.trackingNumber}`, s.rider?.name && `rider ${s.rider.name}`, s.eta && `ETA ${s.eta}`, s.cost && `cost ₦${s.cost.amount.toLocaleString('en-NG')} (${s.cost.method.replace(/_/g, ' ')})`].filter(Boolean).join(' · ') });
   return s;
 }
 
@@ -189,7 +202,16 @@ export const RETURN_REASONS = ['damaged', 'wrong_item', 'not_as_described', 'cha
 const RETURN_NEXT = { requested: ['approved', 'rejected'], approved: ['received', 'rejected'], received: ['inspected'], inspected: ['refunded', 'exchanged', 'credited', 'rejected'], rejected: [], refunded: [], exchanged: [], credited: [] };
 export const returnNext = (s) => RETURN_NEXT[s] || [];
 
-export function createReturn(order, b, by) {
+/** How the return request sits against the returns policy (change of mind: N days; problems: report within N hours). */
+export function returnWindow(order, policy, at = Date.now()) {
+  const deliveredAt = order.shipment?.deliveredAt || order.history?.findLast?.((h) => h.status === 'delivered')?.at || null;
+  if (!deliveredAt || !policy) return { deliveredAt, days: null, changeOfMindDays: policy?.changeOfMindDays ?? null, reportProblemHours: policy?.reportProblemHours ?? null };
+  const hours = (at - Date.parse(deliveredAt)) / 36e5;
+  return { deliveredAt, days: Math.floor(hours / 24), hours: Math.floor(hours), changeOfMindDays: policy.changeOfMindDays, reportProblemHours: policy.reportProblemHours,
+    changeOfMindOpen: hours <= policy.changeOfMindDays * 24, problemOpen: hours <= policy.reportProblemHours };
+}
+
+export function createReturn(order, b, by, policy = null) {
   if (!['delivered', 'dispatched', 'returned'].includes(order.status)) fail(422, 'transition', 'Returns can be opened once an order has been dispatched or delivered.');
   const kind = v.oneOf(b.kind || 'refund', ['refund', 'exchange', 'store_credit'], 'Resolution');
   const reason = v.oneOf(b.reason, RETURN_REASONS, 'Reason');
@@ -203,8 +225,17 @@ export function createReturn(order, b, by) {
     if (!(qty > 0) || qty > ol.qty - (already[ol.id] || 0)) fail(422, 'invalid', `You can return at most ${ol.qty - (already[ol.id] || 0)} × ${ol.name}.`);
     return { id: ol.id, name: ol.name, qty, unitPrice: ol.unitPrice, value: r2(ol.unitPrice * qty) };
   });
+  // Returns policy: outside the window a manager may still accept it, but must say why (recorded on the return).
+  const w = returnWindow(order, policy);
+  const late = w.days != null && (reason === 'changed_mind' ? !w.changeOfMindOpen : !w.problemOpen);
+  if (late && !b.override) {
+    fail(422, 'outside_policy', reason === 'changed_mind'
+      ? `This is outside the ${w.changeOfMindDays}-day change-of-mind window (delivered ${w.days} days ago). Tick “Accept outside the policy” and give a reason to continue.`
+      : `Problems should be reported within ${w.reportProblemHours} hours (delivered ${w.hours} hours ago). Tick “Accept outside the policy” and give a reason to continue.`);
+  }
+  if (late && !(String(b.note || '').trim().length >= 3)) fail(422, 'outside_policy', 'Give a reason for accepting a return outside the policy.');
   const n = (order.returns || []).length + 1;
-  const rt = { rma: `RMA-${order.number.slice(4)}-${n}`, status: 'requested', kind, reason, note: v.str(b.note, { name: 'Note', max: 500, required: false }) || '', lines, value: r2(lines.reduce((s, l) => s + l.value, 0)), createdAt: now(), createdBy: by, history: [{ status: 'requested', at: now(), by }] };
+  const rt = { rma: `RMA-${order.number.slice(4)}-${n}`, status: 'requested', kind, reason, ...(late ? { outsidePolicy: true } : {}), note: v.str(b.note, { name: 'Note', max: 500, required: false }) || '', lines, value: r2(lines.reduce((s, l) => s + l.value, 0)), createdAt: now(), createdBy: by, history: [{ status: 'requested', at: now(), by }] };
   order.returns = [...(order.returns || []), rt];
   return rt;
 }
@@ -290,6 +321,10 @@ export function deliveryStats(orders, couriers) {
     avgHours: hours.length ? Math.round(hours.reduce((s, h) => s + h, 0) / hours.length) : null,
     p90Hours: hours.length ? Math.round(hours[Math.min(hours.length - 1, Math.floor(hours.length * 0.9))]) : null,
     openExceptions: orders.filter(hasOpenException).length,
+    // Delivery economics: what customers paid for delivery vs what CNM paid couriers/riders (where recorded).
+    costRecorded: shipped.filter((o) => o.shipment.cost).length,
+    deliveryCost: r2(shipped.reduce((sum, o) => sum + (o.shipment.cost?.amount || 0), 0)),
+    deliveryCharged: r2(shipped.filter((o) => o.shipment.cost).reduce((sum, o) => sum + (o.totals.delivery || 0), 0)),
     byCourier: group((o) => o.shipment.courier || 'unassigned', (k) => couriers.find((c) => c.id === k)?.name || 'Not set'),
     byState: group((o) => orderLocation(o), (k) => k),
   };

@@ -55,7 +55,7 @@ function sellerFor(o, companies) {
   };
 }
 
-function detail(o, all, couriers, admin, cfg, companies = []) {
+function detail(o, all, couriers, admin, cfg, companies = [], returnsPolicy = null) {
   const { accessToken, ...safe } = o;
   void accessToken;
   const courier = couriers.find((c) => c.id === o.shipment?.courier);
@@ -71,7 +71,7 @@ function detail(o, all, couriers, admin, cfg, companies = []) {
       cancel: ['pending_payment', 'payment_failed'].includes(o.status) || (MONEY_ROLES.includes(admin.role) && ['paid', 'processing'].includes(o.status) && !['handed_over', 'in_transit', 'out_for_delivery'].includes(o.shipment?.status)),
       returns: ['dispatched', 'delivered', 'returned'].includes(o.status), returnNext: Object.fromEntries((o.returns || []).map((r) => [r.rma, OPS.returnNext(r.status)])),
     },
-    refundApprovalThreshold: cfg.refundApprovalThreshold,
+    refundApprovalThreshold: cfg.refundApprovalThreshold, returnWindow: OPS.returnWindow(o, returnsPolicy),
     invoiceNumber: `INV-${o.number.slice(4)}`, seller: sellerFor(o, companies),
     pickupStore: OPS.pickupStore(o) ? { name: OPS.pickupStore(o).name, address: `${OPS.pickupStore(o).address}, ${OPS.pickupStore(o).city}` } : null,
     paymentMethods: PAYMENT_METHODS.map(({ id, label }) => ({ id, label })),
@@ -160,7 +160,7 @@ export default handler(async (req, context) => {
   const order = await getOrder(number);
   if (!order || !inScope(order)) fail(404, 'not_found', 'Order not found.');
   const all = async () => (await listOrders()).filter(inScope);
-  const respond = async (status = 200) => json(detail(order, await all(), couriers, admin, cfg, companies), status);
+  const respond = async (status = 200) => json(detail(order, await all(), couriers, admin, cfg, companies, (await commerce()).returns), status);
   const by = admin.email;
 
   if (req.method === 'GET' && !sub) return respond();
@@ -263,7 +263,7 @@ export default handler(async (req, context) => {
         if (r.body.refund?.status === 'failed') fail(502, 'refund_failed', `The payment provider rejected the refund: ${r.body.refund.error}`);
         const fresh = await getOrder(number);
         Object.assign(order, fresh);
-        return json({ ...detail(order, await all(), couriers, admin, cfg, companies), refund: r.body.refund, replayed: !!r.replayed }, 201);
+        return json({ ...detail(order, await all(), couriers, admin, cfg, companies, (await commerce()).returns), refund: r.body.refund, replayed: !!r.replayed }, 201);
       }
       if (req.method === 'POST' && subId && ['approve', 'reject'].includes(op)) {
         const rf = (order.refunds || []).find((x) => x.id === subId);
@@ -288,12 +288,12 @@ export default handler(async (req, context) => {
     case 'returns': {
       if (req.method === 'POST' && !subId) {
         const r = await idempotent(req, `${by}:return:${number}`, b, async () => {
-          const rt = OPS.createReturn(order, b, by);
+          const rt = OPS.createReturn(order, b, by, (await commerce()).returns);
           await saveOrder(order); await audit('return.create', { number, rma: rt.rma, kind: rt.kind, reason: rt.reason, value: rt.value });
           return { status: 201, body: { rma: rt.rma } };
         });
         Object.assign(order, await getOrder(number));
-        return json({ ...detail(order, await all(), couriers, admin, cfg, companies), rma: r.body.rma }, 201);
+        return json({ ...detail(order, await all(), couriers, admin, cfg, companies, (await commerce()).returns), rma: r.body.rma }, 201);
       }
       if (req.method === 'POST' && subId) {
         const status = v.oneOf(b.status, ['approved', 'rejected', 'received', 'inspected', 'exchanged', 'credited'], 'Return status');

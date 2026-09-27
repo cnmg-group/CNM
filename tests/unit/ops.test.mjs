@@ -11,7 +11,7 @@ process.env.CNM_LOCAL_STORE = '1';
 process.env.CNM_DATA_DIR = mkdtempSync(path.join(tmpdir(), 'cnm-ops-'));
 process.env.SESSION_SECRET = 'test-secret';
 process.env.PAYSTACK_SECRET_KEY = '';
-process.env.COURIER_WEBHOOK_SECRET_IN_HOUSE = 'wh-secret';
+process.env.COURIER_WEBHOOK_SECRET_GIG = 'wh-secret';
 
 const fn = {};
 let hash;
@@ -74,7 +74,7 @@ test('fulfilment: pack → courier → hand over → failed attempt (exception) 
   assert.equal(d.data.order.status, 'processing');
   assert.equal((await call('ops', 'POST', `/api/ops/orders/${n}/shipment`, { cookie: ship, body: { status: 'handed_over' } })).status, 422, 'courier required first');
   assert.equal((await call('ops', 'POST', `/api/ops/orders/${n}/shipment`, { cookie: ship, body: { status: 'delivered' } })).status, 422, 'no skipping steps');
-  await call('ops', 'PATCH', `/api/ops/orders/${n}/shipment`, { cookie: ship, body: { courier: 'in-house', trackingNumber: 'RIDER-001', eta: '2026-10-01', promisedBy: '2026-10-02' } });
+  await call('ops', 'PATCH', `/api/ops/orders/${n}/shipment`, { cookie: ship, body: { courier: 'gig', trackingNumber: 'GIG-001', eta: '2026-10-01', promisedBy: '2026-10-02' } });
   d = await call('ops', 'POST', `/api/ops/orders/${n}/shipment`, { cookie: ship, body: { status: 'handed_over' } });
   assert.equal(d.data.order.status, 'dispatched');
   assert.equal((await call('ops', 'PATCH', `/api/ops/orders/${n}/address`, { cookie: ship, body: { address: { line1: 'x', city: 'y', state: 'Lagos' } } })).status, 422, 'address locked once with the courier');
@@ -133,7 +133,7 @@ test('returns: RMA → approve → receive → inspect (restock) → refund comp
   const ship = await login('ship@cnm.test', 'dispatch-pass-1');
   const n = await paidOrder([{ id: 'petalrich-room-spray', qty: 2 }]);
   assert.equal((await call('ops', 'POST', `/api/ops/orders/${n}/returns`, { cookie: m1, body: { reason: 'damaged', lines: [{ id: 'petalrich-room-spray', qty: 1 }] } })).status, 422, 'not before dispatch');
-  await call('ops', 'PATCH', `/api/ops/orders/${n}/shipment`, { cookie: ship, body: { courier: 'in-house' } });
+  await call('ops', 'PATCH', `/api/ops/orders/${n}/shipment`, { cookie: ship, body: { courier: 'rider' } });
   for (const s of ['packed', 'handed_over', 'delivered']) await call('ops', 'POST', `/api/ops/orders/${n}/shipment`, { cookie: ship, body: { status: s } });
   assert.equal((await call('ops', 'POST', `/api/ops/orders/${n}/returns`, { cookie: m1, body: { reason: 'damaged', lines: [{ id: 'petalrich-room-spray', qty: 3 }] } })).status, 422, 'cannot return more than bought');
   const rt = await call('ops', 'POST', `/api/ops/orders/${n}/returns`, { cookie: m1, body: { kind: 'refund', reason: 'damaged', note: 'Cap cracked', lines: [{ id: 'petalrich-room-spray', qty: 1 }] }, headers: { 'idempotency-key': 'rma-create-0001' } });
@@ -192,8 +192,8 @@ test('manual orders (paid, unpaid → mark paid), cancellations with refund and 
 test('courier webhook: signature, idempotency, forward jumps; staff notes, address edit; company scope', async () => {
   const ship = await login('ship@cnm.test', 'dispatch-pass-1');
   const n = await paidOrder();
-  await call('ops', 'PATCH', `/api/ops/orders/${n}/shipment`, { cookie: ship, body: { courier: 'in-house', trackingNumber: 'TRK-555' } });
-  const post = (payload, secret = 'wh-secret') => { const raw = JSON.stringify(payload); return call('courier-webhook', 'POST', '/api/couriers/in-house/webhook', { raw, headers: { 'x-cnm-signature': createHmac('sha256', secret).update(raw).digest('hex') } }); };
+  await call('ops', 'PATCH', `/api/ops/orders/${n}/shipment`, { cookie: ship, body: { courier: 'gig', trackingNumber: 'TRK-555' } });
+  const post = (payload, secret = 'wh-secret') => { const raw = JSON.stringify(payload); return call('courier-webhook', 'POST', '/api/couriers/gig/webhook', { raw, headers: { 'x-cnm-signature': createHmac('sha256', secret).update(raw).digest('hex') } }); };
   assert.equal((await post({ event_id: 'e1', tracking_number: 'TRK-555', status: 'in_transit' }, 'wrong')).status, 401);
   const r = await post({ event_id: 'e1', tracking_number: 'TRK-555', status: 'in_transit', note: 'Left hub' });
   assert.equal(r.status, 200);
@@ -219,4 +219,53 @@ test('courier webhook: signature, idempotency, forward jumps; staff notes, addre
   const owner = await login('admin@cnm.local', 'cnm-local-admin');
   const actions = (await call('admin', 'GET', '/api/admin/audit', { cookie: owner })).data.entries.map((x) => x.action);
   for (const a of ['shipment.status', 'refund.approve', 'return.create', 'order.manual', 'order.cancel', 'shipment.webhook', 'order.address', 'order.note']) assert.ok(actions.includes(a), a);
+});
+
+test('couriers: GIG waybill or a booked dispatch rider (name, phone, what CNM paid); delivery cost vs charge', async () => {
+  const { DEFAULT_COURIERS, deliveryStats } = await import('../../netlify/lib/ops.mjs');
+  assert.deepEqual(DEFAULT_COURIERS.map((c) => [c.id, c.kind]), [['gig', 'courier'], ['rider', 'rider'], ['pickup', 'pickup']]);
+  const m1 = await login('m1@cnm.test', 'manager-one-pass');
+  const n = await paidOrder();
+  await call('ops', 'POST', `/api/ops/orders/${n}/shipment`, { cookie: m1, body: { status: 'packed' } });
+  const r = await call('ops', 'PATCH', `/api/ops/orders/${n}/shipment`, { cookie: m1, body: { courier: 'rider', rider: { name: 'Tunde', phone: '08031234567' }, cost: { amount: 2500, method: 'cash' } } });
+  assert.equal(r.status, 200);
+  const s = r.data.order.shipment;
+  assert.deepEqual(s.rider, { name: 'Tunde', phone: '08031234567' });
+  assert.equal(s.cost.amount, 2500);
+  assert.equal(s.cost.method, 'cash');
+  assert.equal(s.cost.recordedBy, 'm1@cnm.test');
+  assert.match(s.events.at(-1).note, /rider Tunde/);
+  assert.equal((await call('ops', 'PATCH', `/api/ops/orders/${n}/shipment`, { cookie: m1, body: { cost: { amount: -5 } } })).status, 422, 'no negative costs');
+  assert.equal((await call('ops', 'PATCH', `/api/ops/orders/${n}/shipment`, { cookie: m1, body: { cost: { amount: 100, method: 'crypto' } } })).status, 422, 'known payment methods only');
+  const stats = deliveryStats([{ ...r.data.order, status: 'dispatched' }]);
+  assert.equal(stats.costRecorded, 1);
+  assert.equal(stats.deliveryCost, 2500);
+});
+
+test('returns policy: change of mind within 7 days, problems within 48 hours; outside needs an override with a reason', async () => {
+  const { returnWindow, createReturn } = await import('../../netlify/lib/ops.mjs');
+  const policy = { changeOfMindDays: 7, reportProblemHours: 48 };
+  const day = 864e5;
+  const t0 = Date.parse('2026-09-01T10:00:00Z');
+  const order = { number: 'CNM-260901-0001', status: 'delivered', shipment: { deliveredAt: new Date(t0).toISOString() }, returns: [], lines: [{ id: 'x', name: 'Spray', qty: 2, unitPrice: 10000 }] };
+  const w = returnWindow(order, policy, t0 + 3 * day);
+  assert.equal(w.changeOfMindOpen, true);
+  assert.equal(w.problemOpen, false, 'damage must be reported within 48 hours');
+  const lines = [{ id: 'x', qty: 1 }];
+  const at = (ms, fn) => { const real = Date.now; Date.now = () => ms; try { return fn(); } finally { Date.now = real; } };
+  assert.equal(at(t0 + 3 * day, () => createReturn(order, { reason: 'changed_mind', lines }, 'm', policy)).outsidePolicy, undefined);
+  assert.throws(() => at(t0 + 10 * day, () => createReturn(order, { reason: 'changed_mind', lines }, 'm', policy)), (e) => e.code === 'outside_policy');
+  assert.throws(() => at(t0 + 10 * day, () => createReturn(order, { reason: 'changed_mind', lines, override: true }, 'm', policy)), (e) => e.code === 'outside_policy', 'override needs a reason');
+  const late = at(t0 + 10 * day, () => createReturn(order, { reason: 'changed_mind', lines, override: true, note: 'Loyal customer, sealed box' }, 'm', policy));
+  assert.equal(late.outsidePolicy, true);
+});
+
+test('companies: legal details for invoices are validated, never invented', async () => {
+  const { validateCompany } = await import('../../netlify/lib/companies.mjs');
+  assert.equal(validateCompany({ rcNumber: 'rc-1234567' }, { creating: false }).rcNumber, 'RC 1234567');
+  assert.equal(validateCompany({ rcNumber: '' }, { creating: false }).rcNumber, null);
+  assert.equal(validateCompany({ taxId: '12345678-0001' }, { creating: false }).taxId, '12345678-0001');
+  assert.throws(() => validateCompany({ rcNumber: 'pending' }, { creating: false }));
+  assert.throws(() => validateCompany({ taxId: 'abc' }, { creating: false }));
+  assert.equal(validateCompany({}, { creating: false }).rcNumber, undefined, 'untouched fields stay unset');
 });

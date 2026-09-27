@@ -197,10 +197,15 @@ test('admin: sign in, dashboard, move an order to processing', async ({ page, re
   await expect(page.locator('.os-title')).toContainText(r.order.number);
   await page.click('[data-ship-to="packed"]');
   await expect(page.locator('[data-ship] .os-ship')).toHaveText('Packed');
-  await page.selectOption('[data-ship-details] select[name="courier"]', 'in-house');
-  await page.fill('[data-ship-details] input[name="trackingNumber"]', 'RIDER-42');
+  // A dispatch rider booked for this delivery: no waybill, just who is carrying it and what CNM paid them
+  await page.selectOption('[data-ship-details] select[name="courier"]', 'rider');
+  await expect(page.locator('[data-ship-details] input[name="trackingNumber"]')).toBeHidden();
+  await page.fill('[data-ship-details] input[name="riderName"]', 'Tunde');
+  await page.fill('[data-ship-details] input[name="riderPhone"]', '08031234567');
+  await page.fill('[data-ship-details] input[name="costAmount"]', '2500');
   await page.click('[data-ship-details] button[type="submit"]');
   await expect(page.locator('[data-flash]')).toContainText('Delivery details saved');
+  await expect(page.locator('.os-note-line', { hasText: 'Rider:' })).toContainText('Rider: Tunde');
   await page.click('[data-ship-to="handed_over"]');
   await expect(page.locator('.os-title .pill')).toHaveText('dispatched');
   await page.click('[data-ship-to="delivered"]');

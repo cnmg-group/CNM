@@ -97,3 +97,10 @@ Full specification: [docs/ADMIN-OS-SPEC.md](docs/ADMIN-OS-SPEC.md). Target relat
 | Catalogue editor, multi-location stock, finance, customers & growth, 2FA, notifications, risk | SPECIFIED (see delivery plan §25) |
 
 Local demo data for review: `npm run seed:demo -- /path/to/dir`, then start the dev server with `CNM_DATA_DIR` set to that directory. It refuses to run outside local development.
+
+## Couriers, legal details and returns policy (CNM decisions 1–4)
+
+1. **Couriers:** GIG Logistics (waybill number) and a dispatch rider booked per delivery (rider name + phone, paid manually). Each shipment records what CNM paid (cash, bank transfer, POS, courier account); the order page and fulfilment board show delivery cost vs what the customer paid. Collected in store stays as the pickup option.
+2. **Refund approval threshold:** kept at ₦100,000 (owner can change it under Couriers & refunds).
+3. **RC number / TIN:** editable per company (Companies → Edit → Legal details for invoices), validated and printed on invoices once entered. Left blank — never invented. **NEEDS CNM:** the values from the CAC certificate and FIRS.
+4. **Returns policy:** drafted in `content/commerce.json` (7 days change of mind for unopened items, 48 hours to report damaged/wrong items, refund within 5 business days, non-returnable list), shown on `/delivery-returns/` marked NEEDS CNM APPROVAL, and enforced when staff open a return (outside the window needs a manager override with a reason).

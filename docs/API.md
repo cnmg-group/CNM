@@ -117,4 +117,4 @@ Admin session + `X-CNM-Request` header, like `/api/admin/*`. Any role with order
 
 ### Courier webhook — `POST /api/couriers/:courier/webhook`
 
-Header `X-CNM-Signature` = hex HMAC-SHA256 of the raw body with `COURIER_WEBHOOK_SECRET_<COURIER_ID>` (e.g. `COURIER_WEBHOOK_SECRET_IN_HOUSE`). Body `{ event_id, order_number | tracking_number, status, at?, note?, recipient?, eta? }`. The same `event_id` is only applied once, and couriers may skip forward stages.
+Header `X-CNM-Signature` = hex HMAC-SHA256 of the raw body with `COURIER_WEBHOOK_SECRET_<COURIER_ID>` (e.g. `COURIER_WEBHOOK_SECRET_GIG`). Body `{ event_id, order_number | tracking_number, status, at?, note?, recipient?, eta? }`. The same `event_id` is only applied once, and couriers may skip forward stages.

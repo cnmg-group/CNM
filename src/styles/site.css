@@ -1674,3 +1674,7 @@ body:has(.site-header.is-hidden) .toolbar { top: var(--header-offset, 0px); }
 /* CNMWorX's pillar strip is dark: its tagline and icons use the bright brand orange there. */
 body[data-site="cnmworx"] .co-pillars { --c-em: var(--c-brand, #d9921c); }
 :root[data-theme="dark"] body[data-site="cnmworx"] .co-pillars { --c-em: #e4a23a; }
+
+/* Returns policy (info page) */
+.policy__h { font-size: 1rem; font-weight: 600; margin-top: .5rem; }
+.policy__list { padding-left: 1.2rem; list-style: disc; display: grid; gap: .35rem; color: var(--ink-2); }

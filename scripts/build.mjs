@@ -181,10 +181,18 @@ for (const [site, pagesOf] of [['spectra', spectraPages], ['cnmworx', cnmworxPag
 
 // Info pages
 const pendingSection = (title, what) => `<section class="stack"><h2 class="h3">${title}</h2>${approval(what)}</section>`;
+// Returns policy: drafted in content/commerce.json and enforced in the admin returns flow; shown as a draft until CNM approves it.
+const returnsSection = (r) => (r && typeof r === 'object' ? `<section class="stack"><h2 class="h3">Returns &amp; exchanges</h2>
+    ${r.status !== 'APPROVED' ? approval(`Draft returns policy (${r.changeOfMindDays} days change of mind, ${r.reportProblemHours} hours to report a problem, refund within ${r.refundBusinessDays} business days). Confirm the wording and time limits before launch.`) : ''}
+    <h3 class="policy__h">Damaged, faulty or wrong item</h3><p>${r.problem}</p>
+    <h3 class="policy__h">Change of mind</h3><p>${r.changeOfMind}</p>
+    <h3 class="policy__h">What we can’t take back</h3><ul class="policy__list">${r.nonReturnable.map((x) => `<li>${x}</li>`).join('')}</ul>
+    <h3 class="policy__h">Refunds</h3><p>${r.refunds}</p>
+    <h3 class="policy__h">How to start a return</h3><p>${r.howTo}</p></section>` : pendingSection('Returns', 'Returns and exchanges policy.'));
 const info = [
   { path: '/delivery-returns/', title: 'Delivery & returns', sections: [
     `<section class="stack"><h2 class="h3">Delivery options</h2><table class="table"><thead><tr><th>Method</th><th>Timing</th><th>Fee</th></tr></thead><tbody>${content.commerce.deliveryMethods.map((d) => `<tr><td>${d.label}</td><td>${d.eta}</td><td>${d.fee ? `₦${d.fee.toLocaleString('en-NG')}` : 'Free'}${d.freeOver ? ` · free over ₦${d.freeOver.toLocaleString('en-NG')}` : ''}</td></tr>`).join('')}</tbody></table>${approval('Delivery methods, fees and timings above are staging values.')}</section>`,
-    pendingSection('Returns', 'Returns and exchanges policy.'),
+    returnsSection(content.commerce.returns),
   ] },
   { path: '/faqs/', title: 'FAQs', sections: [pendingSection('Orders & delivery', 'Customer FAQs.'), pendingSection('Products', 'Product FAQs (usage, safety, refills).')] },
   { path: '/essentials/contact/', title: 'Contact', intro: 'We’re here to help with orders, products and services.', sections: [

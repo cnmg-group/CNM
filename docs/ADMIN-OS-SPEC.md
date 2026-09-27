@@ -242,7 +242,7 @@ awaiting fulfilment → packed → handed over → in transit → out for delive
 
 Also: failed attempt, rescheduled, returned to sender, lost.
 
-- **Courier integrations** (adapter interface like `payments/`): GIG Logistics, DHL, Kwik, Sendbox, in-house riders.
+- **Courier integrations** (adapter interface like `payments/`): GIG Logistics and dispatch riders booked per delivery (paid manually, cost recorded per shipment) are live; DHL, Kwik, Sendbox can be added later.
   - Create waybill, get label, track.
   - Status webhooks are signature-verified and written to `shipment_events`.
 - **Tracking:** tracking number and link, ETA, promised-by date, attempts, proof of delivery (photo, signature, recipient, GPS).

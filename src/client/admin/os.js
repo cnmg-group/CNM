@@ -237,6 +237,7 @@ export async function companiesView(v, ctx, flash) {
       <div><dt>Payments</dt><dd>${c.paymentMethods.map((p) => e(PAY[p] || p)).join(', ') || '<span class="muted">None</span>'}</dd></div>
       <div><dt>Delivery</dt><dd>${c.deliveryOptions.map((p) => e(DEL[p] || p)).join(', ') || '<span class="muted">None</span>'}</dd></div>
       <div><dt>Company admins</dt><dd>${c.admins.length ? c.admins.map((a) => e(a)).join(', ') : '<span class="muted">Group admins only</span>'}</dd></div>
+      <div><dt>Legal (invoices)</dt><dd>${c.legalName || c.rcNumber || c.taxId ? [c.legalName, c.rcNumber, c.taxId && `TIN ${c.taxId}`].filter(Boolean).map(e).join(' · ') : '<span class="muted">Not entered yet</span>'}</dd></div>
     </dl>
     <footer><a class="os-btn os-btn--ghost" href="#command?company=${e(c.id)}">Open dashboard</a>${canManage ? `<button class="os-btn os-btn--ghost" type="button" data-edit="${e(c.id)}">Edit</button><button class="os-btn os-btn--quiet" type="button" data-archive="${e(c.id)}" data-to="${c.status === 'archived' ? 'active' : 'archived'}">${c.status === 'archived' ? 'Restore' : 'Archive'}</button>` : ''}</footer>
   </article>`).join('') || '<p class="os-empty">No companies here.</p>'}</div>
@@ -256,6 +257,11 @@ export async function companiesView(v, ctx, flash) {
         <label>Brand colour<span class="os-color"><input type="color" value="${e(c?.color || '#16161a')}" data-color-pick><input name="color" value="${e(c?.color || '#16161a')}" pattern="#[0-9a-fA-F]{6}" required></span></label>
         <label>Logo <small>(/assets/… path or https URL, upload in Media)</small><input name="logo" value="${e(c?.logo || '')}" placeholder="/assets/brand/…"></label>
       </div>
+      <fieldset class="os-checks os-legal"><legend>Legal details for invoices</legend>
+        <label>Registered company name<input name="legalName" maxlength="120" value="${e(c?.legalName || '')}" placeholder="As registered with CAC"></label>
+        <label>RC number<input name="rcNumber" maxlength="20" value="${e(c?.rcNumber || '')}" placeholder="RC 1234567"></label>
+        <label>Tax ID (TIN)<input name="taxId" maxlength="20" value="${e(c?.taxId || '')}" placeholder="12345678-0001"></label>
+        <small class="muted">Shown on invoices when filled in. Copy them exactly from the CAC certificate and FIRS records.</small></fieldset>
       ${box('paymentMethods', PAY, c?.paymentMethods)}
       ${box('deliveryOptions', DEL, c?.deliveryOptions)}
       <label>Domains <small>(one per line)</small><textarea name="domains" rows="2" placeholder="cnmenergy.com">${e((c?.domains || []).join('\n'))}</textarea></label>
@@ -271,7 +277,7 @@ export async function companiesView(v, ctx, flash) {
       ev.preventDefault();
       const fd = new FormData(form);
       const lines = (s) => String(s || '').split('\n').map((x) => x.trim()).filter(Boolean);
-      const body = { name: fd.get('name'), kind: fd.get('kind'), currency: fd.get('currency'), color: fd.get('color'), logo: fd.get('logo') || '', paymentMethods: fd.getAll('paymentMethods'), deliveryOptions: fd.getAll('deliveryOptions'), domains: lines(fd.get('domains')), admins: lines(fd.get('admins')) };
+      const body = { name: fd.get('name'), kind: fd.get('kind'), currency: fd.get('currency'), color: fd.get('color'), logo: fd.get('logo') || '', paymentMethods: fd.getAll('paymentMethods'), deliveryOptions: fd.getAll('deliveryOptions'), domains: lines(fd.get('domains')), admins: lines(fd.get('admins')), legalName: fd.get('legalName') || '', rcNumber: fd.get('rcNumber') || '', taxId: fd.get('taxId') || '' };
       if (!c && fd.get('id')) body.id = fd.get('id');
       const btn = form.querySelector('[type=submit]');
       btn.disabled = true;
