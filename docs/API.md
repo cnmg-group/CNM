@@ -80,7 +80,12 @@ Order statuses: `pending_payment → paid → processing → dispatched → deli
 
 Separate `cnm_admin` cookie. Roles: `owner` (everything), `manager` (catalogue, content, orders, customers, discounts), `fulfilment` (orders only), `editor` (content, SEO, stores). Admin users are defined in the `ADMIN_USERS` env var (see `.env.example`); add `"companies": ["spectra"]` to an entry to limit that person to specific companies. Full platform spec: [ADMIN-OS-SPEC.md](ADMIN-OS-SPEC.md).
 
-- `POST /api/admin/login`, `POST /api/admin/logout`, `GET /api/admin/me`
+- Sign-in, in order (each step needs the previous one; a short-lived signed `cnm_admin_step` cookie carries progress and grants nothing by itself):
+  1. `POST /api/admin/login` `{ email, password }` → emails a 6-digit code (10 minutes) → `{ step: "otp", email (masked) }`
+  2. `POST /api/admin/login/otp` `{ code }` → `{ step: "pin" }` (5 tries, then start again); `POST /api/admin/login/resend` sends a new code (30 s apart)
+  3. `POST /api/admin/login/pin` `{ pin }` → sets the `cnm_admin` session (12 h) → `{ admin }` (5 tries, then start again)
+  Every success and failure is written to the audit log. Without email configured a deployed site refuses to sign in (`email_not_configured`) rather than skip the code.
+- `POST /api/admin/logout`, `GET /api/admin/me`
 - `GET /api/admin/dashboard`
 - `GET /api/admin/command?from=YYYY-MM-DD&to=YYYY-MM-DD&compare=previous|year|none&company=all|<id>&location=all|<state>&channel=all|web|app|manual|pos`: CNM Group OS Command Center (KPIs with deltas, ops, attention, series, per-company roll-up, locations, channels, top sellers/viewed/trending, low stock, live feed). Company-scoped admins get only their companies; others return 403.
 - `GET /api/admin/pulse`: live-update change stamp (poll every ~20 s; refetch `command` when it changes).

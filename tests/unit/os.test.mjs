@@ -1,6 +1,7 @@
 // CNM Group OS: Command Center metrics (pure) and the companies / command / pulse admin APIs.
 import { test, before } from 'node:test';
 import assert from 'node:assert/strict';
+import { adminLogin, TEST_PIN } from './admin-login.mjs';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -108,7 +109,7 @@ const call = async (method, p, { body, cookie, headers = {} } = {}) => {
 };
 
 test('api: command center, pulse, companies CRUD with idempotency, archive, audit and RBAC', async () => {
-  const { cookie } = await call('POST', '/api/admin/login', { body: { email: 'admin@cnm.local', password: 'cnm-local-admin' } });
+  const { cookie } = await adminLogin((p, body, cookie) => call('POST', p, { body, cookie }), 'admin@cnm.local', 'cnm-local-admin');
   assert.ok(cookie);
   const me = await call('GET', '/api/admin/me', { cookie });
   assert.equal(me.data.admin.scope, null, 'owners see every company');
@@ -158,16 +159,16 @@ test('api: command center, pulse, companies CRUD with idempotency, archive, audi
   // RBAC: an editor can't manage companies or see the audit log
   const { hashPassword } = await import('../../netlify/lib/crypto.mjs');
   process.env.ADMIN_USERS = JSON.stringify([
-    { email: 'ed@cnm.test', role: 'editor', name: 'Ed', passwordHash: await hashPassword('editor-pass-123') },
-    { email: 'sp@cnm.test', role: 'manager', name: 'Spectra lead', companies: ['spectra'], passwordHash: await hashPassword('spectra-pass-123') },
+    { email: 'ed@cnm.test', role: 'editor', name: 'Ed', passwordHash: await hashPassword('editor-pass-123'), pinHash: await hashPassword(TEST_PIN) },
+    { email: 'sp@cnm.test', role: 'manager', name: 'Spectra lead', companies: ['spectra'], passwordHash: await hashPassword('spectra-pass-123'), pinHash: await hashPassword(TEST_PIN) },
   ]);
-  const ed = await call('POST', '/api/admin/login', { body: { email: 'ed@cnm.test', password: 'editor-pass-123' } });
+  const ed = await adminLogin((p, body, cookie) => call('POST', p, { body, cookie }), 'ed@cnm.test', 'editor-pass-123');
   assert.ok(ed.cookie, 'editor signs in');
   assert.equal((await call('POST', '/api/admin/companies', { cookie: ed.cookie, body: { name: 'Nope Ltd' } })).status, 403);
   assert.equal((await call('GET', '/api/admin/audit', { cookie: ed.cookie })).status, 403);
   assert.equal((await call('GET', '/api/admin/command', { cookie: ed.cookie })).status, 200);
   // A company-scoped manager only ever sees their own company
-  const sp = await call('POST', '/api/admin/login', { body: { email: 'sp@cnm.test', password: 'spectra-pass-123' } });
+  const sp = await adminLogin((p, body, cookie) => call('POST', p, { body, cookie }), 'sp@cnm.test', 'spectra-pass-123');
   assert.deepEqual((await call('GET', '/api/admin/me', { cookie: sp.cookie })).data.admin.scope, ['spectra']);
   const spc = await call('GET', '/api/admin/command', { cookie: sp.cookie });
   assert.deepEqual(spc.data.byCompany.map((c) => c.id), ['spectra']);

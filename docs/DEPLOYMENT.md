@@ -6,7 +6,8 @@
 2. Branch: `claude/cnm-essentials-platform-s0u4wq` (or `main` once merged). The root `netlify.toml` already sets base `cnm-essentials`, build `npm ci && npm run build`, publish `dist` and functions `netlify/functions`.
 3. Site name, e.g. `cnm-essentials-staging`. The URL is `https://cnmgg.netlify.app`.
 4. Environment variables (see `.env.example`). The minimum for a fully interactive staging site:
-   - `ADMIN_STAGING_PASSWORD`: lets you sign in to `/admin/` as `staging@cnmessentials.com`
+   - `ADMIN_STAGING_PASSWORD` + `ADMIN_STAGING_PIN`: lets you sign in to `/admin/` as `staging@cnmessentials.com`
+   - Admin sign-in always goes email + password → code emailed to the admin → PIN, so `RESEND_API_KEY` must be set (with `EMAIL_FROM` on a domain verified in Resend, or codes only reach the Resend account owner)
    - optional: `SESSION_SECRET`, `RESEND_API_KEY` + `EMAIL_FROM`, `CNM_NOTIFY_EMAIL`, `GA_MEASUREMENT_ID`
    - leave `PAYSTACK_SECRET_KEY` empty to use the payment simulator (no real money)
 5. Deploy. Staging is always noindexed (`robots.txt` Disallow, `X-Robots-Tag` and meta robots) and shows the staging banner.
@@ -29,7 +30,7 @@ npm run dev   # review at http://localhost:8888, then commit and push
 ## 3. Production (only after CNM's final approval)
 
 1. Replace demo content (see `docs/CONTENT-APPROVAL.md`). Approve prices in **Admin → Products & inventory** (tick "Price approved") so Product offers and the Merchant feed include them.
-2. Set production environment variables: `CNM_LAUNCH_APPROVED=true`, `SITE_URL=https://www.cnmgroup.com`, `SESSION_SECRET`, `PAYSTACK_SECRET_KEY` (live), `RESEND_API_KEY`, `EMAIL_FROM`, `ADMIN_USERS` (hash passwords with `node scripts/hash-password.mjs`), `GA_MEASUREMENT_ID`. Remove `ADMIN_STAGING_PASSWORD`.
+2. Set production environment variables: `CNM_LAUNCH_APPROVED=true`, `SITE_URL=https://www.cnmgroup.com`, `SESSION_SECRET`, `PAYSTACK_SECRET_KEY` (live), `RESEND_API_KEY`, `EMAIL_FROM`, `ADMIN_USERS` (hash passwords with `node scripts/hash-password.mjs` and PINs with `--pin`), `GA_MEASUREMENT_ID`. Remove `ADMIN_STAGING_PASSWORD`.
 3. In Paystack, set the webhook URL to `https://www.cnmgroup.com/api/payments/paystack-webhook`.
 4. **Domains.** One Netlify site serves every CNM website:
    - **Domain management → Add domain → cnmgroup.com** (primary, with `www`). Point DNS (Netlify DNS, or an A/ALIAS record plus a `www` CNAME) and let Netlify issue the TLS certificate. `/` is the CNM Group hub.

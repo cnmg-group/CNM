@@ -102,6 +102,10 @@ for (const vp of VIEWPORTS) {
       await page.fill('#ae', 'admin@cnm.local');
       await page.fill('#ap', 'cnm-local-admin');
       await page.click('[data-login] button');
+      await page.fill('#ac', (await page.locator('[data-dev-code]').textContent()).match(/(\d{6})/)[1]);
+      await page.click('[data-otp] button');
+      await page.fill('#apin', '246810');
+      await page.click('[data-pin] button');
       await page.waitForSelector('.admin__main h1');
     }
     await page.goto(`${BASE}${url}`, { waitUntil: 'networkidle' });

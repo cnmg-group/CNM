@@ -78,6 +78,20 @@ export async function issueAdminSession(req, admin) {
   return cookie(req, ADMIN_COOKIE, token, ADMIN_TTL, 'Strict');
 }
 export const clearAdminCookie = (req) => cookie(req, ADMIN_COOKIE, '', 0, 'Strict');
+
+// Admin sign-in is three steps: email + password → emailed code (OTP) → PIN. Between steps the browser holds a short-lived
+// signed "step" cookie saying which step it has reached; it never grants access to anything by itself.
+const ADMIN_STEP_COOKIE = 'cnm_admin_step';
+export const ADMIN_STEP_TTL = 60 * 10;
+export async function issueAdminStep(req, { email, stage, nonce }) {
+  const token = await sign({ typ: 'admin_step', email, stage, nonce, exp: Math.floor(Date.now() / 1000) + ADMIN_STEP_TTL });
+  return cookie(req, ADMIN_STEP_COOKIE, token, ADMIN_STEP_TTL, 'Strict');
+}
+export async function readAdminStep(req) {
+  const p = await verify(readCookie(req, ADMIN_STEP_COOKIE));
+  return p?.typ === 'admin_step' ? p : null;
+}
+export const clearAdminStep = (req) => cookie(req, ADMIN_STEP_COOKIE, '', 0, 'Strict');
 export async function currentAdmin(req) {
   const p = await verify(readCookie(req, ADMIN_COOKIE));
   return p?.typ === 'admin' ? p : null;

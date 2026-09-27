@@ -1,6 +1,7 @@
 // Integration tests: exercise the Netlify functions directly with the local store.
 import { test, before } from 'node:test';
 import assert from 'node:assert/strict';
+import { adminLogin, TEST_PIN } from './admin-login.mjs';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -115,8 +116,8 @@ test('payments: Paystack webhook signature is verified', async () => {
 test('admin: login, RBAC, order status transitions and notifications', async () => {
   assert.equal((await call('admin', 'GET', '/api/admin/dashboard')).status, 401);
   const { hashPassword } = await import('../../netlify/lib/crypto.mjs');
-  process.env.ADMIN_USERS = JSON.stringify([{ email: 'ops@cnm.test', name: 'Ops', role: 'fulfilment', passwordHash: await hashPassword('ops-password-1') }]);
-  const ops = await call('admin', 'POST', '/api/admin/login', { body: { email: 'ops@cnm.test', password: 'ops-password-1' } });
+  process.env.ADMIN_USERS = JSON.stringify([{ email: 'ops@cnm.test', name: 'Ops', role: 'fulfilment', passwordHash: await hashPassword('ops-password-1'), pinHash: await hashPassword(TEST_PIN) }]);
+  const ops = await adminLogin((p, body, cookie) => call('admin', 'POST', p, { body, cookie }), 'ops@cnm.test', 'ops-password-1');
   assert.equal(ops.status, 200);
   assert.equal((await call('admin', 'GET', '/api/admin/inventory', { cookie: ops.cookie })).status, 403, 'fulfilment cannot edit inventory');
   const orders = await call('admin', 'GET', '/api/admin/orders', { cookie: ops.cookie });
@@ -125,7 +126,7 @@ test('admin: login, RBAC, order status transitions and notifications', async () 
   const moved = await call('admin', 'PATCH', `/api/admin/orders/${paid.number}`, { cookie: ops.cookie, body: { status: 'processing', note: 'Packing' } });
   assert.equal(moved.data.order.status, 'processing');
   assert.equal(moved.data.order.accessToken, undefined);
-  const owner = await call('admin', 'POST', '/api/admin/login', { body: { email: 'admin@cnm.local', password: 'cnm-local-admin' } });
+  const owner = await adminLogin((p, body, cookie) => call('admin', 'POST', p, { body, cookie }), 'admin@cnm.local', 'cnm-local-admin');
   const inv = await call('admin', 'PUT', '/api/admin/inventory', { cookie: owner.cookie, body: { products: { 'petalrich-room-spray': { price: 16000, stock: 7 } } } });
   assert.equal(inv.status, 200);
   const q = await call('checkout', 'POST', '/api/checkout/quote', { body: { items: [{ id: 'petalrich-room-spray', qty: 1 }] } });
@@ -159,7 +160,7 @@ test('otp sign-in: new customers get a code, verify creates a verified account; 
 });
 
 test('admin refunds go through the payment adapter before the order is marked refunded', async () => {
-  const owner = await call('admin', 'POST', '/api/admin/login', { body: { email: 'admin@cnm.local', password: 'cnm-local-admin' } });
+  const owner = await adminLogin((p, body, cookie) => call('admin', 'POST', p, { body, cookie }), 'admin@cnm.local', 'cnm-local-admin');
   const orders = await call('admin', 'GET', '/api/admin/orders?status=processing', { cookie: owner.cookie });
   const n = orders.data.orders[0].number;
   assert.equal((await call('admin', 'PATCH', `/api/admin/orders/${n}`, { cookie: owner.cookie, body: { status: 'refunded', amount: 99999999 } })).status, 422);

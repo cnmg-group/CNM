@@ -2,6 +2,7 @@
 // courier webhooks, RBAC and company scope.
 import { test, before } from 'node:test';
 import assert from 'node:assert/strict';
+import { adminLogin, TEST_PIN } from './admin-login.mjs';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -21,10 +22,10 @@ before(async () => {
   const { store } = await import('../../netlify/lib/store.mjs');
   await (await store('config')).set('inventory', { products: { 'midnight-vanilla-room-spray': { stock: 40 }, 'petalrich-room-spray': { stock: 40 }, 'love-stoned-room-spray': { stock: 40 } } });
   process.env.ADMIN_USERS = JSON.stringify([
-    { email: 'm1@cnm.test', name: 'Manager One', role: 'manager', passwordHash: await hash('manager-one-pass') },
-    { email: 'm2@cnm.test', name: 'Manager Two', role: 'manager', passwordHash: await hash('manager-two-pass') },
-    { email: 'ship@cnm.test', name: 'Dispatch', role: 'fulfilment', passwordHash: await hash('dispatch-pass-1') },
-    { email: 'sp@cnm.test', name: 'Spectra lead', role: 'manager', companies: ['spectra'], passwordHash: await hash('spectra-pass-12') },
+    { email: 'm1@cnm.test', name: 'Manager One', role: 'manager', passwordHash: await hash('manager-one-pass'), pinHash: await hash(TEST_PIN) },
+    { email: 'm2@cnm.test', name: 'Manager Two', role: 'manager', passwordHash: await hash('manager-two-pass'), pinHash: await hash(TEST_PIN) },
+    { email: 'ship@cnm.test', name: 'Dispatch', role: 'fulfilment', passwordHash: await hash('dispatch-pass-1'), pinHash: await hash(TEST_PIN) },
+    { email: 'sp@cnm.test', name: 'Spectra lead', role: 'manager', companies: ['spectra'], passwordHash: await hash('spectra-pass-12'), pinHash: await hash(TEST_PIN) },
   ]);
 });
 
@@ -37,7 +38,7 @@ const call = async (f, method, p, { body, cookie, headers = {}, raw } = {}) => {
   let data; try { data = JSON.parse(text); } catch { data = text; }
   return { status: res.status, data, cookie: res.headers.get('set-cookie')?.split(';')[0], headers: res.headers };
 };
-const login = async (email, password) => (await call('admin', 'POST', '/api/admin/login', { body: { email, password } })).cookie;
+const login = async (email, password) => (await adminLogin((p, body, cookie) => call('admin', 'POST', p, { body, cookie }), email, password)).cookie;
 const contact = { email: 'chioma@example.com', phone: '+2348031234567', firstName: 'Chioma', lastName: 'Nwosu' };
 const delivery = { method: 'lagos-standard', address: { line1: '5 Admiralty Way', city: 'Lekki', state: 'Lagos' } };
 async function paidOrder(items = [{ id: 'midnight-vanilla-room-spray', qty: 2 }], c = contact) {
@@ -268,4 +269,49 @@ test('companies: legal details for invoices are validated, never invented', asyn
   assert.throws(() => validateCompany({ rcNumber: 'pending' }, { creating: false }));
   assert.throws(() => validateCompany({ taxId: 'abc' }, { creating: false }));
   assert.equal(validateCompany({}, { creating: false }).rcNumber, undefined, 'untouched fields stay unset');
+});
+
+test('admin sign-in: email + password → emailed code → PIN; no skipping steps, limited tries, audited', async () => {
+  const post = (p, body, cookie) => call('admin', 'POST', p, { body, cookie });
+  assert.equal((await post('/api/admin/login', { email: 'm1@cnm.test', password: 'wrong-password' })).status, 401);
+  const a = await post('/api/admin/login', { email: 'm1@cnm.test', password: 'manager-one-pass' });
+  assert.equal(a.status, 200);
+  assert.equal(a.data.step, 'otp');
+  assert.equal(a.data.admin, undefined, 'a password alone never signs you in');
+  assert.equal((await call('admin', 'GET', '/api/admin/me', { cookie: a.cookie })).status, 401, 'the step cookie is not a session');
+  assert.equal((await post('/api/admin/login/pin', { pin: TEST_PIN }, a.cookie)).status, 409, 'cannot jump to the PIN before the code');
+  const bad = await post('/api/admin/login/otp', { code: a.data.devCode === '000000' ? '111111' : '000000' }, a.cookie);
+  assert.equal(bad.status, 400);
+  assert.match(bad.data.message, /4 attempts left/);
+  const b = await post('/api/admin/login/otp', { code: a.data.devCode }, a.cookie);
+  assert.equal(b.data.step, 'pin');
+  assert.equal((await post('/api/admin/login/otp', { code: a.data.devCode }, a.cookie)).status, 409, 'a code works once');
+  assert.equal((await post('/api/admin/login/pin', { pin: '000001' }, b.cookie)).status, 401);
+  const c = await post('/api/admin/login/pin', { pin: TEST_PIN }, b.cookie);
+  assert.equal(c.status, 200);
+  assert.equal(c.data.admin.email, 'm1@cnm.test');
+  assert.equal((await call('admin', 'GET', '/api/admin/me', { cookie: c.cookie })).status, 200, 'full access after code and PIN');
+  assert.equal((await post('/api/admin/login/pin', { pin: TEST_PIN }, b.cookie)).status, 401, 'the finished sign-in cannot be replayed');
+  // Five wrong PINs: start again from the password
+  const a2 = await post('/api/admin/login', { email: 'm2@cnm.test', password: 'manager-two-pass' });
+  const b2 = await post('/api/admin/login/otp', { code: a2.data.devCode }, a2.cookie);
+  for (let i = 0; i < 4; i++) assert.equal((await post('/api/admin/login/pin', { pin: '999999' }, b2.cookie)).status, 401);
+  const locked = await post('/api/admin/login/pin', { pin: '999999' }, b2.cookie);
+  assert.equal(locked.data.error, 'login_expired');
+  assert.equal((await post('/api/admin/login/pin', { pin: TEST_PIN }, b2.cookie)).status, 401, 'even the right PIN needs a fresh sign-in');
+  const audit = await call('admin', 'GET', '/api/admin/audit', { cookie: c.cookie });
+  assert.ok(audit.status === 403 || audit.data.entries.some((x) => x.action === 'login.success'));
+  // Without email set up, a deployed site refuses rather than skipping the code
+  process.env.CNM_LOCAL_STORE = '0';
+  assert.equal((await post('/api/admin/login', { email: 'm2@cnm.test', password: 'manager-two-pass' })).data.error, 'email_not_configured');
+  process.env.CNM_LOCAL_STORE = '1';
+});
+
+test('shipped admin account holds only hashes, with a PIN', async () => {
+  const { BOOTSTRAP_ADMINS } = await import('../../netlify/lib/admin-accounts.mjs');
+  const owner = BOOTSTRAP_ADMINS.find((u) => u.email === 'gabeth.ai4@gmail.com');
+  assert.equal(owner.role, 'owner');
+  assert.match(owner.passwordHash, /^scrypt\$/);
+  assert.match(owner.pinHash, /^scrypt\$/);
+  assert.deepEqual(Object.keys(owner).sort(), ['email', 'name', 'passwordHash', 'pinHash', 'role']);
 });

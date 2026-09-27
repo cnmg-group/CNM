@@ -33,18 +33,54 @@ async function boot() {
   try { ({ admin: me } = await api('/api/admin/me', { loader: false })); shell(); route(); } catch { login(); }
 }
 
+// Sign-in: email + password → 6-digit code from email → PIN → dashboard.
+const loginCard = (inner, step) => `<div class="admin-login os-login"><div class="stack"><img src="/assets/brand/cnm-group-emblem-128.webp" alt="" width="56" height="59"><p class="os-eyebrow">CNM Group</p><h1 class="h2">Operating system</h1>
+  <ol class="os-login__steps" aria-label="Sign-in steps">${['Password', 'Email code', 'PIN'].map((t, i) => `<li class="${i < step ? 'is-done' : i === step ? 'is-now' : ''}"${i === step ? ' aria-current="step"' : ''}>${t}</li>`).join('')}</ol>
+  ${inner}<p class="muted" style="font-size:.75rem">Access is restricted to CNM staff. Activity is audited.</p></div></div>`;
+const errBox = (err) => (err ? `<p class="alert alert--err" role="alert">${e(err)}</p>` : '');
 function login(err = '') {
-  root.innerHTML = `<div class="admin-login os-login"><div class="stack"><img src="/assets/brand/cnm-group-emblem-128.webp" alt="" width="56" height="59"><p class="os-eyebrow">CNM Group</p><h1 class="h2">Operating system</h1><p class="muted" style="margin-top:-8px">Sign in to manage every CNM company.</p>
-  ${err ? `<p class="alert alert--err">${e(err)}</p>` : ''}
+  root.innerHTML = loginCard(`<p class="muted os-login__lead">Sign in to manage every CNM company.</p>${errBox(err)}
   <form class="form" data-login novalidate><div class="field"><label for="ae">Email</label><input id="ae" name="email" type="email" autocomplete="username" required></div>
   <div class="field"><label for="ap">Password</label><input id="ap" name="password" type="password" autocomplete="current-password" required></div>
-  <button class="os-btn" type="submit">Sign in</button></form>
-  <p class="muted" style="font-size:.75rem">Access is restricted to CNM staff. Activity is audited.</p></div></div>`;
+  <button class="os-btn" type="submit">Continue</button></form>`, 0);
   root.querySelector('[data-login]').addEventListener('submit', async (ev) => {
     ev.preventDefault();
     const f = ev.currentTarget;
-    try { ({ admin: me } = await api('/api/admin/login', { method: 'POST', body: { email: f.email.value.trim(), password: f.password.value } })); shell(); route(); } catch (x) { login(x.message); }
+    try { otpStep(await api('/api/admin/login', { method: 'POST', body: { email: f.email.value.trim(), password: f.password.value } })); } catch (x) { login(x.message); }
   });
+}
+const restartOr = (x, again) => (x.code === 'login_expired' ? login(x.message) : again(x.message));
+function otpStep(info, err = '', note = '') {
+  root.innerHTML = loginCard(`<p class="muted os-login__lead">We emailed a 6-digit code to <strong>${e(info.email)}</strong>. It expires in ${e(info.expiresInMinutes || 10)} minutes.</p>${errBox(err)}${note ? `<p class="alert alert--ok" data-otp-note>${e(note)}</p>` : ''}
+  ${info.devCode ? `<p class="alert alert--ok" data-dev-code>Local development: your code is ${e(info.devCode)}</p>` : ''}
+  <form class="form" data-otp novalidate><div class="field"><label for="ac">Code from your email</label><input id="ac" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></div>
+  <button class="os-btn" type="submit">Verify code</button></form>
+  <p class="os-login__links"><button class="textlink" type="button" data-resend>Send a new code</button><button class="textlink" type="button" data-restart>Use a different account</button></p>`, 1);
+  const f = root.querySelector('[data-otp]');
+  f.code.focus();
+  f.code.addEventListener('input', () => { f.code.value = f.code.value.replace(/\D/g, '').slice(0, 6); });
+  f.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    try { await api('/api/admin/login/otp', { method: 'POST', body: { code: f.code.value } }); pinStep(); } catch (x) { restartOr(x, (m) => otpStep(info, m)); }
+  });
+  root.querySelector('[data-resend]').addEventListener('click', async () => {
+    try { const next = await api('/api/admin/login/resend', { method: 'POST', body: {} }); otpStep(next, '', 'A new code is on its way. Earlier codes no longer work.'); } catch (x) { restartOr(x, (m) => otpStep(info, m)); }
+  });
+  root.querySelector('[data-restart]').addEventListener('click', () => login());
+}
+function pinStep(err = '') {
+  root.innerHTML = loginCard(`<p class="muted os-login__lead">Code verified. Enter your 6-digit admin PIN to open the dashboard.</p>${errBox(err)}
+  <form class="form" data-pin novalidate><div class="field"><label for="apin">PIN</label><input id="apin" name="pin" type="password" inputmode="numeric" autocomplete="off" pattern="[0-9]{6}" maxlength="6" required></div>
+  <button class="os-btn" type="submit">Open dashboard</button></form>
+  <p class="os-login__links"><button class="textlink" type="button" data-restart>Start again</button></p>`, 2);
+  const f = root.querySelector('[data-pin]');
+  f.pin.focus();
+  f.pin.addEventListener('input', () => { f.pin.value = f.pin.value.replace(/\D/g, '').slice(0, 6); });
+  f.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    try { ({ admin: me } = await api('/api/admin/login/pin', { method: 'POST', body: { pin: f.pin.value } })); shell(); route(); } catch (x) { restartOr(x, (m) => pinStep(m)); }
+  });
+  root.querySelector('[data-restart]').addEventListener('click', () => login());
 }
 
 const NAV_KEY = 'cnm.os.nav';

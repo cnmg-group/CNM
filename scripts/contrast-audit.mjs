@@ -24,7 +24,13 @@ for (const theme of ['light', 'dark']) {
   for (const [dev, vp] of [['desktop', { width: 1440, height: 900 }], ['phone', { width: 390, height: 844 }]]) {
     const ctx = await browser.newContext({ viewport: vp, colorScheme: theme, reducedMotion: 'reduce' });
     await ctx.addInitScript((t) => { try { localStorage.setItem('cnm.theme', t); localStorage.setItem('cnm.consent', 'denied'); localStorage.setItem('cnm.nlpop', String(Date.now())); } catch {} }, theme);
-    if (ADMIN.length) await ctx.request.post(`${base}/api/admin/login`, { headers: { 'X-CNM-Request': '1' }, data: { email: 'admin@cnm.local', password: 'cnm-local-admin' } });
+    if (ADMIN.length) {
+      // Local sign-in: password → code (returned locally as devCode) → PIN
+      const h = { 'X-CNM-Request': '1' };
+      const a = await (await ctx.request.post(`${base}/api/admin/login`, { headers: h, data: { email: 'admin@cnm.local', password: 'cnm-local-admin' } })).json();
+      await ctx.request.post(`${base}/api/admin/login/otp`, { headers: h, data: { code: a.devCode } });
+      await ctx.request.post(`${base}/api/admin/login/pin`, { headers: h, data: { pin: '246810' } });
+    }
     const page = await ctx.newPage();
     for (const path of [...PAGES, ...ADMIN]) {
       await page.goto(base + path, { waitUntil: 'networkidle' }).catch(() => {});

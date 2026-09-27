@@ -1,7 +1,7 @@
 import { store } from './store.mjs';
 import { fail } from './http.mjs';
 
-const LIMITS = { ai: [8, 60], auth: [10, 60], checkout: [20, 60], quote: [120, 60], lead: [5, 60], admin: [5, 60], events: [120, 60], otp: [5, 600] };
+const LIMITS = { ai: [8, 60], auth: [10, 60], checkout: [20, 60], quote: [120, 60], lead: [5, 60], admin: [5, 60], admin2fa: [20, 600], events: [120, 60], otp: [5, 600] };
 
 /** Fixed-window limiter per bucket+key. Best-effort (eventual writes), sufficient to blunt brute force & spam. */
 export async function rateLimit(bucket, key) {

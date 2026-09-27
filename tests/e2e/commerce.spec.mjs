@@ -2,6 +2,22 @@ import { expect, test } from '@playwright/test';
 
 const unique = () => `e2e${Date.now()}${Math.floor(Math.random() * 1e4)}@example.com`;
 
+async function adminSignIn(page) {
+  await page.fill('#ae', 'admin@cnm.local');
+  await page.fill('#ap', 'cnm-local-admin');
+  await page.click('[data-login] button');
+  const code = (await page.locator('[data-dev-code]').textContent()).match(/(\d{6})/)[1];
+  await page.fill('#ac', code);
+  await page.click('[data-otp] button');
+  await page.fill('#apin', '246810');
+  await page.click('[data-pin] button');
+}
+async function adminApiSignIn(request, h) {
+  const a = await (await request.post('/api/admin/login', { headers: h, data: { email: 'admin@cnm.local', password: 'cnm-local-admin' } })).json();
+  await request.post('/api/admin/login/otp', { headers: h, data: { code: a.devCode } });
+  await request.post('/api/admin/login/pin', { headers: h, data: { pin: '246810' } });
+}
+
 async function fillCheckout(page, email) {
   await page.fill('#c-email', email);
   await page.fill('#c-first', 'Ada');
@@ -68,7 +84,7 @@ test('wishlist persists and moves to bag', async ({ page }) => {
 
 test('bag: quantity, promo, remove; out-of-stock cannot be added', async ({ page, request }) => {
   const h = { 'X-CNM-Request': '1' };
-  await request.post('/api/admin/login', { headers: h, data: { email: 'admin@cnm.local', password: 'cnm-local-admin' } });
+  await adminApiSignIn(request, h);
   await request.put('/api/admin/inventory', { headers: h, data: { products: { 'crushed-room-spray': { stock: 0 } } } });
   await page.goto('/products/crushed-room-spray/');
   await expect(page.locator('.buy-actions')).toHaveCount(0);
@@ -184,9 +200,21 @@ test('admin: sign in, dashboard, move an order to processing', async ({ page, re
   const r = await (await request.post('/api/checkout', { headers: h, data: { items: [{ id: 'sweet-pea-wallflower-plug-in-refill', qty: 1 }], contact: { email: 'adm@example.com', phone: '+2348000000000', firstName: 'A', lastName: 'D' }, delivery: { method: 'nationwide', address: { line1: '2 Road', city: 'Enugu', state: 'Enugu' } } } })).json();
   await request.post('/api/payments/simulate', { headers: h, data: { number: r.order.number, accessToken: r.order.accessToken, outcome: 'success' } });
   await page.goto('/admin/');
+  // Sign-in: email + password → code from email (shown locally, since no email is sent) → PIN → dashboard
   await page.fill('#ae', 'admin@cnm.local');
   await page.fill('#ap', 'cnm-local-admin');
   await page.click('[data-login] button');
+  await expect(page.locator('[aria-current="step"]')).toHaveText('Email code');
+  await expect(page.locator('h1')).toHaveText('Operating system');
+  const code = (await page.locator('[data-dev-code]').textContent()).match(/(\d{6})/)[1];
+  await page.fill('#ac', '000000' === code ? '111111' : '000000');
+  await page.click('[data-otp] button');
+  await expect(page.locator('.alert--err')).toContainText('incorrect');
+  await page.fill('#ac', code);
+  await page.click('[data-otp] button');
+  await expect(page.locator('[aria-current="step"]')).toHaveText('PIN');
+  await page.fill('#apin', '246810');
+  await page.click('[data-pin] button');
   await expect(page.locator('h1')).toHaveText('Command Center');
   // The paid order shows up in the Command Center and the live feed
   await expect(page.locator('.os-kpi').first()).toBeVisible();
@@ -228,9 +256,7 @@ test('admin: sign in, dashboard, move an order to processing', async ({ page, re
 test('operations: fulfilment board, new phone order paid in store, refund', async ({ page, isMobile }) => {
   test.skip(isMobile, 'desktop workflow (the order screens are covered on phones above)');
   await page.goto('/admin/');
-  await page.fill('#ae', 'admin@cnm.local');
-  await page.fill('#ap', 'cnm-local-admin');
-  await page.click('[data-login] button');
+  await adminSignIn(page);
   await page.goto('/admin/#fulfilment');
   await expect(page.locator('.os-title')).toHaveText('Fulfilment');
   await expect(page.locator('.os-col').first()).toBeVisible();
@@ -263,9 +289,7 @@ test('operations: fulfilment board, new phone order paid in store, refund', asyn
 
 test('CNM Group OS: filters in the URL, company drill-down, create and archive a company, audit log, phone menu', async ({ page, isMobile }) => {
   await page.goto('/admin/');
-  await page.fill('#ae', 'admin@cnm.local');
-  await page.fill('#ap', 'cnm-local-admin');
-  await page.click('[data-login] button');
+  await adminSignIn(page);
   await expect(page.locator('.os-title')).toHaveText('Command Center');
   await expect(page.locator('.os-kpi')).toHaveCount(10);
   await expect(page.locator('.os-cos tbody tr')).toHaveCount(4);

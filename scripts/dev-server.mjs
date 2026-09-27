@@ -71,4 +71,4 @@ const server = createServer(async (req, res) => {
     res.end('Server error');
   }
 });
-server.listen(PORT, () => console.log(`CNM Essentials running at http://localhost:${PORT}  (admin: /admin/ — admin@cnm.local / cnm-local-admin)`));
+server.listen(PORT, () => console.log(`CNM Essentials running at http://localhost:${PORT}  (admin: /admin/ — admin@cnm.local / cnm-local-admin, code shown on screen, PIN 246810)`));
