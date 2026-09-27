@@ -1504,8 +1504,6 @@ body[data-site="foundation"] .co-pillars__list li:hover .co-pillars__icon { back
   display: grid; justify-items: start; gap: 10px; pointer-events: none; color: #f5f1e8; font-family: var(--sans);
   transition: opacity .35s var(--ease), transform .45s var(--ease); }
 .cnmnav > * { pointer-events: auto; }
-.cnmnav.is-intro .cnmnav__dock { animation: cnmnav-in .9s var(--spring) .35s backwards; }
-@keyframes cnmnav-in { from { opacity: 0; transform: translateY(24px) scale(.8); } }
 
 /* Glass surfaces (Apple-style: blur + saturation, a hairline edge and a soft inner highlight).
    The frosted layer is a childless pseudo-element under the content, which keeps the blur reliable in every engine. */
@@ -1516,18 +1514,14 @@ body[data-site="foundation"] .co-pillars__list li:hover .co-pillars__icon { back
 
 .cnmnav__dock { display: flex; align-items: center; gap: 4px; padding: 5px; border-radius: 999px; transition: transform .45s var(--spring); }
 /* specular sheen that follows the pointer */
-.cnmnav__dock::after { content: ""; position: absolute; inset: 1px; z-index: -1; border-radius: inherit; background: radial-gradient(140px circle at var(--mx, 30%) var(--my, 0%), rgba(255, 255, 255, .14), transparent 65%); pointer-events: none; }
-.cnmnav__dock:hover { transform: translateY(-2px); }
+.cnmnav__dock::after { content: ""; position: absolute; inset: 1px; z-index: -1; border-radius: inherit; background: radial-gradient(140px circle at 30% 0%, rgba(255, 255, 255, .12), transparent 65%); pointer-events: none; }
 
 .cnmnav__home { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 16px 0 0; border-radius: 999px; color: inherit; text-decoration: none; -webkit-touch-callout: none; user-select: none; }
 .cnmnav__orb { position: relative; display: grid; place-items: center; width: 46px; height: 46px; flex: none; border-radius: 50%;
   background: radial-gradient(circle at 32% 24%, rgba(255, 255, 255, .28), transparent 42%), linear-gradient(160deg, #1d2438, #0b1120 70%);
   box-shadow: inset 0 0 0 1px rgba(212, 176, 106, .55), inset 0 1px 1px rgba(255, 255, 255, .25), 0 4px 14px rgba(0, 0, 0, .35); transition: transform .45s var(--spring); }
 .cnmnav__orb img { width: 30px; height: auto; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .45)); transition: transform .6s var(--spring); }
-.cnmnav__orb::after { content: ""; position: absolute; inset: -1px; border-radius: 50%; box-shadow: 0 0 0 0 rgba(212, 176, 106, .45); animation: cnmnav-breathe 3.2s var(--ease) 1.6s 2; pointer-events: none; }
-@keyframes cnmnav-breathe { 0%, 100% { box-shadow: 0 0 0 0 rgba(212, 176, 106, 0); } 15% { box-shadow: 0 0 0 0 rgba(212, 176, 106, .55); } 70% { box-shadow: 0 0 0 12px rgba(212, 176, 106, 0); } }
-.cnmnav__home:hover .cnmnav__orb, .cnmnav__home:focus-visible .cnmnav__orb { transform: scale(1.06); }
-.cnmnav__home:hover .cnmnav__orb img { transform: rotate(-8deg) scale(1.05); }
+.cnmnav__home:focus-visible .cnmnav__orb { box-shadow: inset 0 0 0 1px rgba(212, 176, 106, .55), 0 0 0 3px rgba(212, 176, 106, .6); }
 .cnmnav__home:active .cnmnav__orb { transform: scale(.94); }
 .cnmnav__word { display: block; max-width: 120px; overflow: hidden; white-space: nowrap; font-size: .6875rem; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: rgba(245, 241, 232, .8);
   transition: max-width .5s var(--ease), opacity .35s var(--ease), margin .5s var(--ease); }
@@ -1539,7 +1533,6 @@ body[data-site="foundation"] .co-pillars__list li:hover .co-pillars__icon { back
 .cnmnav__dots { display: grid; grid-template-columns: repeat(2, 6px); gap: 4px; transition: transform .5s var(--spring); }
 .cnmnav__dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); transition: transform .45s var(--spring), border-radius .3s, background .3s; }
 .cnmnav__dots i:nth-child(1) { background: #b99a5b; } .cnmnav__dots i:nth-child(2) { background: #3fb3da; } .cnmnav__dots i:nth-child(3) { background: #e3a13a; } .cnmnav__dots i:nth-child(4) { background: #5fb34a; }
-.cnmnav__toggle:hover .cnmnav__dots { transform: rotate(45deg); }
 /* open: the four company dots fold into a close "×" */
 .cnmnav.is-open .cnmnav__dots { transform: rotate(45deg); }
 .cnmnav.is-open .cnmnav__dots i { background: #f5f1e8; border-radius: 2px; }
@@ -1574,7 +1567,6 @@ body[data-site="foundation"] .co-pillars__list li:hover .co-pillars__icon { back
 /* Compact while reading down the page; the label returns when the visitor scrolls up or opens it */
 .cnmnav.is-compact:not(.is-open) .cnmnav__word { max-width: 0; opacity: 0; }
 .cnmnav.is-compact:not(.is-open) .cnmnav__home { padding-right: 0; }
-.cnmnav.is-compact:not(.is-open) .cnmnav__dock { transform: scale(.94); transform-origin: left bottom; }
 /* Never in the way: step aside for full-screen menus and dialogs, lift above the phone buy bar */
 html[style*="overflow: hidden"] .cnmnav { opacity: 0; transform: translateY(16px); pointer-events: none; }
 html[style*="overflow: hidden"] .cnmnav > * { pointer-events: none; }

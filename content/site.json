@@ -260,8 +260,8 @@
         "imageAlt": "A woman in dark sunglasses inside an eyewear boutique",
         "imagePosition": "center 30%",
         "menuLabel": "Eyewear",
-        "imageWidth": 1744,
-        "imageHeight": 1882,
+        "imageWidth": 2000,
+        "imageHeight": 3000,
         "banner": {
           "words": [
             "Vision",
@@ -331,8 +331,8 @@
         "imageAlt": "An engineer in a hard hat and safety vest overlooking a construction site",
         "imagePosition": "center 20%",
         "menuLabel": "Engineering & Energy",
-        "imageWidth": 1744,
-        "imageHeight": 1882,
+        "imageWidth": 2400,
+        "imageHeight": 1663,
         "banner": {
           "words": [
             "Engineer",
@@ -403,8 +403,8 @@
         "imageAlt": "A smiling schoolgirl holding her books",
         "imagePosition": "center 25%",
         "menuLabel": "Social Impact",
-        "imageWidth": 1544,
-        "imageHeight": 1882,
+        "imageWidth": 2000,
+        "imageHeight": 2385,
         "banner": {
           "words": [
             "Education",

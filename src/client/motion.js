@@ -188,7 +188,6 @@ function initDropdowns() {
 function initCnmNav() {
   const nav = document.querySelector('[data-cnmnav]');
   if (!nav) return;
-  const dock = nav.querySelector('.cnmnav__dock');
   const toggle = nav.querySelector('[data-cnmnav-toggle]');
   const items = [...nav.querySelectorAll('.cnmnav__item')];
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -217,8 +216,6 @@ function initCnmNav() {
     if (open) { openedAtY = scrollY; armIdle(); }
   }
 
-  // First visit in this tab: the control rises into place. Afterwards it simply stays put between pages.
-  try { if (!sessionStorage.getItem('cnm.nav')) { nav.classList.add('is-intro'); sessionStorage.setItem('cnm.nav', '1'); } } catch { /* storage blocked */ }
   // It rests as the compact emblem + switch button and only opens when the switch button is clicked or tapped:
   // no hover, scroll or long-press behaviour, so it never pops out on its own.
   nav.classList.add('is-compact');
@@ -229,13 +226,6 @@ function initCnmNav() {
     if (open && e.detail === 0) items[0]?.focus({ preventScroll: true }); // keyboard
   });
 
-  if (fine && !reduce) {
-    dock.addEventListener('pointermove', (e) => {
-      const r = dock.getBoundingClientRect();
-      dock.style.setProperty('--mx', `${e.clientX - r.left}px`);
-      dock.style.setProperty('--my', `${e.clientY - r.top}px`);
-    });
-  }
 
   nav.addEventListener('pointermove', () => { if (isOpen()) armIdle(); }, { passive: true });
   nav.addEventListener('keydown', (e) => {

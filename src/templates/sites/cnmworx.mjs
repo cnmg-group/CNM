@@ -4,7 +4,7 @@ import { escapeHtml } from '../../shared/format.mjs';
 import { icon } from '../../shared/icons.mjs';
 import { approval } from '../layout.mjs';
 import { cards, contactBlock, coHero, ctaBand, orgLd, pageHead, pillarsStrip, profileOf, sectionHead } from '../company.mjs';
-import { enquiryForm, field, message, phoneInput, select } from '../kit.mjs';
+import { enquiryForm, field, message, phoneInput, photo, select } from '../kit.mjs';
 
 const K = 'cnmworx';
 const SERVICES = [
@@ -54,6 +54,9 @@ ${pillarsStrip(p)}
 <section class="co-section co-section--soft" aria-labelledby="wx-way"><div class="container co-split">
   ${sectionHead('How we work', 'Embedded in your team, <em>or managed independently</em>', p.value, 'wx-way')}
   <ul class="co-ticks">${['Weekly reporting', 'Full project management flexibility', 'Tailor-made solutions', 'Embedded in your organisation or managed end-to-end'].map((x) => `<li>${icon('check')} ${escapeHtml(x)}</li>`).join('')}</ul>
+</div></section>
+<section class="co-section co-section--photo" aria-label="On site"><div class="container">
+  <figure class="co-figure">${photo('/assets/group/cnmworx-site.webp', 'A CNMWorX engineer in a hard hat and safety glasses surveying a high-rise construction site at sunset', { sizes: '(max-width: 1280px) 100vw, 1240px', width: 2400, height: 1663 })}</figure>
 </div></section>
 <section class="co-section" aria-labelledby="wx-ind"><div class="container">
   ${sectionHead('Industries', 'Where we work', '', 'wx-ind')}
