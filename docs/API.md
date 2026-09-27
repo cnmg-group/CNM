@@ -85,6 +85,9 @@ Separate `cnm_admin` cookie. Roles: `owner` (everything), `manager` (catalogue, 
   2. `POST /api/admin/login/otp` `{ code }` → `{ step: "pin" }` (5 tries, then start again); `POST /api/admin/login/resend` sends a new code (30 s apart)
   3. `POST /api/admin/login/pin` `{ pin }` → sets the `cnm_admin` session → `{ admin }` (5 tries, then start again)
   Session length: by default the cookie ends when the browser closes (and the token after 12 h); with `remember: true` on step 1 ("Keep me signed in") it lasts 24 hours — never longer. "Remember my login details" is client-side only: the email is kept in `localStorage` (`cnm.admin.remember`) until the admin presses Forget, and the password is offered to the browser's password manager; the page never stores a password.
+  - Forgot password: `POST /api/admin/login/forgot-password` `{ email }` (same answer whether or not the email is an admin) → `/login/otp` → `/login/pin` → `POST /api/admin/login/new-password` `{ password, confirm }` (12+ characters) → signed in.
+  - Forgot PIN: `/login` (password) → `/login/otp` → `POST /api/admin/login/forgot-pin` → `POST /api/admin/login/new-pin` `{ pin, confirm }` (no repeated/sequential digits) → signed in.
+  - Every path needs two of password / emailed code / PIN; an admin who has forgotten both password and PIN is reset by the owner (new hashes in `ADMIN_USERS`, and delete their `cred/…` entry in the `admins` store). A reset password or PIN is stored hashed in the `admins` store and takes precedence over `ADMIN_USERS` / the shipped account; the admin gets an email whenever either changes.
   Every success and failure is written to the audit log. Without email configured a deployed site refuses to sign in (`email_not_configured`) rather than skip the code.
 - `POST /api/admin/logout`, `GET /api/admin/me`
 - `GET /api/admin/dashboard`

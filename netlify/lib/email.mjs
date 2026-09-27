@@ -56,12 +56,22 @@ export const otpEmail = (to, code) => ({
 <p style="color:#6d6b66">It expires in 10 minutes and can only be used once. If you didn't ask for it, you can ignore this email — nobody can sign in without the code.</p>`),
   text: `Your CNM Essentials sign-in code is ${code}. It expires in 10 minutes. If you didn't request it, ignore this email.`,
 });
-export const adminOtpEmail = (to, code) => ({
-  to,
-  subject: `${code} is your CNM Group admin sign-in code`,
-  html: shell('Admin sign-in code', `<p>Someone (hopefully you) entered the correct password for the CNM Group admin. Enter this code to continue:</p>
+export const adminOtpEmail = (to, code, purpose = 'login') => {
+  const reset = purpose === 'reset_password';
+  return {
+    to,
+    subject: reset ? `${code} is your CNM Group admin password reset code` : `${code} is your CNM Group admin sign-in code`,
+    html: shell(reset ? 'Reset your admin password' : 'Admin sign-in code', `<p>${reset ? 'Someone asked to reset the password for your CNM Group admin account. Enter this code, then your PIN, to choose a new password:' : 'Someone (hopefully you) entered the correct password for the CNM Group admin. Enter this code to continue:'}</p>
 <p style="font-size:34px;letter-spacing:10px;font-weight:700;margin:24px 0;font-family:Menlo,Consolas,monospace">${code}</p>
-<p style="color:#6d6b66">It expires in 10 minutes and works once. You will then be asked for your PIN. If this wasn't you, change your admin password now.</p>`),
-  text: `Your CNM Group admin sign-in code is ${code}. It expires in 10 minutes. If this wasn't you, change your admin password now.`,
+<p style="color:#6d6b66">It expires in 10 minutes and works once. ${reset ? "If you didn't ask for this, ignore this email — your password stays the same." : "You will then be asked for your PIN. If this wasn't you, change your admin password now."}</p>`),
+    text: reset ? `Your CNM Group admin password reset code is ${code}. It expires in 10 minutes. If you didn't ask for this, ignore this email.` : `Your CNM Group admin sign-in code is ${code}. It expires in 10 minutes. If this wasn't you, change your admin password now.`,
+  };
+};
+export const credentialChangedEmail = (to, what, ip) => ({
+  to,
+  subject: `Your CNM Group admin ${what} was changed`,
+  html: shell(`Your admin ${what} was changed`, `<p>The ${escapeHtml(what)} for your CNM Group admin account was changed on ${escapeHtml(new Date().toLocaleString('en-NG', { timeZone: 'Africa/Lagos', dateStyle: 'medium', timeStyle: 'short' }))} (Lagos time)${ip ? ` from IP ${escapeHtml(ip)}` : ''}.</p>
+<p style="color:#6d6b66">If this was you, there is nothing to do. If it wasn't, contact the CNM Group owner immediately so the account can be locked and reset.</p>`),
+  text: `The ${what} for your CNM Group admin account was changed. If this wasn't you, contact the CNM Group owner immediately.`,
 });
 export const enquiryNotice = (e) => ({ to: process.env.CNM_NOTIFY_EMAIL, subject: e.sector === 'group' ? `New CNM Group enquiry — ${e.subject || e.division || 'General'}` : `New Fragrance as a Service enquiry — ${e.sector}`, html: shell('New enquiry', `<p><strong>${escapeHtml(e.name)}</strong> (${escapeHtml(e.email)}${e.phone ? `, ${escapeHtml(e.phone)}` : ''})</p><p>${escapeHtml(e.company || '')} · ${escapeHtml(e.sector)} · ${escapeHtml(e.eventDate || '')} · ${escapeHtml(e.location || '')}${e.interest ? ` · ${escapeHtml(e.interest)}` : ''}${e.timeline ? ` · ${escapeHtml(e.timeline)}` : ''}</p><p>${escapeHtml(e.message)}</p>`), text: `${e.name} ${e.email}: ${e.message}` });

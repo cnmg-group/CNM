@@ -303,7 +303,7 @@ export async function companiesView(v, ctx, flash) {
 /* ------------------------------------------------------------------ Audit log */
 const ACTION_LABEL = {
   'order.status': 'Order status changed', 'inventory.update': 'Inventory updated', 'discounts.update': 'Discounts updated', 'content.update': 'Content updated', 'media.upload': 'Media uploaded',
-  publish: 'Site published', 'enquiry.status': 'Enquiry status changed', 'company.create': 'Company created', 'company.update': 'Company edited', 'company.archive': 'Company archived', 'company.restore': 'Company restored',
+  publish: 'Site published', 'enquiry.status': 'Enquiry status changed', 'company.create': 'Company created', 'company.update': 'Company edited', 'company.archive': 'Company archived', 'company.restore': 'Company restored', 'login.success': 'Signed in', 'login.password_failed': 'Wrong password', 'login.otp_locked': 'Too many wrong codes', 'login.pin_failed': 'Wrong PIN', 'login.pin_locked': 'Too many wrong PINs', 'login.forgot_password': 'Forgot password', 'login.forgot_pin': 'Forgot PIN', 'login.password_reset': 'Password reset', 'login.pin_reset': 'PIN reset',
 };
 export async function auditView(v) {
   const { entries } = await api('/api/admin/audit', { loader: false });
@@ -312,7 +312,7 @@ export async function auditView(v) {
   const shown = entries.filter(match);
   const summary = (x) => {
     const d = x.detail || {};
-    if (d.changed) return d.changed.map((k) => `${k}: ${JSON.stringify(d.before?.[k])} → ${JSON.stringify(d.after?.[k])}`).join('; ');
+    if (Array.isArray(d.changed)) return d.changed.map((k) => `${k}: ${JSON.stringify(d.before?.[k])} → ${JSON.stringify(d.after?.[k])}`).join('; ');
     return Object.entries(d).map(([k, val]) => `${k}: ${typeof val === 'object' ? JSON.stringify(val) : val}`).join(' · ');
   };
   v.innerHTML = `<header class="os-head"><div><p class="os-eyebrow">Security</p><h1 class="os-title">Audit log</h1><p class="os-sub">Every sensitive action: who did it, their role, what changed (before → after), when, and from where. Entries cannot be edited or deleted from the admin.</p></div>

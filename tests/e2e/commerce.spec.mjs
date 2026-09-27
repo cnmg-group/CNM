@@ -277,6 +277,49 @@ test('admin sign-in remembers login details on this device until Forget', async 
   expect(await page.evaluate(() => localStorage.getItem('cnm.admin.remember'))).toBeNull();
 });
 
+test('admin forgot PIN and forgot password', async ({ page }) => {
+  const code = async () => (await page.locator('[data-dev-code]').textContent()).match(/(\d{6})/)[1];
+  const changePin = async (from, to) => {
+    await page.goto('/admin/');
+    await page.fill('#ae', 'admin@cnm.local');
+    await page.fill('#ap', 'cnm-local-admin');
+    await page.click('[data-login] button');
+    await page.fill('#ac', await code());
+    await page.click('[data-otp] button');
+    await page.click('[data-forgot-pin]');
+    await expect(page.locator('[aria-current="step"]')).toHaveText('New PIN');
+    await page.fill('#ns1', to);
+    await page.fill('#ns2', to);
+    await page.click('[data-new-secret] button');
+    await expect(page.locator('h1')).toHaveText('Command Center');
+    await expect(page.locator('[data-flash]')).toContainText('new PIN');
+    await page.context().clearCookies();
+  };
+  // Forgot PIN: password + code → new PIN (then put the demo PIN back for the other tests)
+  await changePin('246810', '402817');
+  await changePin('402817', '246810');
+  // Forgot password: email → code → PIN → new password screen (cancelled here so the demo password stays)
+  await page.goto('/admin/');
+  await page.click('[data-forgot-password]');
+  await page.fill('#fe', 'admin@cnm.local');
+  await page.click('[data-forgot] button');
+  await expect(page.locator('[aria-current="step"]')).toHaveText('Email code');
+  await expect(page.locator('.os-login__lead')).toContainText('If that email belongs to a CNM admin');
+  await page.fill('#ac', await code());
+  await page.click('[data-otp] button');
+  await expect(page.locator('[data-pin]')).toContainText('Continue');
+  await expect(page.locator('.os-login__links')).toContainText('Forgot your PIN too?');
+  await page.fill('#apin', '246810');
+  await page.click('[data-pin] button');
+  await expect(page.locator('[aria-current="step"]')).toHaveText('New password');
+  await page.fill('#ns1', 'short');
+  await page.fill('#ns2', 'short');
+  await page.click('[data-new-secret] button');
+  await expect(page.locator('.alert--err')).toContainText('12 characters');
+  await page.click('[data-restart]');
+  await expect(page.locator('[data-login]')).toBeVisible();
+});
+
 test('operations: fulfilment board, new phone order paid in store, refund', async ({ page, isMobile }) => {
   test.skip(isMobile, 'desktop workflow (the order screens are covered on phones above)');
   await page.goto('/admin/');

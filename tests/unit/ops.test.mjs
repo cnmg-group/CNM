@@ -335,3 +335,49 @@ test('admin session: ends with the browser by default; "keep me signed in" lasts
   assert.ok(hours > 23.9 && hours <= 24, `session ends within 24 hours (${hours})`);
   assert.equal((await signIn('yes')).data.admin.remembered, false, 'only an explicit true remembers');
 });
+
+test('forgot password: email code + PIN → new password; unknown emails look the same; old password stops working', async () => {
+  const post = (p, body, cookie) => call('admin', 'POST', p, { body, cookie });
+  const ghost = await post('/api/admin/login/forgot-password', { email: 'nobody@cnm.test' });
+  assert.equal(ghost.status, 200);
+  assert.equal(ghost.data.step, 'otp');
+  assert.equal(ghost.data.devCode, undefined, 'no code exists for an unknown email');
+  assert.equal((await post('/api/admin/login/otp', { code: '123456' }, ghost.cookie)).status, 400, 'and no code can match');
+  const a = await post('/api/admin/login/forgot-password', { email: 'm2@cnm.test' });
+  assert.equal(a.data.message, ghost.data.message, 'same answer for real and unknown emails');
+  assert.equal((await post('/api/admin/login/new-password', { password: 'x'.repeat(14), confirm: 'x'.repeat(14) }, a.cookie)).status, 409, 'no skipping to the new password');
+  const b = await post('/api/admin/login/otp', { code: a.data.devCode }, a.cookie);
+  assert.equal(b.data.step, 'pin');
+  assert.equal((await post('/api/admin/login/forgot-pin', {}, b.cookie)).data.error, 'need_owner', 'forgetting both needs the owner');
+  const c = await post('/api/admin/login/pin', { pin: TEST_PIN }, b.cookie);
+  assert.equal(c.data.step, 'new_password');
+  assert.equal(c.data.admin, undefined, 'not signed in yet');
+  assert.equal((await post('/api/admin/login/new-password', { password: 'short', confirm: 'short' }, c.cookie)).status, 422);
+  assert.equal((await post('/api/admin/login/new-password', { password: 'a-brand-new-pass', confirm: 'a-different-pass' }, c.cookie)).data.error, 'mismatch');
+  assert.equal((await post('/api/admin/login/new-password', { password: 'manager-two-pass', confirm: 'manager-two-pass' }, c.cookie)).data.error, 'same_password');
+  const d = await post('/api/admin/login/new-password', { password: 'a-brand-new-pass', confirm: 'a-brand-new-pass' }, c.cookie);
+  assert.equal(d.status, 200);
+  assert.equal(d.data.changed, 'password');
+  assert.equal((await call('admin', 'GET', '/api/admin/me', { cookie: d.cookie })).status, 200, 'signed in after the reset');
+  assert.equal((await post('/api/admin/login', { email: 'm2@cnm.test', password: 'manager-two-pass' })).status, 401, 'old password no longer works');
+  assert.equal((await adminLogin(post, 'm2@cnm.test', 'a-brand-new-pass')).status, 200, 'new password + code + PIN works');
+});
+
+test('forgot PIN: password + email code → new PIN; weak PINs refused; old PIN stops working', async () => {
+  const post = (p, body, cookie) => call('admin', 'POST', p, { body, cookie });
+  const a = await post('/api/admin/login', { email: 'ship@cnm.test', password: 'dispatch-pass-1' });
+  assert.equal((await post('/api/admin/login/forgot-pin', {}, a.cookie)).status, 409, 'the emailed code comes first');
+  const b = await post('/api/admin/login/otp', { code: a.data.devCode }, a.cookie);
+  const c = await post('/api/admin/login/forgot-pin', {}, b.cookie);
+  assert.equal(c.data.step, 'new_pin');
+  for (const weak of ['111111', '123456', '987654']) assert.equal((await post('/api/admin/login/new-pin', { pin: weak, confirm: weak }, c.cookie)).data.error, 'weak_pin');
+  assert.equal((await post('/api/admin/login/new-pin', { pin: TEST_PIN, confirm: TEST_PIN }, c.cookie)).data.error, 'same_pin');
+  assert.equal((await post('/api/admin/login/new-pin', { pin: '402817', confirm: '402871' }, c.cookie)).data.error, 'mismatch');
+  const d = await post('/api/admin/login/new-pin', { pin: '402817', confirm: '402817' }, c.cookie);
+  assert.equal(d.data.changed, 'pin');
+  assert.equal(d.data.admin.email, 'ship@cnm.test');
+  assert.equal((await adminLogin(post, 'ship@cnm.test', 'dispatch-pass-1')).status, 401, 'old PIN no longer works');
+  assert.equal((await adminLogin(post, 'ship@cnm.test', 'dispatch-pass-1', '402817')).status, 200);
+  const audit = (await call('admin', 'GET', '/api/admin/audit?limit=200', { cookie: await login('m1@cnm.test', 'manager-one-pass') })).data;
+  assert.ok(!audit.entries || audit.entries.some((x) => x.action === 'login.pin_reset'));
+});

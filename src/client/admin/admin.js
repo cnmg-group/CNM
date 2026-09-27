@@ -34,8 +34,9 @@ async function boot() {
 }
 
 // Sign-in: email + password → 6-digit code from email → PIN → dashboard.
-const loginCard = (inner, step) => `<div class="admin-login os-login"><div class="stack"><img src="/assets/brand/cnm-group-emblem-128.webp" alt="" width="56" height="59"><p class="os-eyebrow">CNM Group</p><h1 class="h2">Operating system</h1>
-  <ol class="os-login__steps" aria-label="Sign-in steps">${['Password', 'Email code', 'PIN'].map((t, i) => `<li class="${i < step ? 'is-done' : i === step ? 'is-now' : ''}"${i === step ? ' aria-current="step"' : ''}>${t}</li>`).join('')}</ol>
+const STEPS = { login: ['Password', 'Email code', 'PIN'], reset_password: ['Email code', 'PIN', 'New password'], reset_pin: ['Password', 'Email code', 'New PIN'] };
+const loginCard = (inner, step, flow = 'login') => `<div class="admin-login os-login"><div class="stack"><img src="/assets/brand/cnm-group-emblem-128.webp" alt="" width="56" height="59"><p class="os-eyebrow">CNM Group</p><h1 class="h2">Operating system</h1>
+  <ol class="os-login__steps" aria-label="Sign-in steps">${STEPS[flow].map((t, i) => `<li class="${i < step ? 'is-done' : i === step ? 'is-now' : ''}"${i === step ? ' aria-current="step"' : ''}>${t}</li>`).join('')}</ol>
   ${inner}<p class="muted" style="font-size:.75rem">Access is restricted to CNM staff. Activity is audited.</p></div></div>`;
 const errBox = (err) => (err ? `<p class="alert alert--err" role="alert">${e(err)}</p>` : '');
 // "Remember login details": the email is kept on this device (until Forget), and the password is offered to the
@@ -61,9 +62,10 @@ function login(err = '', note = '') {
   <label class="os-check"><input type="checkbox" name="remember"> Keep me signed in for 24 hours</label>
   <label class="os-check"><input type="checkbox" name="rememberDetails"${rem ? ' checked' : ''}> Remember my login details on this device</label>
   <button class="os-btn" type="submit">Continue</button></form>
-  ${rem ? `<p class="os-login__links"><span class="muted">Login details remembered for ${e(rem.email)}</span><button class="textlink" type="button" data-forget>Forget</button></p>` : ''}`, 0);
+  <p class="os-login__links"><button class="textlink" type="button" data-forgot-password>Forgot password?</button>${rem ? `<span><span class="muted">Remembered: ${e(rem.email)}</span> <button class="textlink" type="button" data-forget>Forget</button></span>` : ''}</p>`, 0);
   const f = root.querySelector('[data-login]');
   (rem ? f.password : f.email).focus();
+  root.querySelector('[data-forgot-password]').addEventListener('click', () => forgotPassword(f.email.value.trim()));
   root.querySelector('[data-forget]')?.addEventListener('click', () => { forgetDetails(); login('', 'Forgotten on this device. A password saved in your browser can be removed in its password settings.'); });
   f.addEventListener('submit', async (ev) => {
     ev.preventDefault();
@@ -73,35 +75,83 @@ function login(err = '', note = '') {
   });
 }
 const restartOr = (x, again) => (x.code === 'login_expired' ? login(x.message) : again(x.message));
+const signedIn = async (res) => {
+  ({ admin: me } = res);
+  if (pendingCredential) { pendingCredential.name = me.name; if (res.changed === 'password') pendingCredential = null; }
+  await saveCredential();
+  shell(); route();
+  if (res.changed) flash(res.changed === 'pin' ? 'Your new PIN is set. Use it next time you sign in.' : 'Your new password is set. Use it next time you sign in.');
+};
+// Forgot password: email → code → PIN → new password. (Needs your PIN; forgot both → the group owner resets you.)
+function forgotPassword(prefill = '', err = '') {
+  root.innerHTML = loginCard(`<p class="muted os-login__lead">Enter your admin email. We'll send a code; then you confirm with your PIN and choose a new password.</p>${errBox(err)}
+  <form class="form" data-forgot novalidate><div class="field"><label for="fe">Email</label><input id="fe" name="email" type="email" autocomplete="username" required value="${e(prefill)}"></div>
+  <button class="os-btn" type="submit">Send reset code</button></form>
+  <p class="os-login__links"><button class="textlink" type="button" data-restart>Back to sign in</button></p>`, 0, 'reset_password');
+  const f = root.querySelector('[data-forgot]');
+  f.email.focus();
+  f.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    pendingCredential = null;
+    try { otpStep(await api('/api/admin/login/forgot-password', { method: 'POST', body: { email: f.email.value.trim() } })); } catch (x) { forgotPassword(f.email.value.trim(), x.message); }
+  });
+  root.querySelector('[data-restart]').addEventListener('click', () => login());
+}
 function otpStep(info, err = '', note = '') {
-  root.innerHTML = loginCard(`<p class="muted os-login__lead">We emailed a 6-digit code to <strong>${e(info.email)}</strong>. It expires in ${e(info.expiresInMinutes || 10)} minutes.</p>${errBox(err)}${note ? `<p class="alert alert--ok" data-otp-note>${e(note)}</p>` : ''}
+  const reset = info.purpose === 'reset_password';
+  root.innerHTML = loginCard(`<p class="muted os-login__lead">${reset ? `${e(info.message || '')} Check <strong>${e(info.email)}</strong> for a 6-digit code; it expires in ${e(info.expiresInMinutes || 10)} minutes.` : `We emailed a 6-digit code to <strong>${e(info.email)}</strong>. It expires in ${e(info.expiresInMinutes || 10)} minutes.`}</p>${errBox(err)}${note ? `<p class="alert alert--ok" data-otp-note>${e(note)}</p>` : ''}
   ${info.devCode ? `<p class="alert alert--ok" data-dev-code>Local development: your code is ${e(info.devCode)}</p>` : ''}
   <form class="form" data-otp novalidate><div class="field"><label for="ac">Code from your email</label><input id="ac" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></div>
   <button class="os-btn" type="submit">Verify code</button></form>
-  <p class="os-login__links"><button class="textlink" type="button" data-resend>Send a new code</button><button class="textlink" type="button" data-restart>Use a different account</button></p>`, 1);
+  <p class="os-login__links"><button class="textlink" type="button" data-resend>Send a new code</button><button class="textlink" type="button" data-restart>${reset ? 'Back to sign in' : 'Use a different account'}</button></p>`, reset ? 0 : 1, reset ? 'reset_password' : 'login');
   const f = root.querySelector('[data-otp]');
   f.code.focus();
   f.code.addEventListener('input', () => { f.code.value = f.code.value.replace(/\D/g, '').slice(0, 6); });
   f.addEventListener('submit', async (ev) => {
     ev.preventDefault();
-    try { await api('/api/admin/login/otp', { method: 'POST', body: { code: f.code.value } }); pinStep(); } catch (x) { restartOr(x, (m) => otpStep(info, m)); }
+    try { const r = await api('/api/admin/login/otp', { method: 'POST', body: { code: f.code.value } }); pinStep(r.purpose); } catch (x) { restartOr(x, (m) => otpStep(info, m)); }
   });
   root.querySelector('[data-resend]').addEventListener('click', async () => {
-    try { const next = await api('/api/admin/login/resend', { method: 'POST', body: {} }); otpStep(next, '', 'A new code is on its way. Earlier codes no longer work.'); } catch (x) { restartOr(x, (m) => otpStep(info, m)); }
+    try { const next = await api('/api/admin/login/resend', { method: 'POST', body: {} }); otpStep({ ...info, ...next }, '', 'A new code is on its way. Earlier codes no longer work.'); } catch (x) { restartOr(x, (m) => otpStep(info, m)); }
   });
   root.querySelector('[data-restart]').addEventListener('click', () => { pendingCredential = null; login(); });
 }
-function pinStep(err = '') {
-  root.innerHTML = loginCard(`<p class="muted os-login__lead">Code verified. Enter your 6-digit admin PIN to open the dashboard.</p>${errBox(err)}
+function pinStep(purpose = 'login', err = '') {
+  const reset = purpose === 'reset_password';
+  root.innerHTML = loginCard(`<p class="muted os-login__lead">${reset ? 'Code verified. Enter your PIN to confirm it’s you, then choose a new password.' : 'Code verified. Enter your 6-digit admin PIN to open the dashboard.'}</p>${errBox(err)}
   <form class="form" data-pin novalidate><div class="field"><label for="apin">PIN</label><input id="apin" name="pin" type="password" inputmode="numeric" autocomplete="off" pattern="[0-9]{6}" maxlength="6" required></div>
-  <button class="os-btn" type="submit">Open dashboard</button></form>
-  <p class="os-login__links"><button class="textlink" type="button" data-restart>Start again</button></p>`, 2);
+  <button class="os-btn" type="submit">${reset ? 'Continue' : 'Open dashboard'}</button></form>
+  <p class="os-login__links">${reset ? '<span class="muted">Forgot your PIN too? Ask the CNM Group owner to reset your account.</span>' : '<button class="textlink" type="button" data-forgot-pin>Forgot PIN?</button>'}<button class="textlink" type="button" data-restart>Start again</button></p>`, 1 + (reset ? 0 : 1), reset ? 'reset_password' : 'login');
   const f = root.querySelector('[data-pin]');
   f.pin.focus();
   f.pin.addEventListener('input', () => { f.pin.value = f.pin.value.replace(/\D/g, '').slice(0, 6); });
   f.addEventListener('submit', async (ev) => {
     ev.preventDefault();
-    try { ({ admin: me } = await api('/api/admin/login/pin', { method: 'POST', body: { pin: f.pin.value } })); if (pendingCredential) pendingCredential.name = me.name; await saveCredential(); shell(); route(); } catch (x) { restartOr(x, (m) => pinStep(m)); }
+    try {
+      const r = await api('/api/admin/login/pin', { method: 'POST', body: { pin: f.pin.value } });
+      if (r.step === 'new_password') newSecret('password'); else await signedIn(r);
+    } catch (x) { restartOr(x, (m) => pinStep(purpose, m)); }
+  });
+  root.querySelector('[data-forgot-pin]')?.addEventListener('click', async () => {
+    try { await api('/api/admin/login/forgot-pin', { method: 'POST', body: {} }); newSecret('pin'); } catch (x) { restartOr(x, (m) => pinStep(purpose, m)); }
+  });
+  root.querySelector('[data-restart]').addEventListener('click', () => { pendingCredential = null; login(); });
+}
+// Choose a new password (after code + PIN) or a new PIN (after password + code); then you're signed in.
+function newSecret(kind, err = '') {
+  const pin = kind === 'pin';
+  const input = (id, name, label) => `<div class="field"><label for="${id}">${label}</label><input id="${id}" name="${name}" type="password" ${pin ? 'inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off"' : 'minlength="12" maxlength="200" autocomplete="new-password"'} required></div>`;
+  root.innerHTML = loginCard(`<p class="muted os-login__lead">${pin ? 'Password and code confirmed. Choose a new 6-digit PIN — avoid repeated or sequential digits.' : 'PIN confirmed. Choose a new password of at least 12 characters.'}</p>${errBox(err)}
+  <form class="form" data-new-secret novalidate>${pin ? '' : '<input type="email" name="username" autocomplete="username" hidden>'}${input('ns1', pin ? 'pin' : 'password', pin ? 'New PIN' : 'New password')}${input('ns2', 'confirm', pin ? 'Type the new PIN again' : 'Type the new password again')}
+  <button class="os-btn" type="submit">${pin ? 'Save PIN and open dashboard' : 'Save password and open dashboard'}</button></form>
+  <p class="os-login__links"><button class="textlink" type="button" data-restart>Cancel</button></p>`, 2, pin ? 'reset_pin' : 'reset_password');
+  const f = root.querySelector('[data-new-secret]');
+  f.elements[pin ? 'pin' : 'password'].focus();
+  if (pin) [f.pin, f.confirm].forEach((x) => x.addEventListener('input', () => { x.value = x.value.replace(/\D/g, '').slice(0, 6); }));
+  f.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const body = pin ? { pin: f.pin.value, confirm: f.confirm.value } : { password: f.password.value, confirm: f.confirm.value };
+    try { await signedIn(await api(`/api/admin/login/new-${kind}`, { method: 'POST', body })); } catch (x) { restartOr(x, (m) => newSecret(kind, m)); }
   });
   root.querySelector('[data-restart]').addEventListener('click', () => { pendingCredential = null; login(); });
 }

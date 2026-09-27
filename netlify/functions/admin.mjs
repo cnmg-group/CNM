@@ -3,9 +3,9 @@ import { baseProducts, commerce, liveOverrides, stores } from '../lib/catalogue.
 import { createCompany, leadCompany, listCompanies, scopeFor, updateCompany } from '../lib/companies.mjs';
 import { idempotent } from '../lib/idempotency.mjs';
 import { commandCenter, pulseStamp } from '../lib/metrics.mjs';
-import { emailKey, randomCode, randomToken, safeEqual, sha256, verifyPassword } from '../lib/crypto.mjs';
+import { emailKey, hashPassword, randomCode, randomToken, safeEqual, sha256, verifyPassword } from '../lib/crypto.mjs';
 import { BOOTSTRAP_ADMINS } from '../lib/admin-accounts.mjs';
-import { adminOtpEmail, emailConfigured, sendEmail, statusEmail } from '../lib/email.mjs';
+import { adminOtpEmail, credentialChangedEmail, emailConfigured, sendEmail, statusEmail } from '../lib/email.mjs';
 import { assertCsrf, clientIp, fail, handler, json, readJson, segments } from '../lib/http.mjs';
 import { getOrder, listOrders, saveOrder, setStatus, STATUSES, summary } from '../lib/orders.mjs';
 import { providerFor } from '../lib/payments/index.mjs';
@@ -36,12 +36,25 @@ function adminUsers() {
 }
 const LOCAL_ADMIN = { email: 'admin@cnm.local', role: 'owner', name: 'Local owner', password: 'cnm-local-admin', pin: '246810' };
 const localStore = () => process.env.CNM_LOCAL_STORE === '1';
-function findAdmin(email) {
+function baseAdmin(email) {
   const u = adminUsers().find((x) => x.email.toLowerCase() === email);
   if (u) return u;
   if (process.env.CONTEXT !== 'production' && process.env.ADMIN_STAGING_PASSWORD && email === 'staging@cnmessentials.com') return { email, role: 'owner', name: 'Staging owner', password: process.env.ADMIN_STAGING_PASSWORD, pin: process.env.ADMIN_STAGING_PIN };
   if (localStore() && email === LOCAL_ADMIN.email) return LOCAL_ADMIN;
   return null;
+}
+/** A password or PIN an admin reset themselves (Forgot password / Forgot PIN) is kept, hashed, in the "admins" store and wins over the configured one. */
+const credKey = (email) => `cred/${emailKey(email)}`;
+async function findAdmin(email) {
+  const u = email && baseAdmin(email);
+  if (!u) return null;
+  const o = await (await store('admins')).get(credKey(u.email));
+  return o ? { ...u, ...(o.passwordHash ? { passwordHash: o.passwordHash, password: undefined } : {}), ...(o.pinHash ? { pinHash: o.pinHash, pin: undefined } : {}) } : u;
+}
+async function saveCredential(u, patch) {
+  const admins = await store('admins');
+  const prev = (await admins.get(credKey(u.email))) || {};
+  await admins.set(credKey(u.email), { ...prev, ...patch, email: u.email.toLowerCase(), updatedAt: new Date().toISOString() });
 }
 async function checkPassword(u, password) {
   if (!u) return false;
@@ -54,10 +67,12 @@ const OTP_TTL = 10 * 60 * 1000;
 const OTP_RESEND_AFTER = 30 * 1000;
 const MAX_TRIES = 5;
 const adminPayload = (u) => ({ email: u.email, role: u.role, name: u.name || u.email, permissions: ROLES[u.role] });
-const loginAudit = async (req, context, email, action, detail = {}) => (await store('audit')).set(`${new Date().toISOString()}-${randomToken(4)}`, { admin: email, role: findAdmin(email)?.role || null, action, detail, ip: clientIp(req, context), agent: (req.headers.get('user-agent') || '').slice(0, 160) });
+const loginAudit = async (req, context, email, action, detail = {}) => (await store('audit')).set(`${new Date().toISOString()}-${randomToken(4)}`, { admin: email, role: baseAdmin(email)?.role || null, action, detail, ip: clientIp(req, context), agent: (req.headers.get('user-agent') || '').slice(0, 160) });
+const weakPin = (p) => /^(\d)\1{5}$/.test(p) || '0123456789012345'.includes(p) || '9876543210987654'.includes(p);
+const GENERIC_RESET = 'If that email belongs to a CNM admin, we have sent it a reset code.';
 
-/** Email + password are right → email a fresh 6-digit code and move the browser to the code step. */
-async function startOtp(req, u, resend = false, remember = false) {
+/** Password (or "forgot password") accepted → email a fresh 6-digit code and move the browser to the code step. */
+async function startOtp(req, u, { resend = false, remember = false, purpose = 'login' } = {}) {
   if (!emailConfigured() && !localStore()) fail(503, 'email_not_configured', 'Sign-in codes cannot be emailed yet: email sending (RESEND_API_KEY) is not set up on this site.');
   const tokens = await store('tokens');
   const key = `admin-login/${emailKey(u.email)}`;
@@ -65,67 +80,126 @@ async function startOtp(req, u, resend = false, remember = false) {
   if (resend && prev?.sentAt && Date.now() - prev.sentAt < OTP_RESEND_AFTER) fail(429, 'otp_cooldown', `Please wait ${Math.ceil((OTP_RESEND_AFTER - (Date.now() - prev.sentAt)) / 1000)} seconds before asking for another code.`);
   const code = randomCode(6);
   const nonce = randomToken(12);
-  await tokens.set(key, { nonce, stage: 'otp', hash: sha256(`${nonce}:${code}`), exp: Date.now() + OTP_TTL, attempts: 0, pinAttempts: 0, sentAt: Date.now() });
-  const { sent } = await sendEmail(adminOtpEmail(u.email, code));
-  if (emailConfigured() && !sent) { await tokens.delete(key); fail(502, 'email_failed', 'We could not send your sign-in code. Please try again in a moment.'); }
-  return json({ step: 'otp', email: maskEmail(u.email), expiresInMinutes: OTP_TTL / 60000, resendAfterSeconds: OTP_RESEND_AFTER / 1000, ...(!emailConfigured() && localStore() ? { devCode: code } : {}) }, 200,
+  await tokens.set(key, { nonce, purpose, stage: 'otp', hash: sha256(`${nonce}:${code}`), exp: Date.now() + OTP_TTL, attempts: 0, pinAttempts: 0, sentAt: Date.now() });
+  const { sent } = await sendEmail(adminOtpEmail(u.email, code, purpose));
+  if (emailConfigured() && !sent) { await tokens.delete(key); fail(502, 'email_failed', 'We could not send your code. Please try again in a moment.'); }
+  return json({ step: 'otp', purpose, email: maskEmail(u.email), expiresInMinutes: OTP_TTL / 60000, resendAfterSeconds: OTP_RESEND_AFTER / 1000, ...(purpose !== 'login' ? { message: GENERIC_RESET } : {}), ...(!emailConfigured() && localStore() ? { devCode: code } : {}) }, 200,
     { 'Set-Cookie': await issueAdminStep(req, { email: u.email.toLowerCase(), stage: 'otp', nonce, remember }) });
 }
 
-/** Steps 2–4 of the sign-in: /api/admin/login (password), /login/resend, /login/otp (code), /login/pin (PIN → session). */
+async function finishSignIn(req, context, u, st, tokens, key, detail = {}) {
+  await tokens.delete(key);
+  await loginAudit(req, context, u.email, 'login.success', { remembered: !!st.rem, ...(detail.changed ? { after: `${detail.changed} reset` } : {}) });
+  const expiresAt = new Date(Date.now() + (st.rem ? 24 : 12) * 36e5).toISOString();
+  return json({ admin: { ...adminPayload(u), remembered: !!st.rem, expiresAt }, ...detail }, 200, { 'Set-Cookie': [await issueAdminSession(req, u, { remember: !!st.rem }), clearAdminStep(req)] });
+}
+
+/**
+ * Sign-in:          /login (email + password) → /login/otp (emailed code) → /login/pin → session.
+ * Forgot password:  /login/forgot-password (email) → /login/otp → /login/pin → /login/new-password → session.
+ * Forgot PIN:       /login (password) → /login/otp → /login/forgot-pin → /login/new-pin → session.
+ * Every path needs two of password / emailed code / PIN; forgetting both password and PIN needs the group owner.
+ */
 async function loginFlow(req, context, step) {
   if (req.method !== 'POST') fail(405, 'method_not_allowed', 'Use POST.');
   const b = await readJson(req);
   if (!step) {
     await rateLimit('admin', clientIp(req, context));
     const email = v.email(b.email);
-    const u = findAdmin(email);
+    const u = await findAdmin(email);
     if (!(await checkPassword(u, v.str(b.password, { name: 'Password', max: 200 })))) { if (u) await loginAudit(req, context, email, 'login.password_failed'); fail(401, 'invalid_credentials', 'Email or password is incorrect.'); }
     if (!hasPin(u)) fail(403, 'pin_not_set', 'This admin account has no PIN yet. Ask the owner to set one.');
-    return startOtp(req, u, false, b.remember === true);
+    return startOtp(req, u, { remember: b.remember === true });
+  }
+  if (step === 'forgot-password') {
+    await rateLimit('admin', clientIp(req, context));
+    const email = v.email(b.email);
+    const u = await findAdmin(email);
+    await loginAudit(req, context, email, 'login.forgot_password', { known: !!u });
+    if (u && hasPin(u)) return startOtp(req, u, { remember: b.remember === true, purpose: 'reset_password' });
+    // Unknown email: answer exactly like a real one (a code that can never match), so the form can't be used to find admin emails.
+    const nonce = randomToken(12);
+    await (await store('tokens')).set(`admin-login/${emailKey(email)}`, { nonce, purpose: 'reset_password', stage: 'otp', hash: sha256(randomToken(16)), exp: Date.now() + OTP_TTL, attempts: 0, pinAttempts: 0, sentAt: Date.now() });
+    return json({ step: 'otp', purpose: 'reset_password', email: maskEmail(email), expiresInMinutes: OTP_TTL / 60000, resendAfterSeconds: OTP_RESEND_AFTER / 1000, message: GENERIC_RESET }, 200,
+      { 'Set-Cookie': await issueAdminStep(req, { email, stage: 'otp', nonce }) });
   }
   await rateLimit('admin2fa', clientIp(req, context));
   const st = await readAdminStep(req);
-  const u = st && findAdmin(st.email);
-  if (!u) fail(401, 'login_expired', 'Your sign-in has expired. Please enter your email and password again.');
   const tokens = await store('tokens');
-  const key = `admin-login/${emailKey(u.email)}`;
-  const rec = await tokens.get(key);
-  const restart = async (msg) => { await tokens.delete(key); return fail(401, 'login_expired', msg, { restart: true }); };
-  if (!rec || rec.nonce !== st.nonce || rec.exp < Date.now()) return restart('Your sign-in has expired. Please enter your email and password again.');
+  const key = st && `admin-login/${emailKey(st.email)}`;
+  const rec = key && await tokens.get(key);
+  const restart = async (msg) => { if (key) await tokens.delete(key); return fail(401, 'login_expired', msg, { restart: true }); };
+  if (!rec || rec.nonce !== st.nonce || rec.exp < Date.now()) return restart('Your sign-in has expired. Please start again.');
+  const u = await findAdmin(st.email);
+  const purpose = rec.purpose || 'login';
+  const next = async (stage, extra = {}) => {
+    rec.stage = stage; rec.exp = Date.now() + OTP_TTL;
+    await tokens.set(key, rec);
+    return json({ step: stage, purpose, ...extra }, 200, { 'Set-Cookie': await issueAdminStep(req, { email: st.email, stage, nonce: rec.nonce, remember: !!st.rem }) });
+  };
+  const at = (stage, msg) => { if (st.stage !== stage || rec.stage !== stage) fail(409, 'wrong_step', msg); };
   if (step === 'resend') {
-    if (st.stage !== 'otp' || rec.stage !== 'otp') fail(409, 'wrong_step', 'Your code has already been checked.');
-    return startOtp(req, u, true, !!st.rem);
+    at('otp', 'Your code has already been checked.');
+    if (!u) { rec.sentAt = Date.now(); await tokens.set(key, rec); return json({ step: 'otp', purpose, email: maskEmail(st.email), expiresInMinutes: OTP_TTL / 60000, resendAfterSeconds: OTP_RESEND_AFTER / 1000, message: GENERIC_RESET }); }
+    return startOtp(req, u, { resend: true, remember: !!st.rem, purpose });
   }
   if (step === 'otp') {
-    if (st.stage !== 'otp' || rec.stage !== 'otp') fail(409, 'wrong_step', 'Your code has already been checked. Enter your PIN.');
+    at('otp', 'Your code has already been checked. Enter your PIN.');
     const code = String(b.code || '').replace(/\s/g, '');
     if (!/^\d{6}$/.test(code)) fail(400, 'invalid_code', 'Enter the 6-digit code from your email.');
-    if (!safeEqual(sha256(`${rec.nonce}:${code}`), rec.hash)) {
+    if (!u || !safeEqual(sha256(`${rec.nonce}:${code}`), rec.hash)) {
       rec.attempts++;
-      if (rec.attempts >= MAX_TRIES) { await loginAudit(req, context, u.email, 'login.otp_locked'); return restart('Too many incorrect codes. Please sign in again to get a new code.'); }
+      if (rec.attempts >= MAX_TRIES) { await loginAudit(req, context, st.email, 'login.otp_locked', { purpose }); return restart('Too many incorrect codes. Please start again to get a new code.'); }
       await tokens.set(key, rec);
       fail(400, 'invalid_code', `That code is incorrect. ${MAX_TRIES - rec.attempts} attempts left.`);
     }
-    rec.stage = 'pin'; rec.hash = null; rec.exp = Date.now() + OTP_TTL;
-    await tokens.set(key, rec);
-    return json({ step: 'pin' }, 200, { 'Set-Cookie': await issueAdminStep(req, { email: st.email, stage: 'pin', nonce: rec.nonce, remember: !!st.rem }) });
+    rec.hash = null;
+    return next('pin');
   }
+  if (!u) return restart('Your sign-in has expired. Please start again.');
   if (step === 'pin') {
-    if (st.stage !== 'pin' || rec.stage !== 'pin') fail(409, 'wrong_step', 'Enter the code from your email first.');
+    at('pin', 'Enter the code from your email first.');
     const pin = String(b.pin || '');
     if (!/^\d{6}$/.test(pin)) fail(400, 'invalid_pin', 'Enter your 6-digit PIN.');
     if (!(await checkPin(u, pin))) {
       rec.pinAttempts++;
-      if (rec.pinAttempts >= MAX_TRIES) { await loginAudit(req, context, u.email, 'login.pin_locked'); return restart('Too many incorrect PINs. Please sign in again.'); }
+      if (rec.pinAttempts >= MAX_TRIES) { await loginAudit(req, context, u.email, 'login.pin_locked', { purpose }); return restart('Too many incorrect PINs. Please start again.'); }
       await tokens.set(key, rec);
-      await loginAudit(req, context, u.email, 'login.pin_failed');
+      await loginAudit(req, context, u.email, 'login.pin_failed', { purpose });
       fail(401, 'invalid_pin', `That PIN is incorrect. ${MAX_TRIES - rec.pinAttempts} attempts left.`);
     }
-    await tokens.delete(key);
-    await loginAudit(req, context, u.email, 'login.success', { remembered: !!st.rem });
-    const expiresAt = new Date(Date.now() + (st.rem ? 24 : 12) * 36e5).toISOString();
-    return json({ admin: { ...adminPayload(u), remembered: !!st.rem, expiresAt } }, 200, { 'Set-Cookie': [await issueAdminSession(req, u, { remember: !!st.rem }), clearAdminStep(req)] });
+    if (purpose === 'reset_password') return next('new_password');
+    return finishSignIn(req, context, u, st, tokens, key);
+  }
+  if (step === 'forgot-pin') {
+    at('pin', 'Enter the code from your email first.');
+    if (purpose !== 'login') fail(409, 'need_owner', 'To reset a password you need your PIN, and to reset a PIN you need your password. If you have forgotten both, ask the CNM Group owner to reset your account.');
+    await loginAudit(req, context, u.email, 'login.forgot_pin');
+    return next('new_pin');
+  }
+  if (step === 'new-password') {
+    at('new_password', 'Confirm your email code and PIN first.');
+    const pw = v.str(b.password, { name: 'New password', max: 200 });
+    if (pw.length < 12) fail(422, 'weak_password', 'Use at least 12 characters for your new password.');
+    if (pw !== b.confirm) fail(422, 'mismatch', 'The two passwords do not match.');
+    if (pw.toLowerCase().includes(u.email.split('@')[0].toLowerCase())) fail(422, 'weak_password', 'Your password should not contain your email name.');
+    if (await checkPassword(u, pw)) fail(422, 'same_password', 'Choose a password you have not used for this account.');
+    await saveCredential(u, { passwordHash: await hashPassword(pw) });
+    await sendEmail(credentialChangedEmail(u.email, 'password', clientIp(req, context)));
+    await loginAudit(req, context, u.email, 'login.password_reset');
+    return finishSignIn(req, context, u, st, tokens, key, { changed: 'password' });
+  }
+  if (step === 'new-pin') {
+    at('new_pin', 'Confirm your password and email code first.');
+    const pin = String(b.pin || '');
+    if (!/^\d{6}$/.test(pin)) fail(422, 'invalid_pin', 'Your PIN must be exactly 6 digits.');
+    if (pin !== String(b.confirm || '')) fail(422, 'mismatch', 'The two PINs do not match.');
+    if (weakPin(pin)) fail(422, 'weak_pin', 'Avoid repeated or sequential digits such as 111111 or 123456.');
+    if (hasPin(u) && await checkPin(u, pin)) fail(422, 'same_pin', 'Choose a PIN you have not used for this account.');
+    await saveCredential(u, { pinHash: await hashPassword(pin) });
+    await sendEmail(credentialChangedEmail(u.email, 'PIN', clientIp(req, context)));
+    await loginAudit(req, context, u.email, 'login.pin_reset');
+    return finishSignIn(req, context, u, st, tokens, key, { changed: 'pin' });
   }
   fail(404, 'not_found', 'Unknown sign-in step.');
 }
