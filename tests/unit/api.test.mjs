@@ -139,3 +139,32 @@ test('leads: enquiry requires consent; honeypot; newsletter', async () => {
   assert.equal((await call('leads', 'POST', '/api/enquiry', { body: { ...base, website: 'spam' } })).status, 200);
   assert.equal((await call('leads', 'POST', '/api/newsletter', { body: { email: 'n@example.com', consent: true } })).status, 201);
 });
+
+test('otp sign-in: new customers get a code, verify creates a verified account; cooldown; attempt limits', async () => {
+  const email = 'newbuyer@example.com';
+  const r1 = await call('auth', 'POST', '/api/auth/otp-request', { body: { email } });
+  assert.equal(r1.status, 200);
+  assert.match(r1.data.devCode, /^\d{6}$/);
+  assert.equal((await call('auth', 'POST', '/api/auth/otp-request', { body: { email } })).status, 429, 'resend cooldown');
+  const wrong = await call('auth', 'POST', '/api/auth/otp-verify', { body: { email, code: r1.data.devCode === '000000' ? '111111' : '000000' } });
+  assert.match(wrong.data.message, /4 attempts left/);
+  const ok = await call('auth', 'POST', '/api/auth/otp-verify', { body: { email, code: r1.data.devCode } });
+  assert.equal(ok.status, 201);
+  assert.equal(ok.data.isNew, true);
+  assert.equal(ok.data.needsProfile, true);
+  assert.match(ok.cookie, /^cnm_session=/);
+  assert.equal((await call('auth', 'POST', '/api/auth/otp-verify', { body: { email, code: r1.data.devCode } })).status, 400, 'codes are single use');
+  const pw = await call('auth', 'POST', '/api/auth/login', { body: { email, password: 'whatever-password' } });
+  assert.match(pw.data.message, /email code/);
+});
+
+test('admin refunds go through the payment adapter before the order is marked refunded', async () => {
+  const owner = await call('admin', 'POST', '/api/admin/login', { body: { email: 'admin@cnm.local', password: 'cnm-local-admin' } });
+  const orders = await call('admin', 'GET', '/api/admin/orders?status=processing', { cookie: owner.cookie });
+  const n = orders.data.orders[0].number;
+  assert.equal((await call('admin', 'PATCH', `/api/admin/orders/${n}`, { cookie: owner.cookie, body: { status: 'refunded', amount: 99999999 } })).status, 422);
+  const r = await call('admin', 'PATCH', `/api/admin/orders/${n}`, { cookie: owner.cookie, body: { status: 'refunded', amount: 1000 } });
+  assert.equal(r.data.order.status, 'refunded');
+  assert.equal(r.data.order.payment.refund.amount, 1000);
+  assert.equal(r.data.order.payment.refund.status, 'processed');
+});

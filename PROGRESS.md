@@ -66,8 +66,10 @@ CNM supplied screenshots of **cnmessentials.com** (home, shop, about) and **cnm-
 | Notifications | Transactional email (Resend); push (Expo) with granular preferences; SMS preferences stored | DONE (email/push credentials **NEEDS CNM APPROVAL**; SMS provider not yet chosen) |
 | Performance | Static HTML, 6 KB main JS, code-split pages, self-hosted fonts, immutable caching, lazy images, skeletons, delayed loader | DONE |
 | Accessibility | Skip link, focus states, focus-trapped dialogs, labels, ARIA, reduced motion, keyboard search | DONE |
+| Integrations | Resend email (sign-in codes, orders), Supabase database adapter + SQL migration, Paystack payment adapter (initialize, verify, webhooks, refunds) | DONE (needs keys in Netlify: see `docs/INTEGRATIONS.md`) |
+| Sign-in | Passwordless email code (OTP) as the default sign-in; new customers are created on first code | DONE |
 | Security | Signed HttpOnly sessions, CSRF, rate limits, validation, server-side pricing, RBAC, webhook HMAC, CSP/HSTS | DONE |
-| Testing | 19 unit/integration tests, 23 Playwright E2E tests (desktop + mobile) | DONE (all passing) |
+| Testing | 28 unit/integration tests, 27 Playwright E2E tests (desktop + mobile) | DONE (all passing) |
 | Staging | Netlify config; staging is noindexed with a staging banner and payment simulator | DONE (deploy needs Netlify access, see `docs/DEPLOYMENT.md`) |
 | Visual QA | 69 screenshots, desktop + mobile, `docs/visual-review/index.html` | DONE (with real CNM assets) |
 | Production | Connect cnmessentials.com | Waiting for final CNM approval |

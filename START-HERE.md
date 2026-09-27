@@ -21,7 +21,11 @@ A one-page summary of what's built, how to see it, and what CNM still needs to s
 2. **Screenshots now:** open `docs/visual-review/index.html` for 69 screenshots, every page on desktop and mobile.
 3. **Try it:** promo code `STAGING10`. Payments are simulated, so no money moves; you can test both a successful and a failed payment.
 
-## 3. What CNM needs to send
+## 3. Connect email, database and payments
+
+Follow `docs/INTEGRATIONS.md`: Resend (sign-in codes and order emails), Supabase (database) and Paystack (payments). Each is a few variables in Netlify.
+
+## 4. What CNM needs to send
 
 | # | Item | Why |
 | --- | --- | --- |
@@ -36,6 +40,6 @@ A one-page summary of what's built, how to see it, and what CNM still needs to s
 | 9 | **Confirm:** "Sun Kissed Vanilla" brand (listed as Bath & Body Works, pictured as Febreze) | Accuracy |
 | 10 | **Apple and Google developer accounts** | To publish the app |
 
-## 4. Going live
+## 5. Going live
 
 Nothing is connected to cnmessentials.com yet. After final approval, follow `docs/DEPLOYMENT.md`, section 3. Then set the **Retail** link on cnm-group.net to `https://cnmessentials.com`.

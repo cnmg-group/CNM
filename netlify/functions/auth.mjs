@@ -1,5 +1,5 @@
 // /api/auth/* — register, login, logout, me, password reset, passwordless email code.
-import { emailKey, hashPassword, randomCode, randomToken, sha256, verifyPassword } from '../lib/crypto.mjs';
+import { emailKey, hashPassword, randomCode, randomToken, safeEqual, sha256, verifyPassword } from '../lib/crypto.mjs';
 import { emailConfigured, otpEmail, resetEmail, sendEmail } from '../lib/email.mjs';
 import { assertCsrf, clientIp, fail, handler, isMobile, json, readJson, segments } from '../lib/http.mjs';
 import { rateLimit } from '../lib/ratelimit.mjs';
@@ -19,6 +19,24 @@ async function signedIn(req, user, status = 200) {
   const { token, setCookie } = await issueUserSession(req, user);
   return json({ user: publicUser(user), ...(isMobile(req) ? { token } : {}) }, status, { 'Set-Cookie': setCookie });
 }
+
+async function createUser(users, { email, firstName = '', lastName = '', passwordHash = null, marketing = false, verified = false }) {
+  const user = {
+    id: randomToken(12), email, firstName, lastName, phone: '', passwordHash, sessionVersion: 0, createdAt: new Date().toISOString(),
+    emailVerifiedAt: verified ? new Date().toISOString() : null, addresses: [], wishlist: [], pushTokens: [],
+    preferences: {
+      email: { orders: true, backInStock: true, wishlist: false, newArrivals: marketing, events: marketing, promotions: marketing },
+      sms: { orders: true, backInStock: false, wishlist: false, newArrivals: false, events: false, promotions: false },
+      push: { orders: true, backInStock: true, wishlist: false, newArrivals: false, events: false, promotions: false },
+    },
+  };
+  await users.set(`user/${user.id}`, user);
+  await users.set(`email/${emailKey(email)}`, { id: user.id });
+  return user;
+}
+
+const OTP_TTL = 10 * 60 * 1000;
+const OTP_RESEND_AFTER = 60 * 1000;
 
 // A fixed dummy hash so unknown emails take the same time as wrong passwords (no user enumeration by timing).
 const DUMMY = 'scrypt$16384$AAAAAAAAAAAAAAAAAAAAAA==$' + Buffer.alloc(64).toString('base64');
@@ -46,18 +64,7 @@ export default handler(async (req, context) => {
       const firstName = v.str(body.firstName, { name: 'First name', max: 80 });
       const lastName = v.str(body.lastName, { name: 'Last name', max: 80 });
       if (await findByEmail(users, email)) fail(409, 'exists', 'An account with this email already exists. Try signing in.');
-      const now = new Date().toISOString();
-      const user = {
-        id: randomToken(12), email, firstName, lastName, phone: '', passwordHash: await hashPassword(password), sessionVersion: 0, createdAt: now,
-        addresses: [], wishlist: [], pushTokens: [],
-        preferences: {
-          email: { orders: true, backInStock: true, wishlist: false, newArrivals: v.bool(body.marketingOptIn), events: v.bool(body.marketingOptIn), promotions: v.bool(body.marketingOptIn) },
-          sms: { orders: true, backInStock: false, wishlist: false, newArrivals: false, events: false, promotions: false },
-          push: { orders: true, backInStock: true, wishlist: false, newArrivals: false, events: false, promotions: false },
-        },
-      };
-      await users.set(`user/${user.id}`, user);
-      await users.set(`email/${emailKey(email)}`, { id: user.id });
+      const user = await createUser(users, { email, firstName, lastName, passwordHash: await hashPassword(password), marketing: v.bool(body.marketingOptIn) });
       return signedIn(req, user, 201);
     }
     case 'login': {
@@ -65,7 +72,7 @@ export default handler(async (req, context) => {
       const password = v.str(body.password, { name: 'Password', max: 200 });
       const user = await findByEmail(users, email);
       const ok = await verifyPassword(password, user?.passwordHash || DUMMY);
-      if (!user || !ok) fail(401, 'invalid_credentials', 'Email or password is incorrect.');
+      if (!user || !ok) fail(401, 'invalid_credentials', user && !user.passwordHash ? 'This account signs in with an email code. Choose "Email me a code".' : 'Email or password is incorrect.');
       return signedIn(req, user);
     }
     case 'logout':
@@ -98,29 +105,46 @@ export default handler(async (req, context) => {
       return json({ ok: true });
     }
     case 'otp-request': {
+      // Passwordless sign-in: anyone with an email address gets a 6-digit code. New emails get an account on first verify.
       const email = v.email(body.email);
-      const user = await findByEmail(users, email);
-      let devCode;
-      if (user) {
-        const code = randomCode(6);
-        await (await store('tokens')).set(`otp/${emailKey(email)}`, { hash: sha256(code), exp: Date.now() + 10 * 60 * 1000, attempts: 0 });
-        await sendEmail(otpEmail(email, code));
-        if (!emailConfigured() && staging()) devCode = code;
+      const tokens = await store('tokens');
+      const key = `otp/${emailKey(email)}`;
+      const prev = await tokens.get(key);
+      if (prev && prev.sentAt && Date.now() - prev.sentAt < OTP_RESEND_AFTER) {
+        fail(429, 'otp_cooldown', `Please wait ${Math.ceil((OTP_RESEND_AFTER - (Date.now() - prev.sentAt)) / 1000)} seconds before requesting another code.`);
       }
-      return json({ ok: true, ...(devCode ? { devCode } : {}) });
+      const code = randomCode(6);
+      await tokens.set(key, { hash: sha256(code), exp: Date.now() + OTP_TTL, attempts: 0, sentAt: Date.now() });
+      const { sent } = await sendEmail(otpEmail(email, code));
+      const devCode = !emailConfigured() && staging() ? code : undefined;
+      if (emailConfigured() && !sent) fail(502, 'email_failed', 'We could not send your code right now. Please try again in a moment.');
+      return json({ ok: true, expiresInMinutes: OTP_TTL / 60000, resendAfterSeconds: OTP_RESEND_AFTER / 1000, ...(devCode ? { devCode } : {}) });
     }
     case 'otp-verify': {
       const email = v.email(body.email);
       const code = v.str(body.code, { name: 'Code', max: 6 });
+      if (!/^\d{6}$/.test(code)) fail(400, 'invalid_code', 'Enter the 6-digit code from your email.');
       const tokens = await store('tokens');
       const key = `otp/${emailKey(email)}`;
       const rec = await tokens.get(key);
       if (!rec || rec.exp < Date.now() || rec.attempts >= 5) fail(400, 'invalid_code', 'This code has expired. Please request a new one.');
-      if (sha256(code) !== rec.hash) { rec.attempts++; await tokens.set(key, rec); fail(400, 'invalid_code', 'That code is incorrect.'); }
+      if (!safeEqual(sha256(code), rec.hash)) { rec.attempts++; await tokens.set(key, rec); fail(400, 'invalid_code', `That code is incorrect. ${Math.max(0, 5 - rec.attempts)} attempts left.`); }
       await tokens.delete(key);
-      const user = await findByEmail(users, email);
-      if (!user) fail(400, 'invalid_code', 'That code is incorrect.');
-      return signedIn(req, user);
+      let user = await findByEmail(users, email);
+      const isNew = !user;
+      if (!user) {
+        user = await createUser(users, {
+          email, verified: true, marketing: v.bool(body.marketingOptIn),
+          firstName: v.str(body.firstName, { name: 'First name', max: 80, required: false }),
+          lastName: v.str(body.lastName, { name: 'Last name', max: 80, required: false }),
+        });
+      } else if (!user.emailVerifiedAt) {
+        user.emailVerifiedAt = new Date().toISOString();
+        await users.set(`user/${user.id}`, user);
+      }
+      const res = await signedIn(req, user, isNew ? 201 : 200);
+      const data = await res.json();
+      return json({ ...data, isNew, needsProfile: !user.firstName }, res.status, { 'Set-Cookie': res.headers.get('set-cookie') });
     }
     default:
       fail(404, 'not_found', 'Unknown action.');

@@ -209,3 +209,21 @@ test('CNM Group: Retail routes to the store; contact form sends a message', asyn
   await page.locator('#contact button[type="submit"]').click();
   await expect(page.locator('#contact [data-enquiry-ok]')).toContainText('CNM Group will be in touch');
 });
+
+test('passwordless sign-in: email code creates an account, then asks for a name', async ({ page }) => {
+  await page.goto('/account/login/');
+  await expect(page.locator('[data-otp-form]')).toBeVisible();
+  await page.fill('#o-email', unique());
+  await page.click('[data-otp-submit]');
+  const note = page.locator('[data-otp-note]');
+  await expect(note).toContainText('your code is');
+  const code = (await note.textContent()).match(/(\d{6})/)[1];
+  await page.fill('#o-code', code);
+  await expect(page).toHaveURL(/\/account\/profile\/\?welcome=1/);
+  await expect(page.locator('.alert--ok')).toContainText('Welcome to CNM Essentials');
+  await page.fill('#p-first', 'Chioma');
+  await page.fill('#p-last', 'Eze');
+  await page.click('[data-profile] button[type="submit"]');
+  await expect(page).toHaveURL(/\/account\/$/);
+  await expect(page.locator('[data-account-panel] h1')).toContainText('Welcome, Chioma');
+});

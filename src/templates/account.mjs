@@ -27,21 +27,26 @@ export function accountPage(view) {
 export function loginPage() {
   return `<div class="container"><div class="auth-wrap" data-auth="login">
   <h1>Sign in</h1>
-  <div class="tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-auth-tab="password">Password</button><button type="button" role="tab" aria-selected="false" data-auth-tab="otp">Email code</button></div>
+  <p class="center muted">New or returning, we'll email you a one-time code. No password needed.</p>
+  <div class="tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-auth-tab="otp">Email code</button><button type="button" role="tab" aria-selected="false" data-auth-tab="password">Password</button></div>
   <div class="alert alert--err" role="alert" data-auth-error hidden></div>
-  <form class="form" data-login-form novalidate>
+  <form class="form" data-otp-form novalidate>
+    <div class="field"><label for="o-email">Email</label><input id="o-email" name="email" type="email" autocomplete="email" required></div>
+    <div class="field" data-otp-code hidden><label for="o-code">6-digit code</label><input id="o-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" style="letter-spacing:.5em;font-size:1.25rem;text-align:center"></div>
+    <button class="btn btn--block" type="submit" data-otp-submit>Email me a code</button>
+    <p class="muted" style="font-size:.8125rem" data-otp-note aria-live="polite"></p>
+    <div style="display:flex;justify-content:space-between;gap:12px" data-otp-actions hidden>
+      <button class="textlink muted" type="button" data-otp-change style="font-size:.8125rem">Use a different email</button>
+      <button class="textlink muted" type="button" data-otp-resend style="font-size:.8125rem" disabled>Resend code</button>
+    </div>
+  </form>
+  <form class="form" data-login-form novalidate hidden>
     <div class="field"><label for="l-email">Email</label><input id="l-email" name="email" type="email" autocomplete="username" required></div>
     <div class="field"><label for="l-pass">Password</label><input id="l-pass" name="password" type="password" autocomplete="current-password" required></div>
     <button class="btn btn--block" type="submit">Sign in</button>
     <a class="textlink muted" href="/account/reset/" style="font-size:.875rem;justify-self:center">Forgotten your password?</a>
   </form>
-  <form class="form" data-otp-form novalidate hidden>
-    <div class="field"><label for="o-email">Email</label><input id="o-email" name="email" type="email" autocomplete="email" required></div>
-    <div class="field" data-otp-code hidden><label for="o-code">6-digit code</label><input id="o-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6"></div>
-    <button class="btn btn--block" type="submit" data-otp-submit>Email me a code</button>
-    <p class="muted" style="font-size:.8125rem" data-otp-note></p>
-  </form>
-  <p class="center muted">New to CNM? <a class="textlink" href="/account/register/" data-register-link>Create an account</a></p>
+  <p class="center muted" style="font-size:.8125rem">Prefer a password? <a class="textlink" href="/account/register/" data-register-link>Create an account with a password</a></p>
 </div></div>`;
 }
 

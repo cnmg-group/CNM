@@ -33,7 +33,8 @@ Rate limits (per IP, fixed window): auth 10/min, checkout 20/min, enquiry/newsle
 - `GET /api/auth/me` → `{ user }` or `401`
 - `POST /api/auth/reset-request` `{ email }` → `{ ok: true }` (always 200; never reveals whether an account exists)
 - `POST /api/auth/reset-confirm` `{ token, password }` → `{ ok: true }`
-- `POST /api/auth/otp-request` `{ email }` / `POST /api/auth/otp-verify` `{ email, code }` → passwordless sign-in (6-digit code, 10 minutes, 5 attempts)
+- `POST /api/auth/otp-request` `{ email }` → `{ ok, expiresInMinutes, resendAfterSeconds }` (429 `otp_cooldown` within 60 s). Works for any email.
+- `POST /api/auth/otp-verify` `{ email, code, firstName?, lastName? }` → `{ user, token?, isNew, needsProfile }`. Creates the account on first sign-in. 6-digit code, 10 minutes, single use, 5 attempts. This is the **default** sign-in.
 
 `user` = `{ id, email, firstName, lastName, createdAt }`.
 

@@ -3,8 +3,8 @@ import { computeQuote } from '../../src/shared/pricing.mjs';
 import { baseProducts, commerce, productsMap, stores } from '../lib/catalogue.mjs';
 import { randomToken } from '../lib/crypto.mjs';
 import { assertCsrf, clientIp, fail, handler, json, readJson, segments } from '../lib/http.mjs';
-import { orderNumber, saveOrder } from '../lib/orders.mjs';
-import { initialize, paystackEnabled } from '../lib/paystack.mjs';
+import { orderNumber, saveOrder, setStatus } from '../lib/orders.mjs';
+import { activeProvider } from '../lib/payments/index.mjs';
 import { rateLimit } from '../lib/ratelimit.mjs';
 import { currentUser } from '../lib/session.mjs';
 import { store } from '../lib/store.mjs';
@@ -70,7 +70,7 @@ export default handler(async (req, context) => {
     contact, delivery, notes: v.str(body.notes, { name: 'Notes', max: 300, required: false }),
     lines: quote.lines, promoCode: quote.promo?.valid ? quote.promo.code : null,
     totals: { subtotal: quote.subtotal, discount: quote.discount, delivery: quote.delivery, vat: quote.vat, vatIncluded: quote.vatIncluded, total: quote.total, currency: 'NGN' },
-    payment: { provider: paystackEnabled() ? 'paystack' : 'simulated', reference: `${number}-${randomToken(4)}`, status: 'pending' },
+    payment: { provider: activeProvider().name, reference: `${number}-${randomToken(4)}`, status: 'pending' },
     history: [{ status: 'pending_payment', at: now, by: 'customer' }],
     catalogueVersion: baseProducts.length,
   };
@@ -80,20 +80,18 @@ export default handler(async (req, context) => {
     await (await store('leads')).set(`newsletter/${contact.email}`, { email: contact.email, source: 'checkout', consentAt: now });
   }
 
-  if (paystackEnabled()) {
-    try {
-      const init = await initialize({
-        email: contact.email, amountNaira: order.totals.total, reference: order.payment.reference,
-        callbackUrl: `${siteUrl(req)}/checkout/confirmation/?n=${encodeURIComponent(number)}&t=${encodeURIComponent(order.accessToken)}`,
-        metadata: { order_number: number },
-      });
-      return json({ order: { number, accessToken: order.accessToken, total: order.totals.total, status: order.status }, payment: { mode: 'paystack', authorizationUrl: init.authorization_url, reference: order.payment.reference } }, 201);
-    } catch (err) {
-      console.error('[checkout] paystack init failed', err);
-      fail(502, 'payment_unavailable', 'Our payment provider is unavailable right now. Your bag has been kept — please try again shortly.');
-    }
+  const provider = activeProvider();
+  let pay;
+  try {
+    pay = await provider.initialize(order, { callbackUrl: `${siteUrl(req)}/checkout/confirmation/?n=${encodeURIComponent(number)}&t=${encodeURIComponent(order.accessToken)}` });
+  } catch (err) {
+    console.error(`[checkout] ${provider.name} initialize failed`, err);
+    setStatus(order, 'payment_failed', `Could not start payment: ${err.message}`);
+    await saveOrder(order);
+    fail(502, 'payment_unavailable', 'Our payment provider is unavailable right now. Your bag has been kept — please try again shortly.');
   }
-  return json({ order: { number, accessToken: order.accessToken, total: order.totals.total, status: order.status }, payment: { mode: 'simulated', reference: order.payment.reference } }, 201);
+  if (pay.reference !== order.payment.reference) { order.payment.reference = pay.reference; await saveOrder(order); }
+  return json({ order: { number, accessToken: order.accessToken, total: order.totals.total, status: order.status }, payment: { mode: pay.mode, reference: pay.reference, ...(pay.authorizationUrl ? { authorizationUrl: pay.authorizationUrl } : {}) } }, 201);
 });
 
 export const config = { path: ['/api/checkout', '/api/checkout/quote'] };

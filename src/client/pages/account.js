@@ -16,6 +16,7 @@ export async function init() {
   let user;
   try {
     ({ user } = await api('/api/auth/me', { loader: false }));
+    if (!user.firstName && view !== 'profile') { location.replace('/account/profile/?welcome=1'); return; }
     S.setUser(user);
   } catch {
     S.setUser(null);
@@ -66,7 +67,9 @@ async function order(panel) {
 
 async function profile(panel, user) {
   const { profile: p } = await api('/api/account/profile', { loader: false });
-  panel.innerHTML = `<h1 class="h2" style="font-family:var(--serif)">Profile</h1>
+  const params = new URLSearchParams(location.search);
+  const welcome = params.get('welcome') === '1';
+  panel.innerHTML = `${welcome ? '<p class="alert alert--ok">Welcome to CNM Essentials. Add your name so we can personalise your orders.</p>' : ''}<h1 class="h2" style="font-family:var(--serif)">Profile</h1>
   <form class="form" data-profile novalidate style="max-width:520px">
     <div class="form-row"><div class="field"><label for="p-first">First name</label><input id="p-first" name="firstName" required value="${escapeHtml(p.firstName)}"></div><div class="field"><label for="p-last">Last name</label><input id="p-last" name="lastName" required value="${escapeHtml(p.lastName)}"></div></div>
     <div class="field"><label for="p-email">Email</label><input id="p-email" value="${escapeHtml(user.email)}" disabled><span class="hint">Contact us to change your sign-in email.</span></div>
@@ -80,7 +83,12 @@ async function profile(panel, user) {
     if (!validate(f)) return;
     const btn = f.querySelector('button');
     setBusy(btn, true, 'Saving');
-    try { await api('/api/account/profile', { method: 'PUT', body: formData(f) }); toast('Profile saved'); } catch (ex) { toast(ex.message); }
+    try {
+      await api('/api/account/profile', { method: 'PUT', body: formData(f) });
+      toast('Profile saved');
+      const nxt = params.get('next');
+      if (welcome && nxt && nxt.startsWith('/') && !nxt.startsWith('//')) { location.href = nxt; return; }
+    } catch (ex) { toast(ex.message); }
     setBusy(btn, false);
   });
   panel.querySelector('[data-logout-all]').addEventListener('click', async () => {

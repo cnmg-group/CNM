@@ -4,6 +4,7 @@ import { randomToken, verifyPassword } from '../lib/crypto.mjs';
 import { sendEmail, statusEmail } from '../lib/email.mjs';
 import { assertCsrf, clientIp, fail, handler, json, readJson, segments } from '../lib/http.mjs';
 import { getOrder, listOrders, saveOrder, setStatus, STATUSES, summary } from '../lib/orders.mjs';
+import { providerFor } from '../lib/payments/index.mjs';
 import { rateLimit } from '../lib/ratelimit.mjs';
 import { clearAdminCookie, currentAdmin, issueAdminSession } from '../lib/session.mjs';
 import { store } from '../lib/store.mjs';
@@ -110,6 +111,17 @@ export default handler(async (req, context) => {
       if (req.method === 'PATCH') {
         const next = v.oneOf(b.status, STATUSES, 'Status');
         if (!TRANSITIONS[order.status]?.includes(next)) fail(422, 'transition', `An order cannot move from ${order.status} to ${next}.`);
+        if (next === 'refunded') {
+          // Money goes back through the provider first; the order is only marked refunded if that succeeds.
+          const amount = b.amount != null && b.amount !== '' ? Number(b.amount) : undefined;
+          if (amount != null && !(amount > 0 && amount <= order.totals.total)) fail(422, 'invalid', 'Refund amount must be between 0 and the order total.');
+          try {
+            const r = await providerFor(order).refund(order, amount);
+            order.payment.refund = { id: r.id, status: r.status, amount: amount ?? order.totals.total, requestedBy: admin.email, at: new Date().toISOString() };
+          } catch (err) {
+            fail(502, 'refund_failed', `The payment provider rejected the refund: ${err.message}`);
+          }
+        }
         setStatus(order, next, v.str(b.note, { name: 'Note', max: 300, required: false }), admin.email);
         await saveOrder(order);
         await sendEmail(statusEmail(order, new URL(req.url).origin));

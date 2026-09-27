@@ -40,28 +40,61 @@ export function init() {
   }));
 
   const otp = root.querySelector('[data-otp-form]');
-  otp?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    err.hidden = true;
-    if (!validate(otp)) return;
-    const btn = otp.querySelector('[data-otp-submit]');
+  if (otp) {
     const codeField = otp.querySelector('[data-otp-code]');
-    setBusy(btn, true, '');
-    try {
-      if (codeField.hidden) {
-        const r = await api('/api/auth/otp-request', { method: 'POST', body: { email: otp.email.value.trim() } });
-        codeField.hidden = false;
-        otp.code.required = true;
-        otp.code.focus();
-        setBusy(btn, false);
-        btn.textContent = 'Sign in';
-        otp.querySelector('[data-otp-note]').textContent = r.devCode ? `Staging: your code is ${r.devCode} (email delivery not configured).` : 'If an account exists for this email, a code is on its way. It expires in 10 minutes.';
-      } else {
-        const { user } = await api('/api/auth/otp-verify', { method: 'POST', body: { email: otp.email.value.trim(), code: otp.code.value.trim() } });
-        await signedIn(user, 'otp');
-      }
-    } catch (ex) { fail(ex); setBusy(btn, false); }
-  });
+    const btn = otp.querySelector('[data-otp-submit]');
+    const note = otp.querySelector('[data-otp-note]');
+    const actions = otp.querySelector('[data-otp-actions]');
+    const resend = otp.querySelector('[data-otp-resend]');
+    let timer;
+    const countdown = (secs) => {
+      clearInterval(timer);
+      resend.disabled = true;
+      let left = secs;
+      resend.textContent = `Resend code in ${left}s`;
+      timer = setInterval(() => {
+        left -= 1;
+        if (left <= 0) { clearInterval(timer); resend.disabled = false; resend.textContent = 'Resend code'; } else resend.textContent = `Resend code in ${left}s`;
+      }, 1000);
+    };
+    const request = async () => {
+      const r = await api('/api/auth/otp-request', { method: 'POST', body: { email: otp.email.value.trim() } });
+      codeField.hidden = false;
+      actions.hidden = false;
+      otp.code.required = true;
+      otp.email.readOnly = true;
+      otp.code.value = '';
+      otp.code.focus();
+      btn.textContent = 'Sign in';
+      note.textContent = r.devCode
+        ? `Staging: email delivery isn't configured, so your code is ${r.devCode}.`
+        : `We've sent a 6-digit code to ${otp.email.value.trim()}. It expires in ${r.expiresInMinutes} minutes. Check your spam folder if it doesn't arrive.`;
+      countdown(r.resendAfterSeconds || 60);
+    };
+    otp.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      err.hidden = true;
+      if (!validate(otp)) return;
+      setBusy(btn, true, '');
+      try {
+        if (codeField.hidden) { await request(); setBusy(btn, false); btn.textContent = 'Sign in'; }
+        else {
+          const r = await api('/api/auth/otp-verify', { method: 'POST', body: { email: otp.email.value.trim(), code: otp.code.value.trim() } });
+          S.setUser(r.user);
+          track(r.isNew ? 'sign_up' : 'login', { method: 'otp' });
+          await S.mergeWishlistOnSignIn().catch(() => {});
+          location.href = r.needsProfile ? `/account/profile/?welcome=1&next=${encodeURIComponent(next())}` : next();
+        }
+      } catch (ex) { fail(ex); setBusy(btn, false); if (!codeField.hidden) btn.textContent = 'Sign in'; }
+    });
+    otp.code.addEventListener('input', () => { if (/^\d{6}$/.test(otp.code.value)) otp.requestSubmit(); });
+    resend.addEventListener('click', async () => { err.hidden = true; try { await request(); } catch (ex) { fail(ex); } });
+    otp.querySelector('[data-otp-change]').addEventListener('click', () => {
+      clearInterval(timer);
+      codeField.hidden = true; actions.hidden = true; otp.email.readOnly = false; otp.code.required = false;
+      btn.textContent = 'Email me a code'; note.textContent = ''; otp.email.focus();
+    });
+  }
 
   root.querySelector('[data-register-form]')?.addEventListener('submit', async (e) => {
     e.preventDefault();
