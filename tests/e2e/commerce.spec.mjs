@@ -240,7 +240,7 @@ test('CNMGroup.com hub: founder photo, all companies, menu, and contact form', a
   await expect(page.locator('[data-enquiry-ok]')).toContainText('CNM Group will be in touch');
 });
 
-test('every company site has its own pages and a Back to CNM Group button', async ({ page, request }) => {
+test('every company site has its own pages and the floating CNM navigation', async ({ page, request }) => {
   const SITES = {
     spectra: ['/spectra/', '/spectra/eyewear/', '/spectra/eye-care/', '/spectra/book/', '/spectra/about/', '/spectra/contact/'],
     cnmworx: ['/cnmworx/', '/cnmworx/services/', '/cnmworx/industries/', '/cnmworx/quality/', '/cnmworx/about/', '/cnmworx/request/', '/cnmworx/contact/'],
@@ -252,13 +252,14 @@ test('every company site has its own pages and a Back to CNM Group button', asyn
       expect(res.status(), path).toBe(200);
       const html = await res.text();
       expect(html, path).toContain(`data-site="${site}"`);
-      expect(html, path).toContain('Back to CNM Group');
+      expect(html, path).toContain('data-cnmnav');
+      expect(html, path).not.toContain('Back to CNM Group');
     }
     await page.goto(paths[0]);
     await expect(page.locator('.co-logo img')).toBeVisible();
     await expect(page.locator('.co-pillars__list li')).toHaveCount(4);
     await expect(page.locator('.co-pillars__tagline')).toHaveText({ spectra: 'A clearer tomorrow', cnmworx: 'Solutions for a stronger tomorrow', foundation: 'People today. Brighter tomorrows.' }[site]);
-    await page.locator('.backbar__home').click();
+    await page.locator('.cnmnav__home').click();
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('h1')).toContainText('transcend');
   }
@@ -397,13 +398,15 @@ test('passwordless sign-in: email code creates an account, then asks for a name'
   await expect(page.locator('[data-account-panel] h1')).toContainText('Welcome, Chioma');
 });
 
-test('every Essentials page has a Back to CNM Group button', async ({ page }) => {
+test('every Essentials page has the floating CNM navigation and no back button in the header', async ({ page }) => {
   for (const path of ['/essentials/', '/shop/', '/products/white-tea-and-sage-room-spray/', '/checkout/', '/scent-finder/', '/our-story/']) {
     await page.goto(path);
-    await expect(page.locator('.backbar__home')).toHaveAttribute('href', '/');
-    await expect(page.locator('.backbar__home')).toContainText('Back to CNM Group');
+    await expect(page.locator('.cnmnav__home')).toHaveAttribute('href', '/');
+    await expect(page.locator('.cnmnav__home')).toBeVisible();
+    await expect(page.locator('header a[href="/"]:not(.logo)')).toHaveCount(0);
+    await expect(page.locator('body')).not.toContainText('Back to CNM Group');
   }
-  await page.locator('.backbar__home').click();
+  await page.locator('.cnmnav__home').click();
   await expect(page).toHaveURL(/\/$/);
   await expect(page.locator('.ghero__portrait')).toBeVisible();
 });
@@ -500,26 +503,40 @@ test('newsletter pop-up: shows once, dismisses, and never during checkout', asyn
   await expect(page.locator('#newsletter-pop')).toBeHidden();
 });
 
-test('Back to CNM Group navigation: switcher on phones, tabs on desktop, floating pill after scrolling', async ({ page, isMobile }) => {
+test('floating CNM navigation: expands to the sister companies, switches, auto-collapses and goes home in one click', async ({ page, isMobile }) => {
   await page.goto('/foundation/');
+  const nav = page.locator('[data-cnmnav]');
+  const toggle = page.locator('[data-cnmnav-toggle]');
+  await expect(nav).not.toHaveClass(/is-open/);
+  await expect(page.locator('.cnmnav__item').first()).toBeHidden();
+  await expect(page.locator('.cnmnav__item')).toHaveCount(3); // the other three companies
+  await expect(page.locator('.cnmnav__item[href="/foundation/"]')).toHaveCount(0);
+  if (isMobile) await toggle.tap(); else await page.locator('.cnmnav__home').hover();
+  await expect(nav).toHaveClass(/is-open/);
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('.cnmnav__item[href="/spectra/"]')).toBeVisible();
+  // Escape or a tap elsewhere closes it
+  await page.keyboard.press('Escape');
+  await expect(nav).not.toHaveClass(/is-open/);
+  await toggle.click();
+  await expect(nav).toHaveClass(/is-open/);
   if (isMobile) {
-    await expect(page.locator('.backbar__tabs')).toBeHidden();
-    await page.locator('.backbar__dropbtn').click();
-    await expect(page.locator('.backbar__panel')).toBeVisible();
-    await expect(page.locator('.backbar__panel a[aria-current]')).toContainText('CNM Foundation');
-    await page.locator('.backbar__panel a[href="/spectra/"]').click();
-    await expect(page).toHaveURL(/\/spectra\/$/);
-  } else {
-    await expect(page.locator('.backbar__tabs a[aria-current]')).toHaveText('CNM Foundation');
-    await page.locator('.backbar__tabs a[href="/spectra/"]').click();
-    await expect(page).toHaveURL(/\/spectra\/$/);
+    // Collapses by itself when left alone
+    await expect(nav).not.toHaveClass(/is-open/, { timeout: 7000 });
+    await toggle.tap();
   }
-  await expect(page.locator('.backpill')).not.toHaveClass(/is-on/);
+  await page.locator('.cnmnav__item[href="/spectra/"]').click();
+  await expect(page).toHaveURL(/\/spectra\/$/);
+  // Stays with the visitor while scrolling (compact), then one click home
+  await page.evaluate(() => scrollTo(0, 400));
+  await page.waitForTimeout(100);
   await page.evaluate(() => scrollTo(0, 2000));
-  await expect(page.locator('.backpill')).toHaveClass(/is-on/);
-  await page.locator('.backpill').click();
+  await expect(nav).toHaveClass(/is-compact/);
+  await expect(page.locator('.cnmnav__home')).toBeInViewport();
+  await page.locator('.cnmnav__home').click();
   await expect(page).toHaveURL(/\/$/);
   await expect(page.locator('.ghero__portrait')).toBeVisible();
+  await expect(page.locator('.cnmnav__item')).toHaveCount(4); // on CNMGroup.com it lists all four companies
 });
 
 test('light and dark mode: switch, remember, and swap to the light-lettered logo', async ({ page }) => {

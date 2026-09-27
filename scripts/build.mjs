@@ -169,7 +169,7 @@ for (const a of content.articles) {
 { const r = groupAbout(ctx); await write('/about/', page({ page: 'group', chrome: 'group', current: 'about', path: '/about/', title: 'About CNM Group', description: content.site.group.about, body: r.body + nextPage({ href: '/contact/', label: 'Contact CNM Group', eyebrow: 'Continue' }), jsonld: r.jsonld }), { priority: 0.8, changefreq: 'monthly' }); }
 { const r = groupContactPage(ctx); await write('/contact/', page({ page: 'group', chrome: 'group', current: 'contact', path: '/contact/', title: 'Contact CNM Group', description: 'Contact CNM Group about partnerships, investment, collaboration or any of our companies.', body: r.body + nextPage({ href: '/essentials/', label: 'Shop CNM Essentials', eyebrow: 'Explore our companies' }), jsonld: r.jsonld }), { priority: 0.6, changefreq: 'monthly' }); }
 
-// Company websites: each with its own identity and a "Back to CNM Group" button.
+// Company websites: each with its own identity linked to CNM Group by the floating CNM navigation.
 for (const [site, pagesOf] of [['spectra', spectraPages], ['cnmworx', cnmworxPages], ['foundation', foundationPages]]) {
   const list = pagesOf(ctx);
   for (const [i, pg] of list.entries()) {

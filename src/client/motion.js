@@ -67,7 +67,7 @@ function initScroll() {
   document.body.append(top);
 
   const header = document.querySelector('.co-header, .group-header, .site-header:not(.checkout-header)');
-  const parallax = reduce ? [] : [...document.querySelectorAll('.co-hero__media img, .gpanel__media > img, .split__media > img, [data-parallax]')];
+  const parallax = reduce ? [] : [...document.querySelectorAll('.gpanel__media > img, .split__media > img, [data-parallax]')];
   let lastY = scrollY;
   let ticking = false;
 
@@ -89,10 +89,10 @@ function initScroll() {
     }
     lastY = y;
 
-    // The transparent shop-home header is fixed; keep it below the staging and "Back to CNM Group" bars until they scroll away.
+    // The transparent shop-home header is fixed; keep it below the staging / announcement bars until they scroll away.
     if (header?.classList.contains('site-header--overlay')) {
-      const bars = document.querySelector('[data-backbar]');
-      header.style.top = `${bars ? Math.max(0, bars.getBoundingClientRect().bottom) : 0}px`;
+      const bars = [...document.querySelectorAll('.staging-bar, .announce-bar')];
+      header.style.top = `${bars.reduce((m, b) => Math.max(m, b.getBoundingClientRect().bottom), 0)}px`;
     }
 
     for (const img of parallax) {
@@ -184,12 +184,111 @@ function initDropdowns() {
   document.addEventListener('click', (e) => { if (!e.target.closest('[data-drop]')) closeAll(); });
 }
 
-/* ---------- floating "Back to CNM Group" pill once the back bar has scrolled away ---------- */
-function initBackPill() {
-  const bar = document.querySelector('[data-backbar]');
-  const pill = document.querySelector('[data-backpill]');
-  if (!bar || !pill || !('IntersectionObserver' in window)) return;
-  new IntersectionObserver(([en]) => pill.classList.toggle('is-on', !en.isIntersecting), { threshold: 0 }).observe(bar);
+/* ---------- floating CNM navigation: home to CNM Group in one click, sister companies on hover / tap ---------- */
+function initCnmNav() {
+  const nav = document.querySelector('[data-cnmnav]');
+  if (!nav) return;
+  const dock = nav.querySelector('.cnmnav__dock');
+  const home = nav.querySelector('[data-cnmnav-home]');
+  const toggle = nav.querySelector('[data-cnmnav-toggle]');
+  const items = [...nav.querySelectorAll('.cnmnav__item')];
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const IDLE = 4000;
+  let idle;
+  let leave;
+  let hoverOpenedAt = 0;
+  let openedAtY = 0;
+  let suppressClick = false;
+  let usingKeys = false; // keyboard users keep it open while they move through it
+  document.addEventListener('keydown', (e) => { if (e.key === 'Tab' || e.key.startsWith('Arrow')) usingKeys = true; });
+  document.addEventListener('pointerdown', () => { usingKeys = false; }, { capture: true, passive: true });
+
+  const isOpen = () => nav.classList.contains('is-open');
+  const armIdle = () => {
+    clearTimeout(idle);
+    idle = setTimeout(() => {
+      if ((fine && nav.matches(':hover')) || (usingKeys && nav.contains(document.activeElement))) armIdle(); // mouse over it, or a keyboard user inside
+      else set(false);
+    }, IDLE);
+  };
+  function set(open) {
+    if (open === isOpen()) { if (open) armIdle(); return; }
+    nav.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close the company switcher' : 'Switch to another CNM company');
+    items.forEach((a) => { a.tabIndex = open ? 0 : -1; });
+    clearTimeout(idle);
+    if (open) { openedAtY = scrollY; nav.classList.remove('is-compact'); armIdle(); }
+  }
+
+  // First visit in this tab: the control rises into place. Afterwards it simply stays put between pages.
+  try { if (!sessionStorage.getItem('cnm.nav')) { nav.classList.add('is-intro'); sessionStorage.setItem('cnm.nav', '1'); } } catch { /* storage blocked */ }
+  if (document.body.dataset.page === 'checkout') nav.classList.add('is-compact');
+
+  toggle.addEventListener('click', (e) => {
+    // A click right after a hover-open means "keep it open", not "close".
+    const open = isOpen() && Date.now() - hoverOpenedAt < 700 ? true : !isOpen();
+    set(open);
+    if (open && e.detail === 0) items[0]?.focus({ preventScroll: true }); // keyboard
+  });
+
+  if (fine) {
+    nav.addEventListener('mouseenter', () => { clearTimeout(leave); if (!isOpen()) hoverOpenedAt = Date.now(); set(true); });
+    nav.addEventListener('mouseleave', () => { clearTimeout(leave); leave = setTimeout(() => set(false), 420); });
+    if (!reduce) {
+      dock.addEventListener('pointermove', (e) => {
+        const r = dock.getBoundingClientRect();
+        dock.style.setProperty('--mx', `${e.clientX - r.left}px`);
+        dock.style.setProperty('--my', `${e.clientY - r.top}px`);
+      });
+    }
+  }
+
+  // Touch: a long press on the CNM emblem also opens the switcher (a normal tap still goes home).
+  let press;
+  home.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse') return;
+    clearTimeout(press);
+    press = setTimeout(() => { suppressClick = true; set(true); navigator.vibrate?.(8); }, 450);
+  });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach((t) => home.addEventListener(t, () => clearTimeout(press)));
+  home.addEventListener('contextmenu', (e) => { if (suppressClick || !fine) e.preventDefault(); });
+  home.addEventListener('click', (e) => { if (suppressClick) { e.preventDefault(); suppressClick = false; } });
+
+  nav.addEventListener('pointermove', () => { if (isOpen()) armIdle(); }, { passive: true });
+  nav.addEventListener('keydown', (e) => {
+    if (!isOpen() || !['ArrowUp', 'ArrowDown'].includes(e.key)) return;
+    const i = items.indexOf(document.activeElement);
+    const next = e.key === 'ArrowDown' ? (i < 0 ? 0 : i + 1) : (i < 0 ? items.length - 1 : i - 1);
+    e.preventDefault();
+    if (next >= items.length) toggle.focus(); else items[Math.max(0, next)].focus();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || !isOpen()) return;
+    const inside = nav.contains(document.activeElement);
+    set(false);
+    if (inside) toggle.focus();
+  });
+  nav.addEventListener('focusout', (e) => { if (!nav.contains(e.relatedTarget)) set(false); });
+  document.addEventListener('pointerdown', (e) => { if (isOpen() && !nav.contains(e.target)) set(false); }, { passive: true });
+
+  // Reading down the page: collapse to the emblem; scrolling back up brings the label back. Scrolling closes the switcher.
+  let lastY = scrollY;
+  let ticking = false;
+  addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      const y = scrollY;
+      if (isOpen() && Math.abs(y - openedAtY) > 80) set(false);
+      if (document.body.dataset.page !== 'checkout') {
+        if (y > 240 && y - lastY > 4) nav.classList.add('is-compact');
+        else if (y < 120 || lastY - y > 8) nav.classList.remove('is-compact');
+      }
+      lastY = y;
+    });
+  }, { passive: true });
 }
 
 /* ---------- light / dark switch ---------- */
@@ -215,6 +314,6 @@ export function initMotion() {
   initTransitions();
   initImageFade();
   initDropdowns();
-  initBackPill();
+  initCnmNav();
   initThemeToggle();
 }

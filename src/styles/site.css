@@ -1066,7 +1066,6 @@ body[data-chrome="group"] { --c-accent: #d4b06a; --c-accent-ink: #0b1120; --c-ra
 .co-menu__list { display: grid; gap: 4px; }
 .co-menu__list a { display: block; padding: 12px 0; font-family: var(--c-display); font-weight: var(--c-display-weight); letter-spacing: var(--c-display-track); font-size: clamp(1.8rem, 8vw, 2.6rem); line-height: 1.1; border-bottom: 1px solid var(--c-line); }
 .co-menu__list a[aria-current="page"] { color: var(--c-em); }
-.co-menu__back { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: .875rem; letter-spacing: .12em; text-transform: uppercase; padding: 14px 0; }
 @media (max-width: 1024px) { .co-nav { display: none; } .co-menu { display: block; } .co-logo img { height: 46px; } .co-header__row { min-height: 64px; } }
 @media (max-width: 480px) { .co-cta { display: none; } }
 
@@ -1153,9 +1152,6 @@ body[data-site="cnmworx"] .co-band .site-btn--invert { background: var(--c-accen
 .co-footer__brand { display: grid; gap: 16px; align-content: start; }
 .co-footer__logo img { height: 72px; width: auto; }
 .co-footer__brand p { margin: 0; color: var(--c-mute); max-width: 30ch; }
-.co-footer__back { justify-self: start; display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; background: #0b1120; color: #f3ecdd; font-size: .75rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; border-radius: calc(var(--c-radius) * .5); }
-.co-footer__back:hover { background: #d4b06a; color: #0b1120; }
-.co-footer__back svg { width: 14px; height: 14px; }
 .co-footer h2 { font-size: .75rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--c-mute); margin: 0 0 14px; }
 .co-footer ul { display: grid; gap: 10px; font-size: .9375rem; }
 .co-footer a:hover { color: var(--c-em); }
@@ -1350,7 +1346,6 @@ body[data-chrome="group"] .next-page__link:hover .next-page__arrow { background:
 .gdrop__btn { line-height: inherit; font-size: inherit; font-weight: inherit; }
 /* A backdrop-filter would make the header the containing block of the full-screen phone menu, so use a solid bar. */
 .co-header { background: var(--c-bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
-.co-menu__back svg { width: 16px; height: 16px; }
 
 /* ---------- CNM Essentials logo without background ---------- */
 .logo img, .site-footer .logo img, .site-header--overlay .logo img, .site-header--overlay.is-solid .logo img { filter: none; }
@@ -1362,63 +1357,11 @@ body[data-chrome="group"] .next-page__link:hover .next-page__arrow { background:
 .mobile-menu__top .logo img, .checkout-header .logo img { height: 44px; }
 @media (max-width: 960px) { .logo img { height: 42px; } }
 
-/* ---------- "Back to CNM Group" navigation (every company site) ---------- */
-.backbar { position: relative; z-index: 70; background: #0b1120; color: #f3ecdd; font-size: .75rem; border-bottom: 1px solid rgba(212, 176, 106, .22); }
-.backbar::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: linear-gradient(90deg, transparent, #d4b06a, transparent); opacity: .5; }
-.backbar__row { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 48px; }
-.backbar__home { display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 8px; border: 1px solid rgba(212, 176, 106, .45); border-radius: 999px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; font-size: .6875rem; transition: background .3s var(--ease), color .3s, border-color .3s, box-shadow .3s; }
-.backbar__home:hover, .backbar__home:focus-visible { background: #d4b06a; color: #0b1120; border-color: #d4b06a; box-shadow: 0 6px 20px rgba(212, 176, 106, .25); }
-.backbar__arrow { display: inline-grid; place-items: center; width: 16px; transition: transform .35s var(--ease); }
-.backbar__arrow svg { width: 14px; height: 14px; }
-.backbar__home:hover .backbar__arrow { transform: translateX(-4px); }
-.backbar__emblem { width: 26px; height: auto; flex: none; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .35)); }
-.backbar__hint { font-weight: 400; opacity: .7; }
-.backbar__switch { display: flex; align-items: center; }
-.backbar__tabs { display: flex; gap: 4px; }
-.backbar__tabs a { position: relative; display: inline-block; padding: 10px 12px; letter-spacing: .06em; color: rgba(243, 236, 221, .72); transition: color .25s; }
-.backbar__tabs a::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 4px; height: 1px; background: #d4b06a; transform: scaleX(0); transform-origin: left; transition: transform .35s var(--ease); }
-.backbar__tabs a:hover { color: #f3ecdd; }
-.backbar__tabs a:hover::after, .backbar__tabs a[aria-current]::after { transform: scaleX(1); }
-.backbar__tabs a[aria-current] { color: #d4b06a; }
-.backbar__drop { display: none; position: relative; }
-.backbar__dropbtn { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 4px 0 10px; background: none; border: 0; color: inherit; font: inherit; letter-spacing: .04em; cursor: pointer; }
-.backbar__dropbtn strong { color: #d4b06a; font-weight: 600; }
-.backbar__dropbtn svg { width: 12px; height: 12px; transform: rotate(90deg); transition: transform .3s var(--ease); }
-.backbar__drop.is-open .backbar__dropbtn svg { transform: rotate(-90deg); }
-.backbar__panel { position: absolute; right: 0; top: calc(100% + 8px); width: min(300px, calc(100vw - 32px)); display: grid; padding: 8px; background: #0f1729; border: 1px solid rgba(212, 176, 106, .3); border-radius: 14px; box-shadow: 0 24px 50px rgba(0, 0, 0, .45); opacity: 0; visibility: hidden; transform: translateY(-6px) scale(.98); transform-origin: top right; transition: opacity .25s var(--ease), transform .25s var(--ease), visibility 0s .25s; }
-.backbar__drop.is-open .backbar__panel { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
-.backbar__panel a { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px; border-radius: 10px; font-size: .875rem; color: #f3ecdd; }
-.backbar__panel a:hover, .backbar__panel a:focus-visible { background: rgba(243, 236, 221, .06); }
-.backbar__panel a svg { width: 14px; height: 14px; opacity: .6; }
-.backbar__panel a[aria-current] { color: #d4b06a; }
-.backbar__here { font-size: .625rem; letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
-.backbar__panel-home { justify-content: flex-start !important; border-bottom: 1px solid rgba(243, 236, 221, .1); border-radius: 10px 10px 0 0 !important; margin-bottom: 4px; }
-.backbar__panel-home span { display: grid; gap: 2px; }
-.backbar__panel-home span span { font-size: .75rem; opacity: .65; }
-.backbar__panel-home .backbar__emblem { width: 34px; }
-@media (max-width: 860px) {
-  .backbar__tabs { display: none; }
-  .backbar__drop { display: block; }
-}
-@media (max-width: 420px) {
-  .backbar__hint { display: none; }
-  .backbar__home { padding-right: 12px; }
-}
-
-/* Floating pill: the way back stays one tap away after the bar scrolls off */
-.backpill { position: fixed; left: max(16px, env(safe-area-inset-left)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: 70; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px 8px 10px; border-radius: 999px; background: rgba(11, 17, 32, .92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #f3ecdd; border: 1px solid rgba(212, 176, 106, .5); font-size: .6875rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; box-shadow: 0 12px 30px rgba(0, 0, 0, .25); opacity: 0; transform: translateY(16px); pointer-events: none; transition: opacity .35s var(--ease), transform .35s var(--ease), background .25s, color .25s; }
-.backpill.is-on { opacity: 1; transform: none; pointer-events: auto; }
-.backpill:hover, .backpill:focus-visible { background: #d4b06a; color: #0b1120; }
-.backpill__arrow { display: inline-grid; transition: transform .3s var(--ease); }
-.backpill__arrow svg { width: 13px; height: 13px; }
-.backpill:hover .backpill__arrow { transform: translateX(-3px); }
-.backpill .backbar__emblem { width: 22px; }
-body[data-page="pdp"] .backpill { bottom: calc(max(16px, env(safe-area-inset-bottom)) + 76px); }
-body[data-page="checkout"] .backpill, html[style*="overflow: hidden"] .backpill { opacity: 0; pointer-events: none; }
-@media (prefers-reduced-motion: reduce) { .backpill { transition: none; } }
 
 /* ---------- Company hero photo at its true shape + banner pillars ---------- */
-.co-hero__media { aspect-ratio: var(--ar, 4 / 3); max-height: min(78vh, 760px); width: 100%; justify-self: end; }
+.co-hero__media { aspect-ratio: var(--ar, 4 / 3); max-height: min(78vh, 760px); width: 100%; max-width: calc(min(78vh, 760px) * var(--arn, 1.3333)); justify-self: end; }
+/* Hero photographs are shown whole, at their true shape: no parallax zoom crops their edges */
+.co-hero__media img { transform: none !important; will-change: auto; }
 @media (max-width: 960px) { .co-hero__media { max-height: none; aspect-ratio: 4 / 4.2; } }
 .co-pillars { background: var(--c-dark); color: #fff; padding: clamp(32px, 5vw, 56px) 0; }
 .co-pillars__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px 32px; margin-bottom: clamp(24px, 3vw, 36px); }
@@ -1554,3 +1497,105 @@ body[data-site="foundation"] .co-pillars__list li:hover .co-pillars__icon { back
 
 /* Dark mode: logos drop their white tiles and blend into the dark surfaces too */
 :root[data-theme="dark"] .gdivision__co img, :root[data-theme="dark"] .co-logo img, :root[data-theme="dark"] .co-footer__logo img { background: none; padding: 0; border-radius: 0; filter: brightness(0) invert(.93) sepia(.12); }
+
+/* ---------- Floating CNM navigation: the one way home to CNM Group and across every CNM company ---------- */
+.cnmnav { --glass: rgba(18, 20, 28, .74); --glass-hi: rgba(255, 255, 255, .16); --glass-line: rgba(255, 255, 255, .14); --gold: #d4b06a; --spring: cubic-bezier(.34, 1.56, .64, 1);
+  position: fixed; left: max(16px, env(safe-area-inset-left)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: 80;
+  display: grid; justify-items: start; gap: 10px; pointer-events: none; color: #f5f1e8; font-family: var(--sans);
+  transition: opacity .35s var(--ease), transform .45s var(--ease); }
+.cnmnav > * { pointer-events: auto; }
+.cnmnav.is-intro .cnmnav__dock { animation: cnmnav-in .9s var(--spring) .35s backwards; }
+@keyframes cnmnav-in { from { opacity: 0; transform: translateY(24px) scale(.8); } }
+
+/* Glass surfaces (Apple-style: blur + saturation, a hairline edge and a soft inner highlight).
+   The frosted layer is a childless pseudo-element under the content, which keeps the blur reliable in every engine. */
+.cnmnav__dock, .cnmnav__item { position: relative; isolation: isolate; }
+.cnmnav__dock::before, .cnmnav__item::before, .cnmnav__title { background: var(--glass); -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%); border: 1px solid var(--glass-line);
+  box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 -1px 0 rgba(0, 0, 0, .25), 0 18px 40px -12px rgba(0, 0, 0, .45), 0 4px 12px rgba(0, 0, 0, .18); }
+.cnmnav__dock::before, .cnmnav__item::before { content: ""; position: absolute; inset: 0; z-index: -2; border-radius: inherit; transition: background .3s, box-shadow .3s; pointer-events: none; }
+
+.cnmnav__dock { display: flex; align-items: center; gap: 4px; padding: 5px; border-radius: 999px; transition: transform .45s var(--spring); }
+/* specular sheen that follows the pointer */
+.cnmnav__dock::after { content: ""; position: absolute; inset: 1px; z-index: -1; border-radius: inherit; background: radial-gradient(140px circle at var(--mx, 30%) var(--my, 0%), rgba(255, 255, 255, .14), transparent 65%); pointer-events: none; }
+.cnmnav__dock:hover { transform: translateY(-2px); }
+
+.cnmnav__home { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 16px 0 0; border-radius: 999px; color: inherit; text-decoration: none; -webkit-touch-callout: none; user-select: none; }
+.cnmnav__orb { position: relative; display: grid; place-items: center; width: 46px; height: 46px; flex: none; border-radius: 50%;
+  background: radial-gradient(circle at 32% 24%, rgba(255, 255, 255, .28), transparent 42%), linear-gradient(160deg, #1d2438, #0b1120 70%);
+  box-shadow: inset 0 0 0 1px rgba(212, 176, 106, .55), inset 0 1px 1px rgba(255, 255, 255, .25), 0 4px 14px rgba(0, 0, 0, .35); transition: transform .45s var(--spring); }
+.cnmnav__orb img { width: 30px; height: auto; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .45)); transition: transform .6s var(--spring); }
+.cnmnav__orb::after { content: ""; position: absolute; inset: -1px; border-radius: 50%; box-shadow: 0 0 0 0 rgba(212, 176, 106, .45); animation: cnmnav-breathe 3.2s var(--ease) 1.6s 2; pointer-events: none; }
+@keyframes cnmnav-breathe { 0%, 100% { box-shadow: 0 0 0 0 rgba(212, 176, 106, 0); } 15% { box-shadow: 0 0 0 0 rgba(212, 176, 106, .55); } 70% { box-shadow: 0 0 0 12px rgba(212, 176, 106, 0); } }
+.cnmnav__home:hover .cnmnav__orb, .cnmnav__home:focus-visible .cnmnav__orb { transform: scale(1.06); }
+.cnmnav__home:hover .cnmnav__orb img { transform: rotate(-8deg) scale(1.05); }
+.cnmnav__home:active .cnmnav__orb { transform: scale(.94); }
+.cnmnav__word { display: block; max-width: 120px; overflow: hidden; white-space: nowrap; font-size: .6875rem; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: rgba(245, 241, 232, .8);
+  transition: max-width .5s var(--ease), opacity .35s var(--ease), margin .5s var(--ease); }
+.cnmnav__word strong { font-weight: 700; color: var(--gold); }
+
+.cnmnav__toggle { position: relative; display: grid; place-items: center; width: 46px; height: 46px; flex: none; padding: 0; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .07); color: inherit; cursor: pointer; transition: background .3s, transform .45s var(--spring); }
+.cnmnav__toggle:hover { background: rgba(255, 255, 255, .14); }
+.cnmnav__toggle:active { transform: scale(.9); }
+.cnmnav__dots { display: grid; grid-template-columns: repeat(2, 6px); gap: 4px; transition: transform .5s var(--spring); }
+.cnmnav__dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); transition: transform .45s var(--spring), border-radius .3s, background .3s; }
+.cnmnav__dots i:nth-child(1) { background: #b99a5b; } .cnmnav__dots i:nth-child(2) { background: #3fb3da; } .cnmnav__dots i:nth-child(3) { background: #e3a13a; } .cnmnav__dots i:nth-child(4) { background: #5fb34a; }
+.cnmnav__toggle:hover .cnmnav__dots { transform: rotate(45deg); }
+/* open: the four company dots fold into a close "×" */
+.cnmnav.is-open .cnmnav__dots { transform: rotate(45deg); }
+.cnmnav.is-open .cnmnav__dots i { background: #f5f1e8; border-radius: 2px; }
+.cnmnav.is-open .cnmnav__dots i:nth-child(1) { transform: translate(5px, 5px) scale(1.6, .34); }
+.cnmnav.is-open .cnmnav__dots i:nth-child(2) { transform: translate(-5px, 5px) scale(.34, 1.6); }
+.cnmnav.is-open .cnmnav__dots i:nth-child(3) { transform: translate(5px, -5px) scale(.34, 1.6); }
+.cnmnav.is-open .cnmnav__dots i:nth-child(4) { transform: translate(-5px, -5px) scale(1.6, .34); }
+
+/* Company stack */
+.cnmnav__panel { display: grid; gap: 8px; justify-items: start; visibility: hidden; pointer-events: none; transition: visibility 0s .45s; }
+.cnmnav.is-open .cnmnav__panel { visibility: visible; pointer-events: auto; transition-delay: 0s; }
+.cnmnav__title { margin: 0 0 2px; padding: 7px 14px; border-radius: 999px; font-size: .5625rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: rgba(245, 241, 232, .85);
+  opacity: 0; transform: translateY(8px); transition: opacity .3s var(--ease), transform .4s var(--ease); }
+.cnmnav.is-open .cnmnav__title { opacity: 1; transform: none; transition-delay: .18s; }
+.cnmnav__list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.cnmnav__list li { opacity: 0; transform: translateY(14px) scale(.86); transform-origin: left bottom; filter: blur(4px);
+  transition: opacity .25s var(--ease), transform .3s var(--ease), filter .25s var(--ease); transition-delay: calc((2 - var(--i)) * 25ms); }
+.cnmnav.is-open .cnmnav__list li { opacity: 1; transform: none; filter: none; transition: opacity .4s var(--ease), transform .6s var(--spring), filter .4s var(--ease); transition-delay: calc(var(--i) * 60ms); }
+.cnmnav__item { display: flex; align-items: center; gap: 12px; min-width: 250px; padding: 5px 16px 5px 5px; border-radius: 999px; color: inherit; text-decoration: none; transition: transform .45s var(--spring); }
+.cnmnav__item:hover, .cnmnav__item:focus-visible { transform: translateX(4px); }
+.cnmnav__item:hover::before, .cnmnav__item:focus-visible::before { background: rgba(28, 31, 44, .84); box-shadow: inset 0 1px 0 var(--glass-hi), 0 0 0 1px color-mix(in srgb, var(--tint) 55%, transparent), 0 16px 40px -10px color-mix(in srgb, var(--tint) 55%, transparent); }
+.cnmnav__icon { display: grid; place-items: center; width: 44px; height: 44px; flex: none; border-radius: 50%;
+  background: radial-gradient(circle at 32% 24%, #fff, #f1efe9 55%, #dcd8cf); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 0 0 2px color-mix(in srgb, var(--tint) 70%, transparent), 0 4px 12px rgba(0, 0, 0, .3); }
+.cnmnav__icon img { width: 34px; height: 30px; object-fit: contain; }
+.cnmnav__text { display: grid; gap: 1px; line-height: 1.2; }
+.cnmnav__text strong { font-size: .875rem; font-weight: 600; letter-spacing: .01em; color: #fff; }
+.cnmnav__text small { font-size: .625rem; letter-spacing: .14em; text-transform: uppercase; color: rgba(245, 241, 232, .62); }
+.cnmnav__go { margin-left: auto; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(255, 255, 255, .08); transition: transform .45s var(--spring), background .3s; }
+.cnmnav__go svg { width: 13px; height: 13px; }
+.cnmnav__item:hover .cnmnav__go { transform: translateX(3px); background: var(--tint); }
+
+/* Compact while reading down the page; the label returns when the visitor scrolls up or opens it */
+.cnmnav.is-compact:not(.is-open) .cnmnav__word { max-width: 0; opacity: 0; }
+.cnmnav.is-compact:not(.is-open) .cnmnav__home { padding-right: 0; }
+.cnmnav.is-compact:not(.is-open) .cnmnav__dock { transform: scale(.94); transform-origin: left bottom; }
+/* Never in the way: step aside for full-screen menus and dialogs, lift above the phone buy bar */
+html[style*="overflow: hidden"] .cnmnav { opacity: 0; transform: translateY(16px); pointer-events: none; }
+html[style*="overflow: hidden"] .cnmnav > * { pointer-events: none; }
+@media (max-width: 960px) { body[data-page="pdp"] .cnmnav { bottom: calc(max(16px, env(safe-area-inset-bottom)) + 76px); } }
+@media (max-width: 420px) {
+  .cnmnav { left: max(12px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom)); }
+  .cnmnav__item { min-width: min(260px, calc(100vw - 24px)); }
+}
+:root[data-theme="dark"] .cnmnav { --glass: rgba(28, 30, 40, .76); --glass-line: rgba(212, 176, 106, .24); }
+@media (prefers-reduced-motion: reduce) {
+  .cnmnav, .cnmnav *, .cnmnav *::before, .cnmnav *::after { animation: none !important; transition-duration: .01s !important; transition-delay: 0s !important; }
+  .cnmnav__list li { filter: none; }
+}
+
+/* Full photographs inside company pages: whole image, true shape, never cropped */
+.co-section--photo { padding-block: clamp(8px, 2vw, 24px); }
+.co-figure { margin: 0; border-radius: var(--c-radius, 0px); overflow: hidden; background: var(--c-soft); }
+.co-figure img { display: block; width: 100%; height: auto; }
+
+/* Phones & tablets: the CNM Essentials logo sits right beside the menu button, icons to the right */
+@media (max-width: 960px) {
+  .site-header:not(.checkout-header) .site-header__row { grid-template-columns: auto auto 1fr; gap: 2px; }
+  .site-header:not(.checkout-header) .logo { justify-content: flex-start; margin-left: 2px; }
+}

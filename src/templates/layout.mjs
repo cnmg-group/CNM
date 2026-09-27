@@ -2,7 +2,7 @@ import { escapeHtml } from '../shared/format.mjs';
 import { icon } from '../shared/icons.mjs';
 import { groupFooter, groupHeader } from './group.mjs';
 import { companyFooter, companyHeader, SITES } from './company.mjs';
-import { backBar, themeToggle } from './kit.mjs';
+import { cnmNav, themeToggle } from './kit.mjs';
 
 export const approval = (what, detail = '') =>
   `<div class="approval" role="note"><strong>Needs CNM approval</strong>${escapeHtml(what)}${detail ? ` <span>${escapeHtml(detail)}</span>` : ''}</div>`;
@@ -81,7 +81,6 @@ function mobileMenu(ctx) {
     <div class="mobile-menu__auth" data-signed-out><button class="btn btn--block" type="button" data-auth-open="signin">Sign in</button><button class="btn btn--ghost btn--block" type="button" data-auth-open="signup">Create account</button></div>
     <a href="/account/" class="link" data-signed-in hidden>${icon('user')} My account</a>
     <a href="/wishlist/" class="link">${icon('heart')} Wishlist</a>
-    <a href="/" class="link">${icon('arrowLeft')} Back to CNM Group</a>
   </div>
 </div>`;
 }
@@ -189,7 +188,7 @@ function footer(ctx) {
       </div>
       <div><h2>Shop</h2><ul><li><a href="/shop/">Shop all</a></li>${cats}<li><a href="/scent-finder/">Scent finder</a></li></ul></div>
       <div><h2>Customer service</h2><ul><li><a href="/privacy/">Privacy policy</a></li><li><a href="/terms/">Terms &amp; conditions</a></li><li><a href="/delivery-returns/">Return policy</a></li><li><a href="/faqs/">FAQ</a></li><li><a href="/account/orders/">Track an order</a></li></ul></div>
-      <div><h2>CNM</h2><ul><li><a href="/our-story/">About us</a></li><li><a href="/stores/">Stores</a></li><li><a href="/fragrance-as-a-service/">For business</a></li><li><a href="/journal/">Journal</a></li><li><a href="/cnm-group/">CNM Group</a></li>${social}</ul></div>
+      <div><h2>CNM</h2><ul><li><a href="/our-story/">About us</a></li><li><a href="/stores/">Stores</a></li><li><a href="/fragrance-as-a-service/">For business</a></li><li><a href="/journal/">Journal</a></li><li><a href="/">CNM Group</a></li>${social}</ul></div>
       <div><h2>Contact us</h2><ul>
         ${ctx.stores.map((s) => `<li style="display:flex;gap:8px">${icon('pin')}<a href="/stores/${s.slug}/">${escapeHtml(s.address || s.city)}, ${escapeHtml(s.region === 'FCT' ? 'FCT' : `${s.region} State`)}.</a></li>`).join('')}
         ${site.contact.phone.value ? `<li style="display:flex;gap:8px">${icon('phone')}<a href="tel:${site.contact.phone.value.replace(/\s/g, '')}">${escapeHtml(site.contact.phone.value)}</a></li>` : ''}
@@ -261,13 +260,14 @@ ${ld}
 <a class="skip-link" href="#main">Skip to content</a>
 ${ctx.staging ? `<div class="staging-bar">Staging preview — products, prices and imagery from cnmessentials.com; stock, delivery fees and policies await CNM approval. No real payments are taken.</div>` : ''}
 ${ctx.announcement && mode !== 'checkout' && !group && !company ? `<div class="announce-bar">${ctx.announcement.href ? `<a href="${escapeHtml(ctx.announcement.href)}">${escapeHtml(ctx.announcement.message)}</a>` : escapeHtml(ctx.announcement.message)}</div>` : ''}
-${group ? groupHeader(ctx, o.current) : company ? companyHeader(ctx, o.site, o.current) : `${backBar('essentials')}${header(ctx, mode, o.current)}`}
+${group ? groupHeader(ctx, o.current) : company ? companyHeader(ctx, o.site, o.current) : header(ctx, mode, o.current)}
 ${mode === 'checkout' || group || company ? '' : mobileMenu(ctx)}
 <main id="main" tabindex="-1">
 ${o.body}
 </main>
 ${mode === 'checkout' ? '' : group ? groupFooter(ctx) : company ? companyFooter(ctx, o.site) : footer(ctx)}
 ${overlays()}
+${cnmNav(group ? 'group' : company ? o.site : 'essentials')}
 </body>
 </html>`;
 }

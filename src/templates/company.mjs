@@ -1,11 +1,11 @@
 // Company websites (CNM Spectra, CNMWorX, CNM Foundation): each has its own identity (logo, colours, navigation,
-// footer) and always shows a clear "Back to CNM Group" button. CNM Essentials uses the shop chrome in layout.mjs.
+// footer) and is connected to CNM Group by the floating CNM navigation (kit.mjs cnmNav). CNM Essentials uses the shop chrome in layout.mjs.
 import { escapeHtml } from '../shared/format.mjs';
 import { icon } from '../shared/icons.mjs';
 import { breadcrumbs } from './layout.mjs';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { backBar, COMPANY_LINKS, mailto, photo, tel, themeToggle } from './kit.mjs';
+import { COMPANY_LINKS, mailto, photo, tel, themeToggle } from './kit.mjs';
 
 // Use the cut-out logo when it has been generated; otherwise fall back to the original file.
 const PUBLIC = fileURLToPath(new URL('../../public', import.meta.url));
@@ -42,8 +42,7 @@ export function companyHeader(ctx, key, current) {
       <div class="co-drop__panel" id="drop-${k}" data-drop-panel><a class="co-drop__all" href="${href}">All ${escapeHtml(label.toLowerCase())} ${icon('arrow')}</a>${kids.map(([l, h]) => `<a href="${h}">${escapeHtml(l)}</a>`).join('')}</div></li>`
     : `<li><a href="${href}"${cur(k)}>${escapeHtml(label)}</a></li>`)).join('');
   const menu = [['home', 'Home', s.home], ...s.nav].map(([k, label, href, kids]) => `<li><a href="${href}"${cur(k)}>${escapeHtml(label)}</a>${kids ? `<ul class="co-menu__sub">${kids.map(([l, h]) => `<li><a href="${h}">${escapeHtml(l)}</a></li>`).join('')}</ul>` : ''}</li>`).join('');
-  return `${backBar(key)}
-<header class="co-header" data-co-header>
+  return `<header class="co-header" data-co-header>
   <div class="container co-header__row">
     <a class="co-logo" href="${s.home}" aria-label="${escapeHtml(s.name)} — home"><img src="${s.logo}" alt="${escapeHtml(s.name)}" height="56"></a>
     <nav aria-label="${escapeHtml(s.name)}"><ul class="co-nav">${links}</ul></nav>
@@ -55,7 +54,6 @@ export function companyHeader(ctx, key, current) {
         <div class="co-menu__panel">
           <nav aria-label="${escapeHtml(s.name)} menu"><ul class="co-menu__list">${menu}</ul></nav>
           <a class="btn site-btn btn--block" href="${s.cta[1]}">${escapeHtml(s.cta[0])}</a>
-          <a class="co-menu__back" href="/">${icon('arrowLeft')} Back to CNM Group</a>
         </div>
       </details>
     </div>
@@ -72,7 +70,6 @@ export function companyFooter(ctx, key) {
       <div class="co-footer__brand">
         <a href="${s.home}" class="co-footer__logo" aria-label="${escapeHtml(s.name)} — home"><img src="${s.logo}" alt="${escapeHtml(s.name)}" loading="lazy"></a>
         <p>${escapeHtml(s.blurb)}</p>
-        <a class="co-footer__back" href="/" data-track="back_to_group" data-from="${key}">${icon('arrowLeft')} Back to CNM Group</a>
       </div>
       <div><h2>${escapeHtml(s.name)}</h2><ul><li><a href="${s.home}">Home</a></li>${s.nav.map(([, label, href]) => `<li><a href="${href}">${escapeHtml(label)}</a></li>`).join('')}<li><a href="${s.cta[1]}">${escapeHtml(s.cta[0])}</a></li></ul></div>
       <div><h2>CNM Group</h2><ul><li><a href="/">CNMGroup.com</a></li>${COMPANY_LINKS.filter((c) => c.key !== key).map((c) => `<li><a href="${c.href}">${c.name}</a></li>`).join('')}</ul></div>
@@ -99,7 +96,7 @@ export function coHero({ eyebrow, title, lead, image, imageAlt, position, width 
     ${ctas.length ? `<div class="co-ctas">${ctas.map(([label, href, ghost]) => `<a class="btn site-btn${ghost ? ' site-btn--ghost' : ''}" href="${href}">${escapeHtml(label)}</a>`).join('')}</div>` : ''}
     ${note}
   </div>
-  ${image ? `<div class="co-hero__media" style="--ar:${width} / ${height}">${photo(image, imageAlt, { sizes: '(max-width: 960px) 100vw, 50vw', position, priority: true, width, height })}</div>` : ''}
+  ${image ? `<div class="co-hero__media" style="--ar:${width} / ${height};--arn:${(width / height).toFixed(4)}">${photo(image, imageAlt, { sizes: '(max-width: 960px) 100vw, 50vw', position, priority: true, width, height })}</div>` : ''}
 </div></section>`;
 }
 
