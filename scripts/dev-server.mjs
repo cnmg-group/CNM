@@ -23,7 +23,13 @@ for (const name of FUNCTIONS) {
 }
 routes.sort((a, b) => b.specificity - a.specificity);
 
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.xml': 'application/xml', '.txt': 'text/plain', '.webmanifest': 'application/manifest+json' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.xml': 'application/xml', '.txt': 'text/plain', '.webmanifest': 'application/manifest+json', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.ico': 'image/x-icon' };
+
+// Path-based 301/302 rules from dist/_redirects (host-based rules only apply on Netlify).
+const REDIRECTS = (await readFile(path.join(DIST, '_redirects'), 'utf8').catch(() => '')).split('\n')
+  .map((l) => l.trim().split(/\s+/)).filter(([from, , st]) => from?.startsWith('/') && /^30[12]$/.test(st))
+  .map(([from, to, st]) => ({ from, to, status: Number(st) }));
+const redirectFor = (p) => REDIRECTS.find((r) => (r.from.endsWith('/*') ? p.startsWith(r.from.slice(0, -1)) : p === r.from));
 
 async function file(p) {
   try { const s = await stat(p); if (s.isFile()) return p; if (s.isDirectory()) { const i = path.join(p, 'index.html'); await stat(i); return i; } } catch { /* not found */ }
@@ -49,6 +55,8 @@ const server = createServer(async (req, res) => {
       return;
     }
     let pathname = decodeURIComponent(url.pathname);
+    const rd = redirectFor(pathname);
+    if (rd) { res.writeHead(rd.status, { Location: rd.to }); res.end(); return; }
     const m = pathname.match(/^\/account\/orders\/(CNM-[^/]+)\/?$/);
     if (m) pathname = '/account/orders/view/';
     let f = await file(path.join(DIST, pathname));

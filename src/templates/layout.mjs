@@ -1,6 +1,8 @@
 import { escapeHtml } from '../shared/format.mjs';
 import { icon } from '../shared/icons.mjs';
 import { groupFooter, groupHeader } from './group.mjs';
+import { companyFooter, companyHeader, SITES } from './company.mjs';
+import { backBar } from './kit.mjs';
 
 export const approval = (what, detail = '') =>
   `<div class="approval" role="note"><strong>Needs CNM approval</strong>${escapeHtml(what)}${detail ? ` <span>${escapeHtml(detail)}</span>` : ''}</div>`;
@@ -9,7 +11,7 @@ export function logo(ctx, { footer = false } = {}) {
   const inner = ctx.logoFile
     ? `<img src="${ctx.logoFile}" alt="CNM Essentials — crafting serenity, pioneering comfort" width="702" height="801">`
     : `<span><span class="logo__wordmark">CNM Essentials</span>${footer ? '' : '<span class="logo__flag">Logo placeholder · original file pending</span>'}</span>`;
-  return `<a class="logo" href="/" aria-label="CNM Essentials — home">${inner}</a>`;
+  return `<a class="logo" href="/essentials/" aria-label="CNM Essentials — home">${inner}</a>`;
 }
 
 function megaMenu(ctx) {
@@ -24,14 +26,6 @@ function megaMenu(ctx) {
     ${feature ? `<a class="mega__feature" href="/shop/${feature.slug}/" style="padding:0;position:relative;overflow:hidden"><img src="${feature.banner}" alt="${escapeHtml(feature.name)}" loading="lazy" style="width:100%;height:100%;object-fit:contain;position:absolute;inset:0"></a>` : ''}
   </div>
 </div>`;
-}
-
-/** Thin CNM Group bar on every Essentials page: one tap back to the group or a sister company. */
-function groupBar() {
-  return `<div class="group-bar"><div class="container group-bar__row">
-    <a class="group-bar__back" href="/cnm-group/" data-track="group_bar_back">${icon('arrowLeft')} CNM Group</a>
-    <nav aria-label="CNM Group companies"><ul class="group-bar__links"><li><a href="/" aria-current="true">CNM Essentials</a></li><li><a href="/cnm-group/spectra/">Spectra</a></li><li><a href="/cnm-group/cnmworx/">CNMWorX</a></li><li><a href="/cnm-group/foundation/">Foundation</a></li></ul></nav>
-  </div></div>`;
 }
 
 function header(ctx, mode, current) {
@@ -82,7 +76,7 @@ function mobileMenu(ctx) {
     <div class="mobile-menu__auth" data-signed-out><button class="btn btn--block" type="button" data-auth-open="signin">Sign in</button><button class="btn btn--ghost btn--block" type="button" data-auth-open="signup">Create account</button></div>
     <a href="/account/" class="link" data-signed-in hidden>${icon('user')} My account</a>
     <a href="/wishlist/" class="link">${icon('heart')} Wishlist</a>
-    <a href="/cnm-group/" class="link">${icon('arrowLeft')} Back to CNM Group</a>
+    <a href="/" class="link">${icon('arrowLeft')} Back to CNM Group</a>
   </div>
 </div>`;
 }
@@ -175,7 +169,7 @@ function footer(ctx) {
       </ul></div>
     </div>
     <div class="footer-bottom">
-      <span>© ${new Date().getFullYear()} CNM Essentials. All rights reserved. Part of <a class="textlink" href="/cnm-group/">CNM Group</a>.</span>
+      <span>© ${new Date().getFullYear()} CNM Essentials. All rights reserved. Part of <a class="textlink" href="/">CNM Group</a>.</span>
       <span class="pay-methods">We accept: ${site.acceptedPayments.value.map((m) => `<span>${escapeHtml(m)}</span>`).join('')}</span>
       <span><a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <button type="button" data-consent-open class="textlink" style="font-size:inherit;color:inherit">Cookie settings</button></span>
     </div>
@@ -197,7 +191,8 @@ export function renderPage(ctx, o) {
   if (ov?.title) o = { ...o, title: ov.title };
   if (ov?.description) o = { ...o, description: ov.description };
   const group = o.chrome === 'group';
-  const brand = group ? 'CNM Group' : 'CNM Essentials';
+  const company = o.chrome === 'company' ? SITES[o.site] : null;
+  const brand = group ? 'CNM Group' : company ? company.name : 'CNM Essentials';
   const title = o.title ? `${o.title} | ${brand}` : 'CNM Essentials — Refresh your space. Indulge your senses.';
   const description = o.description || 'CNM Essentials — luxury room sprays, Wallflowers diffusers and refills, body care and home fragrance. Shop online or visit us in Lekki, Lagos and Garki, Abuja.';
   const noindex = ctx.staging || o.noindex;
@@ -233,23 +228,23 @@ ${o.head || ''}
 ${ld}
 <script type="module" src="${ctx.assets.js}"></script>
 </head>
-<body data-page="${o.page}"${group ? ' data-chrome="group"' : ''}${ctx.ga ? ` data-ga="${escapeHtml(ctx.ga)}"` : ''}>
+<body data-page="${o.page}"${group ? ' data-chrome="group"' : ''}${company ? ` data-chrome="company" data-site="${o.site}"` : ''}${ctx.ga ? ` data-ga="${escapeHtml(ctx.ga)}"` : ''}>
 <a class="skip-link" href="#main">Skip to content</a>
 ${ctx.staging ? `<div class="staging-bar">Staging preview — products, prices and imagery from cnmessentials.com; stock, delivery fees and policies await CNM approval. No real payments are taken.</div>` : ''}
-${ctx.announcement && mode !== 'checkout' && !group ? `<div class="announce-bar">${ctx.announcement.href ? `<a href="${escapeHtml(ctx.announcement.href)}">${escapeHtml(ctx.announcement.message)}</a>` : escapeHtml(ctx.announcement.message)}</div>` : ''}
-${group ? groupHeader(ctx, o.current) : `${groupBar()}${header(ctx, mode, o.current)}`}
-${mode === 'checkout' || group ? '' : mobileMenu(ctx)}
+${ctx.announcement && mode !== 'checkout' && !group && !company ? `<div class="announce-bar">${ctx.announcement.href ? `<a href="${escapeHtml(ctx.announcement.href)}">${escapeHtml(ctx.announcement.message)}</a>` : escapeHtml(ctx.announcement.message)}</div>` : ''}
+${group ? groupHeader(ctx, o.current) : company ? companyHeader(ctx, o.site, o.current) : `${backBar('essentials')}${header(ctx, mode, o.current)}`}
+${mode === 'checkout' || group || company ? '' : mobileMenu(ctx)}
 <main id="main" tabindex="-1">
 ${o.body}
 </main>
-${mode === 'checkout' ? '' : group ? groupFooter(ctx) : footer(ctx)}
+${mode === 'checkout' ? '' : group ? groupFooter(ctx) : company ? companyFooter(ctx, o.site) : footer(ctx)}
 ${overlays()}
 </body>
 </html>`;
 }
 
-export function breadcrumbs(ctx, trail) {
-  const items = [{ name: 'Home', path: '/' }, ...trail];
+export function breadcrumbs(ctx, trail, home = { name: 'Home', path: '/essentials/' }) {
+  const items = [home, ...trail];
   const html = `<nav aria-label="Breadcrumb"><ol class="breadcrumbs">${items
     .map((c, i) => (i === items.length - 1 ? `<li aria-current="page">${escapeHtml(c.name)}</li>` : `<li><a href="${c.path}">${escapeHtml(c.name)}</a></li>`))
     .join('')}</ol></nav>`;

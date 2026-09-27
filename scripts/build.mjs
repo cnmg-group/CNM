@@ -15,7 +15,10 @@ import { productPage } from '../src/templates/product.mjs';
 import { bagPage, wishlistPage, searchPage, checkoutPage, confirmationPage } from '../src/templates/commerce.mjs';
 import { ACCOUNT_VIEWS, accountPage, loginPage, registerPage, resetPage } from '../src/templates/account.mjs';
 import { storyPage, storesIndex, storePage, servicesPage, journalIndex, articlePage, infoPage, notFoundPage, styleguidePage, adminPage } from '../src/templates/content.mjs';
-import { companyPage, groupContactPage, groupHome } from '../src/templates/group.mjs';
+import { groupAbout, groupContactPage, groupHome } from '../src/templates/group.mjs';
+import { spectraPages } from '../src/templates/sites/spectra.mjs';
+import { cnmworxPages } from '../src/templates/sites/cnmworx.mjs';
+import { foundationPages } from '../src/templates/sites/foundation.mjs';
 import { scentFinderPage } from '../src/templates/scent-finder.mjs';
 import { productPlaceholder, PLACEHOLDER_KEYS, atmosphere, heroVessel } from './placeholders.mjs';
 import { loadContent } from './content.mjs';
@@ -87,11 +90,11 @@ async function write(route, html, { sitemap = true, priority = 0.5, changefreq =
 const page = (o) => renderPage(ctx, o);
 
 // Home
-await write('/', page({
-  page: 'home', path: '/', header: 'overlay', body: homePage(ctx),
+await write('/essentials/', page({
+  page: 'home', path: '/essentials/', header: 'overlay', body: homePage(ctx),
   description: 'CNM Essentials — home fragrance, diffuser oils, smart scent machines and body care. Shop online or visit us in Lagos and Abuja.',
   jsonld: [
-    { '@context': 'https://schema.org', '@type': 'Organization', name: 'CNM Essentials', url: siteUrl, ...(ctx.logoFile ? { logo: `${siteUrl}/assets/brand/cnm-logo.png` } : {}), parentOrganization: { '@type': 'Organization', name: 'CNM Group', url: content.site.groupUrl }, sameAs: content.site.social.filter((s) => s.url).map((s) => s.url) },
+    { '@context': 'https://schema.org', '@type': 'Organization', name: 'CNM Essentials', url: `${siteUrl}/essentials/`, ...(ctx.logoFile ? { logo: `${siteUrl}/assets/brand/cnm-logo.png` } : {}), parentOrganization: { '@type': 'Organization', name: 'CNM Group', url: content.site.groupUrl }, sameAs: content.site.social.filter((s) => s.url).map((s) => s.url) },
     { '@context': 'https://schema.org', '@type': 'WebSite', name: 'CNM Essentials', url: siteUrl, potentialAction: { '@type': 'SearchAction', target: `${siteUrl}/search/?q={search_term_string}`, 'query-input': 'required name=search_term_string' } },
   ],
 }), { priority: 1, changefreq: 'daily' });
@@ -160,13 +163,17 @@ for (const a of content.articles) {
   const r = articlePage(ctx, a);
   await write(`/journal/${a.slug}/`, page({ page: 'article', path: `/journal/${a.slug}/`, title: a.title, description: a.excerpt, ogType: 'article', body: r.body, jsonld: r.jsonld, noindex: a.status?.startsWith('DRAFT') }), { sitemap: !a.status?.startsWith('DRAFT'), priority: 0.6 });
 }
-// CNM Group corporate pages (group chrome). noindex: the canonical group site is cnm-group.net.
-{ const r = groupHome(ctx); await write('/cnm-group/', page({ page: 'group', chrome: 'group', current: 'overview', path: '/cnm-group/', title: 'Energy, Retail, Impact', description: content.site.group.intro, body: r.body, jsonld: r.jsonld, noindex: true }), { sitemap: false }); }
-for (const p of content.site.group.profiles.filter((x) => x.page)) {
-  const r = companyPage(ctx, p.slug);
-  await write(p.page, page({ page: 'group', chrome: 'group', current: p.slug, path: p.page, title: `${p.name} — ${p.tagline}`, description: p.text.slice(0, 155), body: r.body, jsonld: r.jsonld, noindex: true }), { sitemap: false });
+// CNMGroup.com hub (group chrome): Home, About, Contact.
+{ const r = groupHome(ctx); await write('/', page({ page: 'group', chrome: 'group', current: 'home', path: '/', title: 'CNM Group — Energy, Retail, Impact', description: content.site.group.intro, body: r.body, jsonld: r.jsonld }), { priority: 1, changefreq: 'weekly' }); }
+{ const r = groupAbout(ctx); await write('/about/', page({ page: 'group', chrome: 'group', current: 'about', path: '/about/', title: 'About CNM Group', description: content.site.group.about, body: r.body, jsonld: r.jsonld }), { priority: 0.8, changefreq: 'monthly' }); }
+{ const r = groupContactPage(ctx); await write('/contact/', page({ page: 'group', chrome: 'group', current: 'contact', path: '/contact/', title: 'Contact CNM Group', description: 'Contact CNM Group about partnerships, investment, collaboration or any of our companies.', body: r.body, jsonld: r.jsonld }), { priority: 0.6, changefreq: 'monthly' }); }
+
+// Company websites: each with its own identity and a "Back to CNM Group" button.
+for (const [site, pagesOf] of [['spectra', spectraPages], ['cnmworx', cnmworxPages], ['foundation', foundationPages]]) {
+  for (const pg of pagesOf(ctx)) {
+    await write(pg.path, page({ page: 'site', chrome: 'company', site, current: pg.current, path: pg.path, title: pg.title, description: pg.description, body: pg.body, jsonld: pg.jsonld }), { priority: pg.current === 'home' ? 0.9 : 0.6, changefreq: 'monthly' });
+  }
 }
-{ const r = groupContactPage(ctx); await write('/cnm-group/contact/', page({ page: 'group', chrome: 'group', current: 'contact', path: '/cnm-group/contact/', title: 'Contact', description: 'Contact CNM Group about partnerships, investment, collaboration or any of our companies.', body: r.body, jsonld: r.jsonld, noindex: true }), { sitemap: false }); }
 
 // Info pages
 const pendingSection = (title, what) => `<section class="stack"><h2 class="h3">${title}</h2>${approval(what)}</section>`;
@@ -176,7 +183,7 @@ const info = [
     pendingSection('Returns', 'Returns and exchanges policy.'),
   ] },
   { path: '/faqs/', title: 'FAQs', sections: [pendingSection('Orders & delivery', 'Customer FAQs.'), pendingSection('Products', 'Product FAQs (usage, safety, refills).')] },
-  { path: '/contact/', title: 'Contact', intro: 'We’re here to help with orders, products and services.', sections: [
+  { path: '/essentials/contact/', title: 'Contact', intro: 'We’re here to help with orders, products and services.', sections: [
     `<section class="stack"><h2 class="h3">Customer care</h2>${content.site.contact.email.value ? `<p><a class="textlink" href="mailto:${content.site.contact.email.value}">${content.site.contact.email.value}</a></p>` : approval('Customer care email, phone and WhatsApp.')}</section>`,
     `<section class="stack"><h2 class="h3">Stores</h2><p><a class="textlink" href="/stores/">Find a CNM store</a></p></section>`,
     `<section class="stack"><h2 class="h3">Business &amp; events</h2><p><a class="textlink" href="/fragrance-as-a-service/#enquire">Enquire about Fragrance as a Service</a></p></section>`,
@@ -239,6 +246,15 @@ ${eligible.map((p) => `<item><g:id>${p.id}</g:id><g:title><![CDATA[${p.name}]]><
 const redirects = content.redirects.map((r) => `${r.from} ${r.to} ${r.status || 301}`).join('\n');
 await writeFile(path.join(DIST, '_redirects'), `${redirects}
 /account/orders/:number  /account/orders/view/?n=:number  200
+/cnm-group/  /  301
+/cnm-group/contact/  /contact/  301
+/cnm-group/spectra/  /spectra/  301
+/cnm-group/cnmworx/  /cnmworx/  301
+/cnm-group/foundation/  /foundation/  301
+/cnm-group/*  /  301
+# CNM Essentials' own domain opens the shop home (the shop's other paths are shared with CNMGroup.com).
+https://cnmessentials.com/  /essentials/  200!
+https://www.cnmessentials.com/  /essentials/  200!
 `);
 
 // Security & caching headers

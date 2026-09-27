@@ -6,7 +6,7 @@
     "status": "NEEDS_CNM_APPROVAL"
   },
   "productionUrl": "https://cnmessentials.com",
-  "groupUrl": "https://www.cnm-group.net",
+  "groupUrl": "https://www.cnmgroup.com",
   "tagline": {
     "value": "Welcome to CNM Essentials",
     "status": "FROM_CNM_LIVE_SITE"
@@ -58,7 +58,7 @@
   "group": {
     "name": "CNM Group",
     "logo": "/assets/brand/cnm-group-logo.svg",
-    "url": "https://www.cnm-group.net",
+    "url": "https://www.cnmgroup.com",
     "status": "FROM_CNM_GROUP_SITE",
     "headline": "Creating Sustainable Businesses That Transcend Industries",
     "intro": "CNM Group is a diversified conglomerate built on the vision of creating sustainable businesses across industries. What began as a single vision has grown into a portfolio of companies spanning lifestyle, engineering, and social impact.",
@@ -97,14 +97,15 @@
             "name": "CNM Essentials",
             "tagline": "Pure. Natural. Purposeful.",
             "logo": "/assets/brand/cnm-logo.svg",
-            "url": "/",
-            "internal": true
+            "url": "/essentials/",
+            "internal": true,
+            "slug": "essentials"
           },
           {
             "name": "CNM Spectra",
             "tagline": "See clearly. Look extraordinary.",
             "logo": "/assets/brand/cnm-spectra-logo.jpg",
-            "url": "/cnm-group/spectra/",
+            "url": "/spectra/",
             "text": "A premium eyewear brand offering prescription frames, sunglasses, contact lenses and accessories.",
             "slug": "spectra",
             "internalPage": true
@@ -120,7 +121,7 @@
             "name": "CNMWorX Limited",
             "tagline": "Engineering the future, one project at a time.",
             "logo": "/assets/brand/cnmworx-logo.jpg",
-            "url": "/cnm-group/cnmworx/",
+            "url": "/cnmworx/",
             "text": "ISO 9001:2015-certified engineering and technical services: industrial and process automation, instrumentation, power electronics and ICT.",
             "slug": "cnmworx",
             "internalPage": true
@@ -136,7 +137,7 @@
             "name": "CNM Foundation",
             "tagline": "Zero percent of zero is zero — so we give everything.",
             "logo": "/assets/brand/cnm-foundation-logo.jpg",
-            "url": "/cnm-group/foundation/",
+            "url": "/foundation/",
             "text": "Education, women's economic empowerment, youth development and community health across Nigeria and the African diaspora.",
             "slug": "foundation",
             "internalPage": true
@@ -180,7 +181,7 @@
         "sector": "Lifestyle & Wellness",
         "tagline": "Pure. Natural. Purposeful.",
         "logo": "/assets/brand/cnm-logo.svg",
-        "url": "/",
+        "url": "/essentials/",
         "internal": true,
         "text": "A premium lifestyle brand offering luxury fragrances, home décor, and body care products crafted for the intentional woman and the discerning home. CNM Essentials is the fragrance and lifestyle destination for those who believe that how you live at home reflects who you are in the world.",
         "lists": [
@@ -215,14 +216,15 @@
         "slug": "essentials",
         "image": "/assets/stores/cnm-essentials-store-interior.webp",
         "imageAlt": "Inside a CNM Essentials store",
-        "menuLabel": "Fragrance & Lifestyle"
+        "menuLabel": "Fragrance & Lifestyle",
+        "page": "/essentials/"
       },
       {
         "name": "CNM Spectra",
         "sector": "Eyewear & Vision",
         "tagline": "See clearly. Look extraordinary.",
         "logo": "/assets/brand/cnm-spectra-logo.jpg",
-        "url": "https://www.cnm-group.net",
+        "url": "/spectra/",
         "text": "A premium eyewear brand redefining how Africans see the world. CNM Spectra offers an expertly curated range of prescription frames, sunglasses, contact lenses, and accessories that merge optical precision with contemporary style — serving the style-conscious professional who refuses to compromise on quality or visual clarity.",
         "lists": [
           [
@@ -253,7 +255,7 @@
           "Abuja"
         ],
         "slug": "spectra",
-        "page": "/cnm-group/spectra/",
+        "page": "/spectra/",
         "image": "/assets/group/spectra.webp",
         "imageAlt": "Blue tortoiseshell eyeglass frames",
         "imagePosition": "center 80%",
@@ -264,7 +266,7 @@
         "sector": "Engineering & Automation",
         "tagline": "Engineering the future, one project at a time.",
         "logo": "/assets/brand/cnmworx-logo.jpg",
-        "url": "https://www.cnm-group.net",
+        "url": "/cnmworx/",
         "text": "Registered in Nigeria in 2019 and ISO 9001:2015 certified, CNMWorX Limited is a preferred engineering and technical services company specialising in Industrial and Process Automation & Control, Instrumentation, Power Electronics, and ICT. Acting as a trusted System Integrator, CNMWorX delivers bespoke solutions to IOCs, Independent Oil Companies, and Industrial Services Companies across West and Central Africa.",
         "lists": [
           [
@@ -295,7 +297,7 @@
           "ISO 9001:2015 Certified"
         ],
         "slug": "cnmworx",
-        "page": "/cnm-group/cnmworx/",
+        "page": "/cnmworx/",
         "image": "/assets/group/cnmworx.webp",
         "imageAlt": "An engineer at a plant control panel",
         "imagePosition": "30% center",
@@ -307,7 +309,7 @@
         "sector": "Social Impact & Philanthropy",
         "tagline": "Zero percent of zero is zero — so we give everything.",
         "logo": "/assets/brand/cnm-foundation-logo.jpg",
-        "url": "https://www.cnm-group.net",
+        "url": "/foundation/",
         "text": "The social impact and philanthropic arm of CNM Group — a faith-rooted, community-driven organisation committed to education, women's economic empowerment, youth development, and community health across Nigeria and the African diaspora. Active for over five years through informal programmes, CNM Foundation is now formalising its reach — scaling impact, deepening partnerships, and amplifying its voice where it matters most.",
         "lists": [
           [
@@ -338,7 +340,7 @@
           "African Diaspora Engagement"
         ],
         "slug": "foundation",
-        "page": "/cnm-group/foundation/",
+        "page": "/foundation/",
         "image": "/assets/group/foundation.webp",
         "imageAlt": "A teacher reading with a smiling schoolgirl",
         "imagePosition": "center 30%",

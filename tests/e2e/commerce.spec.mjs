@@ -21,7 +21,7 @@ async function fillCheckout(page, email) {
 test('home renders editorial story and navigates to shop', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto('/');
+  await page.goto('/essentials/');
   await expect(page.locator('h1')).toContainText('Refresh Your Space.');
   await expect(page.locator('.logo img').first()).toHaveAttribute('src', '/assets/brand/cnm-logo.svg');
   await page.locator('.hero__cta a', { hasText: 'Shop now' }).click();
@@ -31,7 +31,7 @@ test('home renders editorial story and navigates to shop', async ({ page }) => {
 });
 
 test('predictive search tolerates typos and opens a product', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/essentials/');
   await page.getByRole('button', { name: 'Search' }).first().click();
   await page.fill('[data-search-input]', 'midnigt vanila');
   const hit = page.locator('[data-search-results] a', { hasText: 'Midnight Vanilla' }).first();
@@ -191,31 +191,35 @@ test('SEO: canonical, structured data, noindex on staging, sitemap', async ({ pa
 
 test('mobile navigation menu opens and is keyboard dismissible', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'mobile only');
-  await page.goto('/');
+  await page.goto('/essentials/');
   await page.click('.menu-toggle');
   await expect(page.locator('#mobile-menu')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.locator('#mobile-menu')).toBeHidden();
 });
 
-test('CNM Group: Retail routes to the store; company pages; contact form sends a message', async ({ page, isMobile }) => {
-  await page.goto('/cnm-group/');
-  await expect(page.locator('#companies .gpanel', { hasText: 'CNM Essentials' })).toHaveAttribute('href', '/');
+test('CNMGroup.com hub: founder photo, all companies, menu, and contact form', async ({ page, isMobile }) => {
+  await page.goto('/');
+  await expect(page.locator('h1')).toContainText('transcend');
   await expect(page.locator('.ghero__portrait img')).toBeVisible();
+  expect(await page.locator('.ghero__portrait img').evaluate((i) => i.naturalWidth)).toBeGreaterThan(900);
   await expect(page.locator('#companies .gpanel')).toHaveCount(4);
-  await expect(page.locator('#leadership')).toContainText('Mrs Nkiruka Cynthia Ajah');
-  await expect(page.locator('.group-store')).toHaveAttribute('href', '/');
+  await expect(page.locator('#companies .gpanel', { hasText: 'CNM Essentials' })).toHaveAttribute('href', '/essentials/');
+  for (const [name, href] of [['CNM Spectra', '/spectra/'], ['CNMWorX', '/cnmworx/'], ['CNM Foundation', '/foundation/']]) {
+    await expect(page.locator('#companies .gpanel', { hasText: name })).toHaveAttribute('href', href);
+  }
   if (isMobile) {
     await page.locator('.group-menu summary').click();
-    await expect(page.locator('.gmenu')).toBeVisible();
     await expect(page.locator('.gmenu__sub', { hasText: 'Engineering & Energy' })).toBeVisible();
     await page.locator('.gmenu__list a', { hasText: 'CNMWorX' }).click();
   } else {
     await page.locator('.group-nav a', { hasText: 'CNMWorX' }).click();
   }
-  await expect(page).toHaveURL(/\/cnm-group\/cnmworx\/$/);
-  await expect(page.locator('h1')).toHaveText('CNMWorX Limited');
-  await page.goto('/cnm-group/contact/');
+  await expect(page).toHaveURL(/\/cnmworx\/$/);
+  await expect(page.locator('h1')).toContainText('Engineering the future');
+  await page.goto('/about/');
+  await expect(page.locator('#leadership')).toContainText('Mrs Nkiruka Cynthia Ajah');
+  await page.goto('/contact/');
   await page.fill('#f-group-name', 'Ngozi Partner');
   await page.fill('#f-group-email', 'ngozi@example.com');
   await page.selectOption('#f-group-subject', 'Partnership');
@@ -225,30 +229,86 @@ test('CNM Group: Retail routes to the store; company pages; contact form sends a
   await expect(page.locator('[data-enquiry-ok]')).toContainText('CNM Group will be in touch');
 });
 
-test('company forms: Spectra consultation and CNMWorX tender request are captured', async ({ page, request }) => {
-  await page.goto('/cnm-group/spectra/');
-  await page.locator('.hero__cta a', { hasText: 'Book an optical consultation' }).click();
-  await page.fill('#f-spectra-name', 'Chidi Okafor');
-  await page.fill('#f-spectra-email', 'chidi@example.com');
-  await page.fill('#f-spectra-phone', '+2348012345678');
-  await page.selectOption('#f-spectra-loc', 'Abuja');
-  await page.selectOption('#f-spectra-int', 'Prescription eyewear');
-  await page.fill('#f-spectra-msg', 'I need new prescription frames please.');
-  await page.locator('input[name="consent"]').check();
-  await page.locator('[data-enquiry-form] button[type="submit"]').click();
-  await expect(page.locator('[data-enquiry-ok]')).toContainText('CNM Spectra');
-
-  await page.goto('/cnm-group/cnmworx/');
-  await page.locator('[data-enquiry-form] button[type="submit"]').click();
-  await expect(page.locator('#f-cnmworx-co')).toHaveAttribute('aria-invalid', 'true');
-  const r = await request.post('/api/enquiry', { headers: { 'X-CNM-Request': '1' }, data: { name: 'Eng Lead', email: 'eng@example.com', company: 'Acme Energy', sector: 'group', division: 'cnmworx', interest: 'EPC project delivery', timeline: 'Within 3 months', location: 'Port Harcourt', message: 'Instrumentation upgrade for a gas plant.', consent: true } });
-  expect(r.status()).toBe(201);
-  const bad = await request.post('/api/enquiry', { headers: { 'X-CNM-Request': '1' }, data: { name: 'X', email: 'x@example.com', sector: 'group', division: 'nope', message: 'Some message here.', consent: true } });
-  expect(bad.status()).toBe(422);
+test('every company site has its own pages and a Back to CNM Group button', async ({ page, request }) => {
+  const SITES = {
+    spectra: ['/spectra/', '/spectra/eyewear/', '/spectra/eye-care/', '/spectra/book/', '/spectra/about/', '/spectra/contact/'],
+    cnmworx: ['/cnmworx/', '/cnmworx/services/', '/cnmworx/industries/', '/cnmworx/quality/', '/cnmworx/about/', '/cnmworx/request/', '/cnmworx/contact/'],
+    foundation: ['/foundation/', '/foundation/programmes/', '/foundation/get-involved/', '/foundation/donate/', '/foundation/about/', '/foundation/contact/'],
+  };
+  for (const [site, paths] of Object.entries(SITES)) {
+    for (const path of paths) {
+      const res = await request.get(path);
+      expect(res.status(), path).toBe(200);
+      const html = await res.text();
+      expect(html, path).toContain(`data-site="${site}"`);
+      expect(html, path).toContain('Back to CNM Group');
+    }
+    await page.goto(paths[0]);
+    await expect(page.locator('.co-logo img')).toBeVisible();
+    await page.locator('.backbar__btn').click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.locator('h1')).toContainText('transcend');
+  }
 });
 
+test('company journeys: Spectra appointment, CNMWorX proposal, Foundation pledge', async ({ page }) => {
+  // Spectra: from the range to a booked appointment, with the service prefilled
+  await page.goto('/spectra/eyewear/');
+  await page.locator('#sunglasses a', { hasText: 'Book to try on' }).click();
+  await expect(page).toHaveURL(/\/spectra\/book\/\?service=/);
+  await expect(page.locator('#f-book-svc')).toHaveValue('Sunglasses & fashion frames');
+  await page.fill('#f-book-name', 'Chidi Okafor');
+  await page.fill('#f-book-email', 'chidi@example.com');
+  await page.fill('#f-book-phone', '+2348012345678');
+  await page.selectOption('#f-book-loc', 'Abuja');
+  const d = new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
+  await page.fill('#f-book-date', d);
+  await page.locator('input[name="consent"]').check();
+  await page.locator('[data-enquiry-form] button[type="submit"]').click();
+  await expect(page.locator('[data-enquiry-ok]')).toContainText('appointment request');
+
+  // CNMWorX: required fields are enforced, then a proposal request goes through
+  await page.goto('/cnmworx/services/');
+  await page.locator('#automation a', { hasText: 'Request a proposal' }).click();
+  await page.locator('[data-enquiry-form] button[type="submit"]').click();
+  await expect(page.locator('#f-request-co')).toHaveAttribute('aria-invalid', 'true');
+  await page.fill('#f-request-name', 'Eng Lead');
+  await page.fill('#f-request-email', 'eng@example.com');
+  await page.fill('#f-request-co', 'Acme Energy');
+  await page.fill('#f-request-phone', '+2348012345678');
+  await expect(page.locator('#f-request-svc')).toHaveValue('Automation & control systems');
+  await page.fill('#f-request-loc', 'Port Harcourt');
+  await page.selectOption('#f-request-time', 'Within 3 months');
+  await page.fill('#f-request-msg', 'Instrumentation upgrade for a gas plant control room.');
+  await page.locator('input[name="consent"]').check();
+  await page.locator('[data-enquiry-form] button[type="submit"]').click();
+  await expect(page.locator('[data-enquiry-ok]')).toContainText('project request');
+
+  // Foundation: pledge a custom monthly gift to a programme
+  await page.goto('/foundation/programmes/');
+  await page.locator('#education a', { hasText: 'Support this programme' }).click();
+  await expect(page.locator('#f-donate-prog')).toHaveValue('Education & literacy programmes');
+  await page.locator('.amount-chip', { hasText: 'Other' }).click();
+  await page.fill('#f-donate-other', '15000');
+  await page.selectOption('#f-donate-freq', 'Monthly');
+  await page.fill('#f-donate-name', 'Ada Giver');
+  await page.fill('#f-donate-email', 'ada@example.com');
+  await page.locator('input[name="consent"]').check();
+  const [res] = await Promise.all([page.waitForRequest('**/api/enquiry'), page.locator('[data-enquiry-form] button[type="submit"]').click()]);
+  const sent = res.postDataJSON();
+  expect(sent).toMatchObject({ division: 'foundation', subject: 'Donation pledge', timeline: '₦15,000 · Monthly', interest: 'Education & literacy programmes' });
+  await expect(page.locator('[data-enquiry-ok]')).toContainText('generosity');
+});
+
+test('old CNM Group addresses redirect to the new hub and company sites', async ({ request }) => {
+  const r = await request.get('/cnm-group/spectra/', { maxRedirects: 0 });
+  expect([301, 302, 308]).toContain(r.status());
+  expect(r.headers().location).toMatch(/\/spectra\/$/);
+});
+
+
 test('scent finder recommends real products (rules fallback without an AI key)', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/essentials/');
   await page.locator('a[href="/scent-finder/"]', { hasText: 'Try the scent finder' }).click();
   await expect(page.locator('h1')).toContainText('Find your');
   await page.locator('[data-chips="families"] [data-chip="sweet"]').click();
@@ -324,20 +384,19 @@ test('passwordless sign-in: email code creates an account, then asks for a name'
   await expect(page.locator('[data-account-panel] h1')).toContainText('Welcome, Chioma');
 });
 
-test('every Essentials page links back to CNM Group and its companies', async ({ page }) => {
-  for (const path of ['/', '/shop/', '/products/white-tea-and-sage-room-spray/', '/checkout/', '/scent-finder/']) {
+test('every Essentials page has a Back to CNM Group button', async ({ page }) => {
+  for (const path of ['/essentials/', '/shop/', '/products/white-tea-and-sage-room-spray/', '/checkout/', '/scent-finder/', '/our-story/']) {
     await page.goto(path);
-    await expect(page.locator('.group-bar__back')).toHaveAttribute('href', '/cnm-group/');
+    await expect(page.locator('.backbar__btn')).toHaveAttribute('href', '/');
+    await expect(page.locator('.backbar__btn')).toContainText('Back to CNM Group');
   }
-  await page.locator('.group-bar__back').click();
-  await expect(page).toHaveURL(/\/cnm-group\/$/);
-  await page.goto('/cnm-group/foundation/');
-  await page.locator('.group-logo').first().click();
-  await expect(page).toHaveURL(/\/cnm-group\/$/);
+  await page.locator('.backbar__btn').click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator('.ghero__portrait')).toBeVisible();
 });
 
 test('campaign artwork is shown whole with captions below, not on top', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/essentials/');
   const banner = page.locator('.banner').first();
   await banner.scrollIntoViewIfNeeded();
   const [img, cap] = await Promise.all([banner.locator('img').boundingBox(), banner.locator('.banner__cap').boundingBox()]);
@@ -368,7 +427,7 @@ test('shopping never requires an account; sign up is optional and inline at chec
   await expect(page.locator('#c-email')).toHaveValue(email);
   await expect(page.locator('#c-first')).toHaveValue('Ifeoma');
   // header account icon now goes to the account instead of the dialog
-  if (!isMobile) { await page.goto('/'); await page.locator('[data-account-link]').click(); await expect(page).toHaveURL(/\/account\/$/); }
+  if (!isMobile) { await page.goto('/essentials/'); await page.locator('[data-account-link]').click(); await expect(page).toHaveURL(/\/account\/$/); }
 });
 
 test('header account icon offers sign in without leaving the page (guest)', async ({ page, isMobile }) => {

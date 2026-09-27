@@ -34,7 +34,7 @@ function HelpLinks() {
       <MenuRow label="Delivery & returns" icon="truck" external onPress={() => openWebPage('/delivery-returns/')} />
       <MenuRow label="FAQs" icon="help-circle" external onPress={() => openWebPage('/faqs/')} />
       <MenuRow label="Stores" icon="map-pin" external onPress={() => openWebPage('/stores/')} />
-      <MenuRow label="Contact" icon="mail" external onPress={() => openWebPage('/contact/')} />
+      <MenuRow label="Contact" icon="mail" external onPress={() => openWebPage('/essentials/contact/')} />
       <MenuRow label="Privacy policy" icon="shield" external onPress={() => openWebPage('/privacy/')} />
       <MenuRow label="Terms" icon="file-text" external onPress={() => openWebPage('/terms/')} />
       <Small style={{ marginTop: space.lg, color: colors.muted }}>

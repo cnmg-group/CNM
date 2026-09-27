@@ -213,19 +213,22 @@ const PAGES = {
   auth: () => import('./pages/auth.js'),
   services: () => import('./pages/services.js'),
   group: () => import('./pages/services.js'),
+  site: () => import('./pages/services.js'),
   'scent-finder': () => import('./pages/scent-finder.js'),
 };
 const pageKey = document.body.dataset.page;
 PAGES[pageKey]?.().then((m) => m.init?.()).catch((err) => console.error('[cnm] page init failed', err));
 
 
-// ---------- CNM Group full-screen menu: lock scroll while open, Escape closes ----------
-const groupMenu = document.querySelector('[data-group-menu]');
-if (groupMenu) {
-  groupMenu.addEventListener('toggle', () => {
-    document.documentElement.style.overflow = groupMenu.open ? 'hidden' : '';
-    if (groupMenu.open) groupMenu.querySelector('.gmenu').style.top = `${Math.max(0, document.querySelector('[data-group-header]').getBoundingClientRect().bottom)}px`;
-    groupMenu.querySelector('summary').setAttribute('aria-label', groupMenu.open ? 'Close menu' : 'Menu');
+// ---------- CNM Group and company-site menus: full-screen on phones, lock scroll while open, Escape closes ----------
+document.querySelectorAll('[data-group-menu], [data-co-menu]').forEach((menu) => {
+  const header = menu.closest('header');
+  const panel = menu.querySelector('.gmenu, .co-menu__panel');
+  const summary = menu.querySelector('summary');
+  menu.addEventListener('toggle', () => {
+    document.documentElement.style.overflow = menu.open ? 'hidden' : '';
+    if (menu.open) panel.style.top = `${Math.max(0, header.getBoundingClientRect().bottom)}px`;
+    summary.setAttribute('aria-label', menu.open ? 'Close menu' : 'Menu');
   });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && groupMenu.open) { groupMenu.open = false; groupMenu.querySelector('summary').focus(); } });
-}
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && menu.open) { menu.open = false; summary.focus(); } });
+});

@@ -48,9 +48,9 @@ export function storyPage(ctx) {
 <section class="section"><div class="container">
   <div class="section-head"><div><span class="label muted">Core values</span><h2 class="h2">The principles that define us</h2></div></div>
   <div class="values">${s.values.value.map(([t, d]) => `<div><p class="h3">${escapeHtml(t)}</p><p class="muted" style="margin:0">${escapeHtml(d)}</p></div>`).join('')}</div>
-  <p class="muted" style="margin-top:24px;font-size:.8125rem">Mission, vision and values of CNM Group (<a class="textlink" href="/cnm-group/">about the group</a>). ${s.timeline.length ? '' : 'A dated CNM Essentials timeline is pending CNM approval.'}</p>
+  <p class="muted" style="margin-top:24px;font-size:.8125rem">Mission, vision and values of CNM Group (<a class="textlink" href="/about/">about the group</a>). ${s.timeline.length ? '' : 'A dated CNM Essentials timeline is pending CNM approval.'}</p>
 </div></section>
-<section class="section section--cream section--tight"><div class="container center stack"><p class="h2" style="font-family:var(--serif)">${escapeHtml(g.motto)}</p><a class="link" href="/cnm-group/" style="justify-self:center">Discover CNM Group ${icon('arrow')}</a></div></section>`;
+<section class="section section--cream section--tight"><div class="container center stack"><p class="h2" style="font-family:var(--serif)">${escapeHtml(g.motto)}</p><a class="link" href="/about/" style="justify-self:center">Discover CNM Group ${icon('arrow')}</a></div></section>`;
   return { body, jsonld: [ld, { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'About CNM Essentials', url: `${ctx.siteUrl}/our-story/` }] };
 }
 

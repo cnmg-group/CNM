@@ -29,10 +29,13 @@ npm run dev   # review at http://localhost:8888, then commit and push
 ## 3. Production (only after CNM's final approval)
 
 1. Replace demo content (see `docs/CONTENT-APPROVAL.md`). Approve prices in **Admin → Products & inventory** (tick "Price approved") so Product offers and the Merchant feed include them.
-2. Set production environment variables: `CNM_LAUNCH_APPROVED=true`, `SITE_URL=https://cnmessentials.com`, `SESSION_SECRET`, `PAYSTACK_SECRET_KEY` (live), `RESEND_API_KEY`, `EMAIL_FROM`, `ADMIN_USERS` (hash passwords with `node scripts/hash-password.mjs`), `GA_MEASUREMENT_ID`. Remove `ADMIN_STAGING_PASSWORD`.
-3. In Paystack, set the webhook URL to `https://cnmessentials.com/api/payments/paystack-webhook`.
-4. **Domain management → Add domain → cnmessentials.com.** Point DNS (Netlify DNS, or an A/ALIAS record plus a `www` CNAME) and let Netlify issue the TLS certificate. Redirect `www` to the apex (or the reverse) and keep one canonical host.
-5. Update the **Retail** link on www.cnm-group.net to point to `https://cnmessentials.com`.
+2. Set production environment variables: `CNM_LAUNCH_APPROVED=true`, `SITE_URL=https://www.cnmgroup.com`, `SESSION_SECRET`, `PAYSTACK_SECRET_KEY` (live), `RESEND_API_KEY`, `EMAIL_FROM`, `ADMIN_USERS` (hash passwords with `node scripts/hash-password.mjs`), `GA_MEASUREMENT_ID`. Remove `ADMIN_STAGING_PASSWORD`.
+3. In Paystack, set the webhook URL to `https://www.cnmgroup.com/api/payments/paystack-webhook`.
+4. **Domains.** One Netlify site serves every CNM website:
+   - **Domain management → Add domain → cnmgroup.com** (primary, with `www`). Point DNS (Netlify DNS, or an A/ALIAS record plus a `www` CNAME) and let Netlify issue the TLS certificate. `/` is the CNM Group hub.
+   - **Add domain alias → cnmessentials.com** (and `www`). The `_redirects` file opens `/essentials/` on that domain's home page; all shop paths work on both domains.
+   - Company sites live at `cnmgroup.com/spectra/`, `/cnmworx/` and `/foundation/`. If a company later gets its own domain, add it as an alias and a host rule like the cnmessentials.com one.
+5. Point the old `www.cnm-group.net` at the new site (or redirect it to `https://www.cnmgroup.com`). Old `/cnm-group/...` addresses already redirect to the new pages.
 6. Update `public/.well-known/apple-app-site-association` (Apple Team ID) and `assetlinks.json` (Play signing SHA-256) for app deep links.
 7. After go-live: submit `https://cnmessentials.com/sitemap.xml` in Google Search Console, connect Merchant Center to `/feeds/google-merchant.xml`, and verify both Google Business Profiles with NAP identical to the store pages.
 
