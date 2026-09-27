@@ -31,7 +31,7 @@ CNM supplied screenshots of **cnmessentials.com** (home, shop, about) and **cnm-
 | "Sun Kissed Vanilla": the live site says Bath & Body Works but the photo shows a Febreze pack | **NEEDS CNM APPROVAL** | Confirm the brand. |
 | Body Care, Hair Care and CNM's own products (Vitamin C Brightening Body Wash, Rosemary hair & scalp oil) | **NEEDS CNM APPROVAL** | Prices and product pages; the category pages currently say "coming soon online". |
 | Opening hours, map coordinates and photos for each store | **NEEDS CNM APPROVAL** | Admin → Stores |
-| Founder portrait, biography and quote (name and title, Mrs Nkiruka Cynthia Ajah, Founder & Group CEO, are now on the CNM Group page from the brief); dated milestones | **NEEDS CNM APPROVAL** | `content/site.json → group.founder`, `content/story.json` |
+| Founder biography; confirm the quote taken from the Lovable draft (portrait now supplied by CNM); dated milestones; rights to the Spectra/CNMWorX photos from the Lovable draft and a Foundation photo | **NEEDS CNM APPROVAL** | `content/site.json → group.founder`, `content/story.json` |
 | Dedicated email/phone for CNM Spectra, CNMWorX and CNM Foundation | **NEEDS CNM APPROVAL** | Their forms currently go to the CNM Group inbox and Admin → Enquiries |
 | Enable Netlify AI Gateway for the scent finder | **NEEDS CNM APPROVAL** | One switch in Netlify (see `docs/INTEGRATIONS.md` §5). It uses the rules matcher until then. |
 | Instagram and WhatsApp links | **NEEDS CNM APPROVAL** | Icons exist on the live site; URLs not visible in the screenshots |
@@ -60,6 +60,7 @@ CNM supplied screenshots of **cnmessentials.com** (home, shop, about) and **cnm-
 | Commerce | Order numbers, confirmation email, order history, tracking status | DONE |
 | Account | Register, sign in, email-code (OTP) sign-in, reset, profile, addresses, orders, preferences, sign out everywhere | DONE |
 | Account | Optional sign-in / create-account dialog (email code or password) from the header, mobile menu, checkout, wishlist and confirmation; shopping and checkout never require an account | DONE |
+| CNM Group | Dark navy editorial design (from CNM's Lovable draft): founder portrait hero, founder quote, company photo panels, company photos on Spectra/CNMWorX pages | DONE (quote wording and photo rights **NEEDS CNM APPROVAL**) |
 | Navigation | CNM Group bar on every Essentials page (back to CNM Group + sister companies); group header on company pages | DONE |
 | Visual | Campaign artwork shown whole (no cropping, no text overlaid); captions sit below | DONE |
 | Content | Our Story (brand and group copy, mission, vision, values), Stores (real NAP), For Business / Lease-to-Own + enquiry, Journal, CNM Group hub with its own group header/footer and "Visit store" (Retail · Energy · Impact, leadership), company pages for Spectra (consultation form), CNMWorX (project/tender form), Foundation (partner/volunteer form), group contact page | DONE (founder and hours **NEEDS CNM APPROVAL**) |

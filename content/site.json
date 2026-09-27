@@ -212,7 +212,9 @@
           "Lagos",
           "Abuja"
         ],
-        "slug": "essentials"
+        "slug": "essentials",
+        "image": "/assets/stores/cnm-essentials-store-interior.webp",
+        "imageAlt": "Inside a CNM Essentials store"
       },
       {
         "name": "CNM Spectra",
@@ -250,7 +252,10 @@
           "Abuja"
         ],
         "slug": "spectra",
-        "page": "/cnm-group/spectra/"
+        "page": "/cnm-group/spectra/",
+        "image": "/assets/group/spectra.webp",
+        "imageAlt": "Blue tortoiseshell eyeglass frames",
+        "imagePosition": "center 80%"
       },
       {
         "name": "CNMWorX Limited",
@@ -288,7 +293,10 @@
           "ISO 9001:2015 Certified"
         ],
         "slug": "cnmworx",
-        "page": "/cnm-group/cnmworx/"
+        "page": "/cnm-group/cnmworx/",
+        "image": "/assets/group/cnmworx.webp",
+        "imageAlt": "An engineer at a plant control panel",
+        "imagePosition": "30% center"
       },
       {
         "name": "CNM Foundation",
@@ -327,16 +335,19 @@
           "African Diaspora Engagement"
         ],
         "slug": "foundation",
-        "page": "/cnm-group/foundation/"
+        "page": "/cnm-group/foundation/",
+        "image": null,
+        "imageAlt": null
       }
     ],
     "founder": {
       "name": "Mrs Nkiruka Cynthia Ajah",
       "title": "Founder & Group CEO",
-      "status": "FROM_CNM_BRIEF",
-      "portrait": null,
-      "quote": null
-    }
+      "status": "PORTRAIT_FROM_CNM · QUOTE_FROM_CNM_LOVABLE_DRAFT_NEEDS_CONFIRMATION",
+      "portrait": "/assets/group/founder.webp",
+      "quote": "We build companies that improve how people live, work and thrive — with excellence as the standard and purpose as the reason."
+    },
+    "since": 2010
   },
   "motto": {
     "value": "Creating serenity, pioneering comfort.",

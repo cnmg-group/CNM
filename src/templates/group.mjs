@@ -42,7 +42,7 @@ export function groupFooter(ctx) {
         <p class="muted" style="max-width:28rem">${escapeHtml(g.about)}</p>
       </div>
       <div><h2>Companies</h2><ul>${companies}</ul></div>
-      <div><h2>Divisions</h2><ul>${g.divisions.map((d) => `<li><a href="/cnm-group/#div-${d.key}">${escapeHtml(d.name)}</a></li>`).join('')}</ul></div>
+      <div><h2>Divisions</h2><ul>${g.divisions.map((d) => `<li><a href="/cnm-group/#companies">${escapeHtml(d.name)}</a></li>`).join('')}</ul></div>
       <div><h2>Group</h2><ul><li><a href="/cnm-group/#leadership">Leadership</a></li><li><a href="/cnm-group/contact/">Contact</a></li><li><a href="${g.url}" rel="noopener">cnm-group.net</a></li><li><a href="/privacy/">Privacy</a></li></ul></div>
       <div><h2>Contact</h2><ul>
         <li style="display:flex;gap:8px">${icon('mail')}<a href="mailto:${g.contact.email}">${escapeHtml(g.contact.email)}</a></li>
@@ -58,54 +58,65 @@ export function groupFooter(ctx) {
 </footer>`;
 }
 
-const companyLink = (c) => c.internal
-  ? { href: '/', label: 'Enter the store' }
-  : { href: c.url, label: `Explore ${c.name.replace(' Limited', '')}` };
-
 /* ---------------- Overview ---------------- */
+const DIVISION_OF = { essentials: 'Retail', spectra: 'Retail', cnmworx: 'Energy', foundation: 'Impact' };
+
+function companyPanel(p, i) {
+  const href = p.page || '/';
+  const cta = p.internal ? 'Visit the store' : 'Explore';
+  const media = p.image
+    ? `<img src="${p.image}" alt="${escapeHtml(p.imageAlt || '')}" loading="lazy" width="1179" height="900"${p.imagePosition ? ` style="object-position:${p.imagePosition}"` : ''}>`
+    : `<span class="gpanel__logo"><img src="${p.logo}" alt="" loading="lazy" width="200" height="200"></span>`;
+  return `<a class="gpanel${p.image ? '' : ' gpanel--plain'}" href="${href}" data-track="group_company" data-company="${p.slug}">
+    <span class="gpanel__media">${media}</span>
+    <span class="gpanel__copy">
+      <span class="gpanel__eyebrow">${String(i + 1).padStart(2, '0')} — ${escapeHtml(DIVISION_OF[p.slug])} · ${escapeHtml(p.sector)}</span>
+      <span class="gpanel__name">${escapeHtml(p.name)}</span>
+      <span class="gpanel__tag">${escapeHtml(p.tagline)}</span>
+      <span class="gbtn gbtn--line">${cta} ${icon('arrow')}</span>
+    </span>
+  </a>`;
+}
+
 export function groupHome(ctx) {
   const g = ctx.site.group;
   const f = g.founder;
-  const body = `<section class="group-hero" aria-labelledby="grp-h">
-  <div class="container group-hero__grid">
-    <div class="stack">
-      <span class="label">About CNM Group</span>
-      <h1 id="grp-h" class="h1">${escapeHtml(g.headline)}</h1>
-      <p class="lead">${escapeHtml(g.intro)}</p>
-      <div class="hero__cta"><a class="btn btn--light" href="#divisions">Explore our companies</a><a class="btn btn--ghost-light" href="/cnm-group/contact/">Get in touch</a></div>
+  const body = `<section class="ghero" aria-labelledby="grp-h">
+  <div class="container ghero__grid">
+    ${f.portrait ? `<figure class="ghero__portrait"><img src="${f.portrait}" alt="${escapeHtml(f.name)}, ${escapeHtml(f.title)}" width="1062" height="1142" fetchpriority="high"><figcaption>${escapeHtml(f.name)} · ${escapeHtml(f.title)}</figcaption></figure>` : ''}
+    <div class="ghero__copy">
+      <span class="geyebrow">CNM Group${g.since ? ` · Since ${g.since}` : ''}</span>
+      <h1 id="grp-h" class="ghero__title">Creating sustainable businesses that <em>transcend</em> industries.</h1>
+      <p class="ghero__lead">${escapeHtml(g.intro)}</p>
+      <div class="ghero__cta"><a class="gbtn gbtn--gold" href="#companies">Our companies ${icon('arrow')}</a><a class="gbtn gbtn--line" href="/cnm-group/contact/">Get in touch</a></div>
+      <dl class="gstats">${g.stats.map(([n, l]) => `<div><dt>${escapeHtml(l)}</dt><dd>${escapeHtml(n)}</dd></div>`).join('')}</dl>
     </div>
-    <dl class="group-stats">${g.stats.map(([n, l]) => `<div><dt>${escapeHtml(l)}</dt><dd>${escapeHtml(n)}</dd></div>`).join('')}</dl>
   </div>
 </section>
-<section class="section section--tight"><div class="container center stack"><p class="lead" style="margin-inline:auto">${escapeHtml(g.about)}</p><p class="h2" style="font-family:var(--serif)">${escapeHtml(g.motto)}</p></div></section>
-<section class="section section--cream"><div class="container group-split">
-  <div class="stack"><span class="label muted">Who we are</span><h2 class="h1">${escapeHtml(g.ecosystem.title)}</h2><p class="lead">${escapeHtml(g.ecosystem.text)}</p>
-    <div class="search-chips">${g.ecosystem.pills.map((x) => `<span class="chip">${escapeHtml(x)}</span>`).join('')}</div>
-    <ul>${g.ecosystem.locations.map(([c, d]) => `<li class="group-loc">${icon('pin')}<span><strong>${escapeHtml(c)}</strong><br><span class="muted">${escapeHtml(d)}</span></span></li>`).join('')}</ul></div>
+${f.quote ? `<section class="gquote" id="leadership" aria-label="From our founder"><div class="container gquote__inner">
+  <blockquote><p>“${escapeHtml(f.quote)}”</p></blockquote>
+  <div class="gquote__by"><strong>${escapeHtml(f.name)}</strong><span>${escapeHtml(f.title)}</span></div>
+  <a class="gbtn gbtn--gold" href="#who-we-are">Discover CNM ${icon('arrow')}</a>
+</div></section>` : ''}
+<section class="gcream" id="who-we-are" aria-labelledby="who-h"><div class="container group-split">
+  <div class="stack">
+    <span class="geyebrow geyebrow--ink">Who we are</span>
+    <h2 id="who-h" class="gtitle">A founder-led family of companies across <em>lifestyle</em>, <em>engineering</em> and <em>social impact</em>.</h2>
+    <p class="lead">${escapeHtml(g.about)} ${escapeHtml(g.ecosystem.text)}</p>
+    <p class="gmotto">${escapeHtml(g.motto)}</p>
+    <ul>${g.ecosystem.locations.map(([c, d]) => `<li class="group-loc">${icon('pin')}<span><strong>${escapeHtml(c)}</strong><br><span class="muted">${escapeHtml(d)}</span></span></li>`).join('')}</ul>
+  </div>
   <img class="group-split__img" src="${g.ecosystem.image}" alt="CNM Group reception" width="1020" height="846" loading="lazy">
 </div></section>
-<section class="section" id="divisions" aria-labelledby="div-h"><div class="container">
-  <div class="section-head"><div><span class="label muted">Energy · Retail · Impact</span><h2 id="div-h" class="h1">${escapeHtml(g.companiesIntro.title)}</h2><p class="lead" style="margin-top:12px;max-width:44rem">${escapeHtml(g.companiesIntro.text)}</p></div></div>
-  <div class="group-divisions">${g.divisions.map((d) => `<section class="group-division" id="div-${d.key}" aria-labelledby="dv-${d.key}">
-    <header><span class="label">${escapeHtml(d.name)}</span><h3 id="dv-${d.key}" class="h3">${escapeHtml(d.summary)}</h3></header>
-    ${d.companies.map((c) => { const l = companyLink(c); return `<a class="group-company" href="${l.href}" data-track="group_division" data-division="${d.key}">
-      <img src="${c.logo}" alt="${escapeHtml(c.name)} logo" width="96" height="96" loading="lazy">
-      <span class="stack" style="gap:4px"><strong>${escapeHtml(c.name)}</strong><span class="muted">${escapeHtml(c.tagline)}</span>${c.text ? `<span class="group-company__text">${escapeHtml(c.text)}</span>` : ''}<span class="link">${l.label} ${icon('arrow')}</span></span>
-    </a>`; }).join('')}
-  </section>`).join('')}</div>
+<section class="gdark" id="companies" aria-labelledby="co-h"><div class="container">
+  <span class="geyebrow">Our companies · Energy · Retail · Impact</span>
+  <h2 id="co-h" class="gtitle gtitle--light">Four businesses. <em>One vision.</em></h2>
+  <p class="gdark__lead">${escapeHtml(g.companiesIntro.text)}</p>
+  <div class="gpanels">${g.profiles.map(companyPanel).join('')}</div>
 </div></section>
-<section class="section section--cream" id="leadership" aria-labelledby="lead-h"><div class="container group-split">
-  <div class="group-founder__portrait" aria-hidden="true">${f.portrait ? `<img src="${f.portrait}" alt="">` : `<span>${escapeHtml(f.name.replace(/^Mrs\s+/, '').split(' ').map((w) => w[0]).join(''))}</span>`}</div>
-  <div class="stack">
-    <span class="label muted">Leadership</span>
-    <h2 id="lead-h" class="h1">${escapeHtml(f.name)}</h2>
-    <p class="h3" style="color:var(--gold-ink);margin:0">${escapeHtml(f.title)}</p>
-    <p class="lead">CNM Group is privately held and founder-led. ${escapeHtml(f.name)} leads the group across its lifestyle, engineering and social impact businesses.</p>
-    ${f.quote ? `<blockquote class="statement">${escapeHtml(f.quote)}</blockquote>` : approval('Founder portrait, biography and quote.', 'Name and title are from the CNM brief. Please supply an approved photograph and words.')}
-  </div>
-</div></section>
-<section class="section section--green section--tight"><div class="container center stack"><h2 class="h2">Interested in partnering with CNM Group?</h2><p class="lead" style="margin-inline:auto">Whether you're looking to collaborate, invest, or explore our companies, we'd love to hear from you.</p><div class="hero__cta" style="justify-content:center"><a class="btn btn--light" href="/cnm-group/contact/">Get in touch</a><a class="btn btn--ghost-light" href="/">Visit CNM Essentials</a></div></div></section>`;
-  return { body, jsonld: [{ '@context': 'https://schema.org', '@type': 'Organization', name: 'CNM Group', url: g.url, logo: `${ctx.siteUrl}${g.logo}`, slogan: g.motto, founder: { '@type': 'Person', name: f.name, jobTitle: f.title }, subOrganization: g.divisions.flatMap((d) => d.companies.map((c) => ({ '@type': 'Organization', name: c.name }))) }] };
+${f.quote ? '' : `<section class="gcream" id="leadership"><div class="container">${approval('Founder quote.', 'Please supply approved words.')}</div></section>`}
+<section class="gdark gdark--cta"><div class="container center stack"><h2 class="gtitle gtitle--light">Interested in partnering with CNM Group?</h2><p class="gdark__lead" style="margin-inline:auto">Whether you're looking to collaborate, invest, or explore our companies, we'd love to hear from you.</p><div class="ghero__cta" style="justify-content:center"><a class="gbtn gbtn--gold" href="/cnm-group/contact/">Get in touch ${icon('arrow')}</a><a class="gbtn gbtn--line" href="/">Visit CNM Essentials</a></div></div></section>`;
+  return { body, jsonld: [{ '@context': 'https://schema.org', '@type': 'Organization', name: 'CNM Group', url: g.url, logo: `${ctx.siteUrl}${g.logo}`, slogan: g.motto, ...(g.since ? { foundingDate: String(g.since) } : {}), founder: { '@type': 'Person', name: f.name, jobTitle: f.title, ...(f.portrait ? { image: `${ctx.siteUrl}${f.portrait}` } : {}) }, subOrganization: g.divisions.flatMap((d) => d.companies.map((c) => ({ '@type': 'Organization', name: c.name }))) }] };
 }
 
 /* ---------------- Company pages ---------------- */
@@ -180,7 +191,7 @@ export function companyPage(ctx, slug) {
     <div class="search-chips">${p.places.map((pl) => `<span class="chip">${escapeHtml(pl)}</span>`).join('')}</div>
     <div class="hero__cta"><a class="btn btn--green" href="#enquire">${escapeHtml(form.title)}</a><a class="btn btn--ghost" href="/cnm-group/contact/">Contact the group</a></div>
   </div>
-  <div class="company-hero__media"><img src="${p.logo}" alt="${escapeHtml(p.name)} logo" width="480" height="480"><div class="profile__card"><strong>${escapeHtml(p.card[0])}</strong><span class="muted">${escapeHtml(p.card[1])}</span></div></div>
+  <div class="company-hero__media">${p.image ? `<img class="company-hero__photo" src="${p.image}" alt="${escapeHtml(p.imageAlt || '')}" width="1179" height="900"${p.imagePosition ? ` style="object-position:${p.imagePosition}"` : ''}>` : ''}<img class="company-hero__logo" src="${p.logo}" alt="${escapeHtml(p.name)} logo" width="480" height="480"><div class="profile__card"><strong>${escapeHtml(p.card[0])}</strong><span class="muted">${escapeHtml(p.card[1])}</span></div></div>
 </div></section>
 <section class="section section--cream section--tight"><div class="container">
   <div class="cards-2 company-lists">${p.lists.map(([h, items]) => `<div><h2 class="label">${escapeHtml(h)}</h2><ul>${items.map((i) => `<li>${icon('check')} ${escapeHtml(i)}</li>`).join('')}</ul></div>`).join('')}</div>

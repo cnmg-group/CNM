@@ -200,7 +200,9 @@ test('mobile navigation menu opens and is keyboard dismissible', async ({ page, 
 
 test('CNM Group: Retail routes to the store; company pages; contact form sends a message', async ({ page, isMobile }) => {
   await page.goto('/cnm-group/');
-  await expect(page.locator('#divisions .group-company', { hasText: 'CNM Essentials' })).toHaveAttribute('href', '/');
+  await expect(page.locator('#companies .gpanel', { hasText: 'CNM Essentials' })).toHaveAttribute('href', '/');
+  await expect(page.locator('.ghero__portrait img')).toBeVisible();
+  await expect(page.locator('#companies .gpanel')).toHaveCount(4);
   await expect(page.locator('#leadership')).toContainText('Mrs Nkiruka Cynthia Ajah');
   await expect(page.locator('.group-store')).toHaveAttribute('href', '/');
   if (isMobile) {
