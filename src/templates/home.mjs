@@ -3,6 +3,15 @@ import { escapeHtml, formatDate } from '../shared/format.mjs';
 import { icon } from '../shared/icons.mjs';
 import { approval } from './layout.mjs';
 
+/** Store card: the photo (or a branded tile) on top, never covered; the details below on a themed panel. */
+export function storeCard(s, { eyebrow = 'CNM Essentials' } = {}) {
+  const img = s.images?.[0];
+  return `<a class="store-card" href="/stores/${s.slug}/">
+    <span class="store-card__media">${img ? `<img src="${img.src}" alt="${escapeHtml(img.alt || '')}" loading="lazy" decoding="async">` : `<span class="store-card__tile" aria-hidden="true"><img src="/assets/brand/cnm-mark-transparent.svg" alt="" width="64" height="64"><span>Photo coming soon</span></span>`}</span>
+    <span class="store-card__body"><span class="label store-card__eyebrow">${escapeHtml(eyebrow)}</span><span class="store-card__city">${escapeHtml(s.city)}</span><span class="store-card__addr">${escapeHtml(s.address)}${s.region === 'FCT' ? ', FCT' : s.region ? `, ${escapeHtml(s.region)} State` : ''}</span>${s.phone ? `<span class="store-card__phone">${escapeHtml(s.phone)}</span>` : ''}<span class="link">Store details ${icon('arrow')}</span></span>
+  </a>`;
+}
+
 const PROMISE_ICONS = {
   truck: icon('truck'),
   lock: icon('lock'),
@@ -116,7 +125,7 @@ export function homePage(ctx) {
 <section class="section" aria-labelledby="stores-title">
   <div class="container">
     <div class="section-head"><div><span class="label muted">Visit us</span><h2 id="stores-title" class="h2">Lagos &amp; Abuja</h2></div><a class="link" href="/stores/">All stores ${icon('arrow')}</a></div>
-    <div class="store-cards">${stores.map((s) => `<a class="store-card" href="/stores/${s.slug}/" style="background:var(--ink);color:#fff">${s.images?.[0] ? `<img src="${s.images[0].src}" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5">` : ''}<div style="position:relative" class="stack"><span class="label" style="color:var(--gold)">CNM Essentials</span><p class="store-card__city">${escapeHtml(s.city)}</p><p style="max-width:28rem">${escapeHtml(s.address)}</p><span class="link">Store details ${icon('arrow')}</span></div></a>`).join('')}</div>
+    <div class="store-cards">${stores.map((s) => storeCard(s)).join('')}</div>
   </div>
 </section>
 

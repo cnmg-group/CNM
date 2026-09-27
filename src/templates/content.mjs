@@ -1,7 +1,7 @@
 import { productCardHTML } from '../shared/card.mjs';
 import { escapeHtml, formatDate } from '../shared/format.mjs';
 import { icon } from '../shared/icons.mjs';
-import { articleCard } from './home.mjs';
+import { articleCard, storeCard } from './home.mjs';
 import { approval, breadcrumbs, butterflySVG } from './layout.mjs';
 
 const art = (name, extra = '') => `<img src="/assets/art/${name}.svg" alt="" loading="lazy" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;${extra}">`;
@@ -14,9 +14,10 @@ export function storyPage(ctx) {
   const { html, ld } = breadcrumbs(ctx, [{ name: 'Our story', path: '/our-story/' }]);
   const body = `
 <section class="hero" style="min-height:88svh" aria-labelledby="story-h">
-  <div class="hero__media" aria-hidden="true"><img src="${s.image.src}" alt="" style="width:100%;height:100%;object-fit:cover;opacity:.45"></div>
-  <div class="container hero__inner"><span class="label hero__eyebrow">About CNM Essentials</span><h1 id="story-h" class="display" style="max-width:12ch">${escapeHtml(s.headline.value)}</h1>
+  <div class="hero__media" aria-hidden="true"><div class="hero__atmos"></div></div>
+  <div class="container hero__inner hero__inner--split"><div><span class="label hero__eyebrow">About CNM Essentials</span><h1 id="story-h" class="display" style="max-width:12ch">${escapeHtml(s.headline.value)}</h1>
     <div class="stat-row" style="margin-top:32px">${s.stats.value.map(([n, l]) => `<div><strong>${escapeHtml(n)}</strong><span class="label">${escapeHtml(l)}</span></div>`).join('')}</div></div>
+    <figure class="hero__feature hero__feature--tall"><img src="${s.image.src}" alt="${escapeHtml(s.image.alt || 'Inside a CNM Essentials store')}" width="1800" height="2400" fetchpriority="high"></figure></div>
 </section>
 <div class="container">${html}</div>
 <section class="section"><div class="container" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:clamp(32px,6vw,96px);align-items:center">
@@ -59,7 +60,7 @@ export function storesIndex(ctx) {
   const { html, ld } = breadcrumbs(ctx, [{ name: 'Stores', path: '/stores/' }]);
   const body = `<div class="container">${html}
   <header class="plp-head"><span class="label muted">Visit CNM</span><h1 class="display" style="font-size:clamp(3rem,8vw,7rem)">Our stores</h1><p class="lead">Experience our fragrances in person, collect online orders and ask about our Lease-to-Own commercial diffusers.</p></header>
-  <div class="store-cards" style="padding-bottom:96px">${ctx.stores.map((s) => `<a class="store-card" href="/stores/${s.slug}/" style="background:var(--ink);color:#fff">${s.images?.[0] ? `<img src="${s.images[0].src}" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5">` : ''}<div style="position:relative" class="stack"><p class="store-card__city">${escapeHtml(s.city)}</p><p>${escapeHtml(s.address)}${s.region === 'FCT' ? ', FCT' : `, ${escapeHtml(s.region)} State`}</p><p>${escapeHtml(s.phone || '')}</p><span class="link">Store details ${icon('arrow')}</span></div></a>`).join('')}</div>
+  <div class="store-cards" style="padding-bottom:96px">${ctx.stores.map((s) => storeCard(s)).join('')}</div>
 </div>`;
   return { body, jsonld: [ld] };
 }
@@ -167,7 +168,7 @@ export function journalIndex(ctx) {
   const [first, ...rest] = ctx.articles;
   const body = `<div class="container">${html}
   <header class="plp-head"><span class="label muted">The CNM Journal</span><h1 class="display" style="font-size:clamp(3rem,8vw,7rem)">Notes on scent</h1></header>
-  ${first ? `<a class="split" href="/journal/${first.slug}/" style="min-height:60vh;margin-bottom:64px"><div class="split__media">${art('tile-green')}</div><div class="split__copy" style="background:var(--cream)"><span class="label muted">${escapeHtml(first.category)}</span><h2 class="h1">${escapeHtml(first.title)}</h2><p class="lead">${escapeHtml(first.excerpt)}</p><span class="link">Read ${icon('arrow')}</span></div></a>` : ''}
+  ${first ? `<a class="split" href="/journal/${first.slug}/" style="min-height:60vh;margin-bottom:64px"><div class="split__media">${art('tile-green')}</div><div class="split__copy" style="background:var(--bg-soft)"><span class="label muted">${escapeHtml(first.category)}</span><h2 class="h1">${escapeHtml(first.title)}</h2><p class="lead">${escapeHtml(first.excerpt)}</p><span class="link">Read ${icon('arrow')}</span></div></a>` : ''}
   <div class="journal-grid" style="padding-bottom:96px">${rest.map((a, i) => articleCard(a, i + 1)).join('')}</div>
 </div>`;
   return { body, jsonld: [ld] };

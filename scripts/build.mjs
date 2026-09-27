@@ -203,7 +203,7 @@ for (const i of info) { const r = infoPage(ctx, i); await write(i.path, page({ p
 // Utility pages
 await write('/404.html', page({ page: '404', path: '/404', title: 'Page not found', body: notFoundPage(ctx), noindex: true }), { sitemap: false });
 await write('/styleguide/', page({ page: 'styleguide', path: '/styleguide/', title: 'Design system', body: styleguidePage(ctx), noindex: true }), { sitemap: false });
-await write('/admin/', `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>CNM Admin</title><link rel="icon" href="/assets/brand/cnm-mark.png"><link rel="stylesheet" href="${assets.css}"><link rel="stylesheet" href="${assets.adminCss}"><script type="module" src="${assets.adminJs}"></script></head><body data-page="admin"${ctx.logoFile ? ` data-logo="/assets/brand/cnm-logo-on-light.svg"` : ''}>${adminPage()}</body></html>`, { sitemap: false });
+await write('/admin/', `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>CNM Group OS</title><link rel="icon" href="/assets/brand/cnm-group-emblem-128.webp"><script src="/assets/theme.js"></script><link rel="stylesheet" href="${assets.css}"><link rel="stylesheet" href="${assets.adminCss}"><script type="module" src="${assets.adminJs}"></script></head><body data-page="admin"${ctx.logoFile ? ` data-logo="/assets/brand/cnm-logo-on-light.svg"` : ''}>${adminPage()}</body></html>`, { sitemap: false });
 
 // ---------- data files ----------
 const catalogue = {

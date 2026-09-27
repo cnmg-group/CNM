@@ -59,7 +59,7 @@ function shell() {
         <button class="os-icon os-nav__collapse" type="button" data-collapse aria-label="${collapsed ? 'Expand' : 'Collapse'} sidebar" aria-pressed="${collapsed}"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
       <nav>${sections.map((sec) => `<p class="os-nav__sec">${sec}</p>${items.filter((x) => x[3] === sec).map(([k, l]) => `<a href="#${k}" data-nav="${k}" title="${e(l)}">${icon(k)}<span>${e(l)}</span></a>`).join('')}`).join('')}</nav>
       <div class="os-nav__me"><span class="os-avatar" aria-hidden="true">${e((me.name || me.email).slice(0, 1).toUpperCase())}</span><span class="os-nav__who"><strong>${e(me.name)}</strong><small>${e(me.role)}${Array.isArray(me.scope) ? ` · ${me.scope.length} compan${me.scope.length === 1 ? 'y' : 'ies'}` : ' · all companies'}</small></span></div>
-      <div class="os-nav__actions">${me.permissions.includes('publish') ? '<button class="os-btn os-btn--light" type="button" data-publish>Publish site</button>' : ''}<a class="os-link" href="/" target="_blank" rel="noopener">View sites ↗</a><button class="os-link" type="button" data-logout>Sign out</button></div>
+      <div class="os-nav__actions"><button class="os-link os-theme" type="button" data-os-theme title="Light / dark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><span data-os-theme-label></span></button>${me.permissions.includes('publish') ? '<button class="os-btn os-btn--light" type="button" data-publish>Publish site</button>' : ''}<a class="os-link" href="/" target="_blank" rel="noopener">View sites ↗</a><button class="os-link" type="button" data-logout>Sign out</button></div>
     </aside>
     <div class="os-scrim" data-nav-close></div>
     <main class="os-main"><div class="alert" data-flash hidden></div><div data-view></div></main></div>`;
@@ -70,6 +70,15 @@ function shell() {
     ev.currentTarget.setAttribute('aria-pressed', String(on));
     ev.currentTarget.setAttribute('aria-label', `${on ? 'Expand' : 'Collapse'} sidebar`);
     try { localStorage.setItem(NAV_KEY, on ? 'collapsed' : 'open'); } catch { /* ignore */ }
+  });
+  // Light / dark: same switch and memory (cnm.theme) as every CNM website; follows the device until chosen.
+  const themeBtn = root.querySelector('[data-os-theme]');
+  const themeLabel = () => { const dark = document.documentElement.dataset.theme === 'dark'; themeBtn.querySelector('[data-os-theme-label]').textContent = dark ? 'Light mode' : 'Dark mode'; themeBtn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode'); };
+  themeLabel();
+  themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    if (window.cnmSetTheme) window.cnmSetTheme(next); else document.documentElement.dataset.theme = next;
+    themeLabel();
   });
   const setMobile = (open) => { os.classList.toggle('is-nav-open', open); root.querySelector('[data-nav-open]').setAttribute('aria-expanded', String(open)); };
   root.querySelector('[data-nav-open]').addEventListener('click', () => setMobile(true));

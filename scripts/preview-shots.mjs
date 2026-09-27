@@ -20,7 +20,7 @@ const MAX_H = 8000;
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
 for (const [dev, vp, dsf] of [['desktop', { width: 1440, height: 900 }, 1], ['mobile', { width: 390, height: 844 }, 2]]) {
-  const ctx = await browser.newContext({ viewport: vp, deviceScaleFactor: dsf });
+  const ctx = await browser.newContext({ viewport: vp, deviceScaleFactor: dsf, reducedMotion: 'reduce' }); // no scroll fade-ins, so full-page captures are complete
   await ctx.addInitScript((theme) => { try { localStorage.setItem('cnm.consent', 'denied'); if (theme) localStorage.setItem('cnm.theme', theme); } catch {} }, process.env.THEME || '');
   const pg = await ctx.newPage();
   for (const [key, path, action] of PAGES) {
