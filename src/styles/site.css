@@ -901,7 +901,8 @@ li > svg, .banner__cap svg, .info-list svg { width: 16px; height: 16px; flex: no
 /* ---------- CNM Group: dark navy editorial theme ---------- */
 body[data-chrome="group"] { --g-navy: #0b1120; --g-navy-2: #111a2e; --g-cream: #f3ecdd; --g-gold: #d4b06a; --g-gold-ink: #7a5c00; --g-line: rgba(243,236,221,.16); }
 body[data-chrome="group"] .group-header { background: var(--g-navy); color: var(--g-cream); border-color: var(--g-line); }
-body[data-chrome="group"] .group-logo img { background: #fff; padding: 3px; width: 52px; height: 52px; }
+body[data-chrome="group"] .group-logo img { width: auto; height: 64px; }
+@media (max-width: 960px) { body[data-chrome="group"] .group-logo img { height: 50px; } }
 body[data-chrome="group"] .group-nav a[aria-current="page"], body[data-chrome="group"] .group-nav a:hover { color: var(--g-gold); }
 body[data-chrome="group"] .group-store { background: var(--g-gold); color: var(--g-navy); border-color: var(--g-gold); }
 body[data-chrome="group"] .group-menu__panel { background: var(--g-navy); border-color: var(--g-line); }
@@ -999,7 +1000,7 @@ body[data-chrome="group"] .group-footer { background: var(--g-navy); }
 .gfooter { background: #080d19; color: var(--g-cream, #f3ecdd); padding: clamp(48px, 7vw, 96px) 0 32px; }
 .gfooter__grid { display: grid; grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr)); gap: 40px 32px; }
 .gfooter__brand { display: grid; gap: 20px; align-content: start; }
-.gfooter__logo img { width: 128px; height: auto; background: #fff; padding: 6px; display: block; }
+.gfooter__logo img { width: 170px; height: auto; display: block; }
 .gfooter__tagline { font-family: var(--serif); font-style: italic; font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.2; margin: 0; max-width: 22ch; }
 .gfooter__motto { margin: 0; color: rgba(243,236,221,.6); font-size: .875rem; }
 .gfooter h2 { font-size: .75rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--g-gold, #d4b06a); margin: 0 0 18px; }

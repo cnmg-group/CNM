@@ -1,8 +1,18 @@
 // CNM Group corporate pages: group chrome (header/footer), overview, company pages and contact.
 // Company facts come from cnm-group.net (content/site.json → group). Anything unverified is marked for approval.
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { escapeHtml } from '../shared/format.mjs';
 import { icon } from '../shared/icons.mjs';
 import { approval, breadcrumbs } from './layout.mjs';
+
+// Photos are stored at 2000 px for sharp high-density screens, with a 1000 px copy for phones (see PHOTO_SRCSET).
+const PHOTO_SRCSET = new Set(['/assets/group/founder.webp', '/assets/group/spectra.webp', '/assets/group/cnmworx.webp', '/assets/group/foundation.webp', '/assets/stores/cnm-essentials-store-interior.webp', '/assets/brand/cnm-group-reception.webp']);
+const PUBLIC = fileURLToPath(new URL('../../public', import.meta.url));
+const srcset = (src, sizes) => {
+  const small = src.replace(/\.webp$/, '-1000.webp');
+  return PHOTO_SRCSET.has(src) && existsSync(PUBLIC + small) ? ` srcset="${small} 1000w, ${src} 2000w" sizes="${sizes}"` : '';
+};
 
 const GROUP_NAV = [
   { key: 'overview', label: 'Overview', href: '/cnm-group/' },
@@ -22,7 +32,7 @@ export function groupHeader(ctx, current) {
   ].map((m) => `<li><a href="${m.href}"${m.key === current ? ' aria-current="page"' : ''}><span class="gmenu__name">${escapeHtml(m.name)}</span>${m.sub ? `<span class="gmenu__sub">${escapeHtml(m.sub)}</span>` : ''}</a></li>`).join('');
   return `<header class="group-header" data-group-header>
   <div class="container group-header__row">
-    <a class="group-logo" href="/cnm-group/" aria-label="CNM Group — home"><img src="${g.logo}" alt="" width="480" height="480"><span>CNM Group</span></a>
+    <a class="group-logo" href="/cnm-group/" aria-label="CNM Group — home"><img src="${g.logo}" alt="" width="1600" height="1488"></a>
     <nav aria-label="CNM Group"><ul class="group-nav">${links}</ul></nav>
     <div class="group-header__right">
       <a class="btn btn--green group-store" href="/" data-track="group_visit_store">${icon('bag')} <span>Visit store</span></a>
@@ -43,7 +53,7 @@ export function groupFooter(ctx) {
   <div class="container">
     <div class="gfooter__grid">
       <div class="gfooter__brand">
-        <a class="gfooter__logo" href="/cnm-group/" aria-label="CNM Group — home"><img src="${g.logo}" alt="" width="480" height="480" loading="lazy"></a>
+        <a class="gfooter__logo" href="/cnm-group/" aria-label="CNM Group — home"><img src="${g.logo}" alt="" width="1600" height="1488" loading="lazy"></a>
         <p class="gfooter__tagline">Creating sustainable businesses that transcend industries.</p>
         <p class="gfooter__motto">${escapeHtml(g.motto)}</p>
       </div>
@@ -68,7 +78,7 @@ function companyPanel(p, i) {
   const href = p.page || '/';
   const cta = p.internal ? 'Visit the store' : 'Explore';
   const media = p.image
-    ? `<img src="${p.image}" alt="${escapeHtml(p.imageAlt || '')}" loading="lazy" width="1179" height="900"${p.imagePosition ? ` style="object-position:${p.imagePosition}"` : ''}>`
+    ? `<img src="${p.image}"${srcset(p.image, '(max-width: 960px) 100vw, 50vw')} alt="${escapeHtml(p.imageAlt || '')}" loading="lazy" width="2000" height="1530"${p.imagePosition ? ` style="object-position:${p.imagePosition}"` : ''}>`
     : `<span class="gpanel__logo"><img src="${p.logo}" alt="" loading="lazy" width="200" height="200"></span>`;
   return `<a class="gpanel${p.image ? '' : ' gpanel--plain'}" href="${href}" data-track="group_company" data-company="${p.slug}">
     <span class="gpanel__media">${media}</span>
@@ -86,7 +96,7 @@ export function groupHome(ctx) {
   const f = g.founder;
   const body = `<section class="ghero" aria-labelledby="grp-h">
   <div class="container ghero__grid">
-    ${f.portrait ? `<figure class="ghero__portrait"><img src="${f.portrait}" alt="${escapeHtml(f.name)}, ${escapeHtml(f.title)}" width="1062" height="1142" fetchpriority="high"><figcaption>${escapeHtml(f.name)} · ${escapeHtml(f.title)}</figcaption></figure>` : ''}
+    ${f.portrait ? `<figure class="ghero__portrait"><img src="${f.portrait}"${srcset(f.portrait, '(max-width: 960px) 92vw, 45vw')} alt="${escapeHtml(f.name)}, ${escapeHtml(f.title)}" width="2000" height="2151" fetchpriority="high"><figcaption>${escapeHtml(f.name)} · ${escapeHtml(f.title)}</figcaption></figure>` : ''}
     <div class="ghero__copy">
       <span class="geyebrow">CNM Group${g.since ? ` · Since ${g.since}` : ''}</span>
       <h1 id="grp-h" class="ghero__title">Creating sustainable businesses that <em>transcend</em> industries.</h1>
@@ -109,7 +119,7 @@ ${f.quote ? `<section class="gquote" id="leadership" aria-label="From our founde
     <p class="gmotto">${escapeHtml(g.motto)}</p>
     <ul>${g.ecosystem.locations.map(([c, d]) => `<li class="group-loc">${icon('pin')}<span><strong>${escapeHtml(c)}</strong><br><span class="muted">${escapeHtml(d)}</span></span></li>`).join('')}</ul>
   </div>
-  <img class="group-split__img" src="${g.ecosystem.image}" alt="CNM Group reception" width="1020" height="846" loading="lazy">
+  <img class="group-split__img" src="${g.ecosystem.image}"${srcset(g.ecosystem.image, '(max-width: 960px) 100vw, 50vw')} alt="CNM Group reception" width="2000" height="1659" loading="lazy">
 </div></section>
 <section class="gdark" id="companies" aria-labelledby="co-h"><div class="container">
   <span class="geyebrow">Our companies · Energy · Retail · Impact</span>
@@ -119,7 +129,7 @@ ${f.quote ? `<section class="gquote" id="leadership" aria-label="From our founde
 </div></section>
 ${f.quote ? '' : `<section class="gcream" id="leadership"><div class="container">${approval('Founder quote.', 'Please supply approved words.')}</div></section>`}
 <section class="gdark gdark--cta"><div class="container center stack"><h2 class="gtitle gtitle--light">Interested in partnering with CNM Group?</h2><p class="gdark__lead" style="margin-inline:auto">Whether you're looking to collaborate, invest, or explore our companies, we'd love to hear from you.</p><div class="ghero__cta" style="justify-content:center"><a class="gbtn gbtn--gold" href="/cnm-group/contact/">Get in touch ${icon('arrow')}</a><a class="gbtn gbtn--line" href="/">Visit CNM Essentials</a></div></div></section>`;
-  return { body, jsonld: [{ '@context': 'https://schema.org', '@type': 'Organization', name: 'CNM Group', url: g.url, logo: `${ctx.siteUrl}${g.logo}`, slogan: g.motto, ...(g.since ? { foundingDate: String(g.since) } : {}), founder: { '@type': 'Person', name: f.name, jobTitle: f.title, ...(f.portrait ? { image: `${ctx.siteUrl}${f.portrait}` } : {}) }, subOrganization: g.divisions.flatMap((d) => d.companies.map((c) => ({ '@type': 'Organization', name: c.name }))) }] };
+  return { body, jsonld: [{ '@context': 'https://schema.org', '@type': 'Organization', name: 'CNM Group', url: g.url, logo: `${ctx.siteUrl}${g.logoPng || g.logo}`, slogan: g.motto, ...(g.since ? { foundingDate: String(g.since) } : {}), founder: { '@type': 'Person', name: f.name, jobTitle: f.title, ...(f.portrait ? { image: `${ctx.siteUrl}${f.portrait}` } : {}) }, subOrganization: g.divisions.flatMap((d) => d.companies.map((c) => ({ '@type': 'Organization', name: c.name }))) }] };
 }
 
 /* ---------------- Company pages ---------------- */
@@ -194,7 +204,7 @@ export function companyPage(ctx, slug) {
     <div class="search-chips">${p.places.map((pl) => `<span class="chip">${escapeHtml(pl)}</span>`).join('')}</div>
     <div class="hero__cta"><a class="btn btn--green" href="#enquire">${escapeHtml(form.title)}</a><a class="btn btn--ghost" href="/cnm-group/contact/">Contact the group</a></div>
   </div>
-  <div class="company-hero__media">${p.image ? `<img class="company-hero__photo" src="${p.image}" alt="${escapeHtml(p.imageAlt || '')}" width="1179" height="900"${p.imagePosition ? ` style="object-position:${p.imagePosition}"` : ''}>` : ''}<img class="company-hero__logo" src="${p.logo}" alt="${escapeHtml(p.name)} logo" width="480" height="480"><div class="profile__card"><strong>${escapeHtml(p.card[0])}</strong><span class="muted">${escapeHtml(p.card[1])}</span></div></div>
+  <div class="company-hero__media">${p.image ? `<img class="company-hero__photo" src="${p.image}"${srcset(p.image, '(max-width: 960px) 100vw, 40vw')} alt="${escapeHtml(p.imageAlt || '')}" width="2000" height="1530"${p.imagePosition ? ` style="object-position:${p.imagePosition}"` : ''}>` : ''}<img class="company-hero__logo" src="${p.logo}" alt="${escapeHtml(p.name)} logo" width="480" height="480"><div class="profile__card"><strong>${escapeHtml(p.card[0])}</strong><span class="muted">${escapeHtml(p.card[1])}</span></div></div>
 </div></section>
 <section class="section section--cream section--tight"><div class="container">
   <div class="cards-2 company-lists">${p.lists.map(([h, items]) => `<div><h2 class="label">${escapeHtml(h)}</h2><ul>${items.map((i) => `<li>${icon('check')} ${escapeHtml(i)}</li>`).join('')}</ul></div>`).join('')}</div>

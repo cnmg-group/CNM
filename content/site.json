@@ -57,7 +57,7 @@
   },
   "group": {
     "name": "CNM Group",
-    "logo": "/assets/brand/cnm-group-logo.png",
+    "logo": "/assets/brand/cnm-group-logo.svg",
     "url": "https://www.cnm-group.net",
     "status": "FROM_CNM_GROUP_SITE",
     "headline": "Creating Sustainable Businesses That Transcend Industries",
@@ -352,7 +352,8 @@
       "portrait": "/assets/group/founder.webp",
       "quote": "We build companies that improve how people live, work and thrive — with excellence as the standard and purpose as the reason."
     },
-    "since": 2010
+    "since": 2010,
+    "logoPng": "/assets/brand/cnm-group-logo-transparent.png"
   },
   "motto": {
     "value": "Creating serenity, pioneering comfort.",
