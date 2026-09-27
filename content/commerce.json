@@ -73,8 +73,8 @@
     "note": "Paystack is recommended for NGN card, bank transfer and USSD. Confirm CNM's approved provider/merchant account."
   },
   "returns": {
-    "status": "DRAFT_FOR_CNM_APPROVAL",
-    "note": "Standard policy drafted for CNM Essentials; the numbers and wording must be confirmed by CNM before launch.",
+    "status": "APPROVED",
+    "approvedAt": "2026-09-27",
     "changeOfMindDays": 7,
     "reportProblemHours": 48,
     "refundBusinessDays": 5,

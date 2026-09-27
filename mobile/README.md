@@ -207,7 +207,7 @@ if you want links to verify on internal/preview builds).
 | App name "CNM Essentials", store listing, developer accounts (Apple team, Play console) | `app.json`, `eas.json` | Needs CNM |
 | Product descriptions, notes, ingredients, sizes, care, FAQs | `../content/products.json` | Needs CNM (names, brands, prices and images come from the live site) |
 | Stock levels | `../content/products.json` (`stock.quantity: null`) | Not published — orders show "Availability to be confirmed" |
-| Delivery fees, VAT treatment, returns policy, payment provider (site lists Visa / Mastercard / PayPal; app flow is built for Paystack) | `../content/commerce.json` | Demo values — needs CNM |
+| Delivery fees, VAT treatment, payment provider (site lists Visa / Mastercard / PayPal; app flow is built for Paystack) | `../content/commerce.json` | Demo values — needs CNM |
 | Store opening hours, WhatsApp / Instagram links, Hair Care & Body Care ranges | `../content/stores.json`, `site.json`, `categories.json` | Needs CNM |
 | Apple Team ID + Play signing fingerprint for `.well-known` files | website | Needs CNM accounts |
 

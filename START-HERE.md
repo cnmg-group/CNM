@@ -41,7 +41,7 @@ Follow `docs/INTEGRATIONS.md`: Resend (sign-in codes and order emails), Supabase
 | 1 | **Original product photo files** (or allow `cnmessentials.com` in the environment's network settings) | The current photos were enhanced from ~165px screenshots. They're sharper, but only the originals will be truly crystal clear, and small label text may be slightly off. |
 | 2 | **Rest of the catalogue** (only page 1 of the shop was supplied) | So every product is online |
 | 3 | **Stock levels** | The live site doesn't show them |
-| 4 | **Delivery fees and returns policy** | Currently placeholder values |
+| 4 | **Delivery fees** | Currently placeholder values (returns policy approved 27 Sept 2026) |
 | 5 | **Store opening hours** | For the store pages and Google Maps |
 | 6 | **Founder's original photo file and biography** | The portrait is enhanced from a phone screenshot of cnm-group.net; the original file will be sharper still. The biography goes on the About page. |
 | 6a | **Company details**: Spectra addresses and hours, CNMWorX certificate details and case studies, Foundation payment account for online giving | Each marked "Needs CNM approval" on its page |

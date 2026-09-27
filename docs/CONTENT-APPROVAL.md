@@ -12,7 +12,7 @@ Nothing below has been invented. Every unverified fact is either empty (`null`) 
 | Our Story | `content/story.json` | Company story in CNM's own words, founder name/title/portrait/quote, philosophies, dated milestones |
 | Stores | Admin → Stores | Addresses, phone and email are in use (from cnmessentials.com). Still needed: opening hours, coordinates, per-store photos, and which store the interior photo shows |
 | Fragrance as a Service | `content/services.json` | Which sectors are offered, process wording, FAQ answers, real case studies and gallery |
-| Commerce rules | `content/commerce.json` | Delivery methods, fees, regions and free-delivery thresholds; VAT treatment; returns policy; payment provider |
+| Commerce rules | `content/commerce.json` | Delivery methods, fees, regions and free-delivery thresholds; VAT treatment; payment provider (returns policy approved 27 Sept 2026) |
 | Legal | `/privacy/`, `/terms/` | Privacy notice (NDPA 2023) and terms of sale from counsel |
 | Contact and social | `content/site.json` | Email and phone are in use. Still needed: Instagram and WhatsApp URLs |
 | CNM Group | `content/site.json` → `group` | In use (from cnm-group.net). Still needed: direct URLs for CNM Spectra, CNMWorX and CNM Foundation |
