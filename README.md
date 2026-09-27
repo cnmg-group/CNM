@@ -10,7 +10,7 @@ One codebase for **CNMGroup.com** and every CNM company website:
 | `/cnmworx/` | CNMWorX Limited: engineering services, proposals and tenders |
 | `/foundation/` | CNM Foundation: programmes, volunteering, donation pledges |
 
-Every page carries the floating CNM control: one click home to CNM Group, hover or tap to switch to any other CNM company.
+Every page carries the floating CNM control: one click home to CNM Group, click the switch to change to any other CNM company.
 
 > **Staging build.** The original CNM logo, the 20 products, prices, photography, campaign banners, store addresses and copy come from cnmessentials.com and cnm-group.net. Anything not yet confirmed (stock, delivery fees, founder story, opening hours) is marked **Needs CNM approval**; nothing has been invented. Import the rest of the catalogue with `scripts/import-catalogue.mjs` (see `PROGRESS.md`).
 

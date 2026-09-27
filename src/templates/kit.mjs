@@ -54,8 +54,8 @@ export const COMPANY_LINKS = [
 
 /**
  * The universal CNM navigation: one floating glass control on every page of every CNM website.
- * A click on the CNM Group emblem goes home to CNMGroup.com; hovering (mouse) or the switch button (touch)
- * fans out the sister companies for instant switching. Behaviour lives in motion.js (initCnmNav).
+ * A click on the CNM Group emblem goes home to CNMGroup.com; clicking or tapping the switch button
+ * fans out the sister companies for instant switching (it never opens on hover or scroll). Behaviour lives in motion.js (initCnmNav).
  */
 export function cnmNav(current) {
   const others = COMPANY_LINKS.filter((c) => c.key !== current);
@@ -64,7 +64,7 @@ export function cnmNav(current) {
       <span class="cnmnav__text"><strong>${c.name}</strong><small>${escapeHtml(c.label)}</small></span>
       <span class="cnmnav__go">${icon('arrow')}</span>
     </a></li>`).join('');
-  return `<div class="cnmnav" data-cnmnav data-current="${current}">
+  return `<div class="cnmnav is-compact" data-cnmnav data-current="${current}">
   <nav class="cnmnav__panel" id="cnmnav-panel" aria-label="CNM Group companies">
     <p class="cnmnav__title">CNM Group companies</p>
     <ul class="cnmnav__list">${items}</ul>

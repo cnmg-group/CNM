@@ -4,7 +4,7 @@ A one-page summary of what's built, how to see it, and what CNM still needs to s
 
 ## 1. What's built
 
-**CNMGroup.com is the main hub.** Each company opens into its own website with its own look, pages and features. Every page of every site carries the **floating CNM control** (bottom-left): one click goes home to CNMGroup.com, and hovering it (or tapping its four-dot button, or long-pressing the emblem on a phone) reveals the other CNM companies for instant switching. There is no separate back button in any header.
+**CNMGroup.com is the main hub.** Each company opens into its own website with its own look, pages and features. Every page of every site carries the **floating CNM control** (bottom-left): one click goes home to CNMGroup.com, and clicking or tapping its four-dot button reveals the other CNM companies for instant switching. There is no separate back button in any header.
 
 | Address | Website | Pages & features |
 | --- | --- | --- |

@@ -184,21 +184,17 @@ function initDropdowns() {
   document.addEventListener('click', (e) => { if (!e.target.closest('[data-drop]')) closeAll(); });
 }
 
-/* ---------- floating CNM navigation: home to CNM Group in one click, sister companies on hover / tap ---------- */
+/* ---------- floating CNM navigation: home to CNM Group in one click, sister companies when the switch is clicked ---------- */
 function initCnmNav() {
   const nav = document.querySelector('[data-cnmnav]');
   if (!nav) return;
   const dock = nav.querySelector('.cnmnav__dock');
-  const home = nav.querySelector('[data-cnmnav-home]');
   const toggle = nav.querySelector('[data-cnmnav-toggle]');
   const items = [...nav.querySelectorAll('.cnmnav__item')];
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
   const IDLE = 4000;
   let idle;
-  let leave;
-  let hoverOpenedAt = 0;
   let openedAtY = 0;
-  let suppressClick = false;
   let usingKeys = false; // keyboard users keep it open while they move through it
   document.addEventListener('keydown', (e) => { if (e.key === 'Tab' || e.key.startsWith('Arrow')) usingKeys = true; });
   document.addEventListener('pointerdown', () => { usingKeys = false; }, { capture: true, passive: true });
@@ -218,42 +214,28 @@ function initCnmNav() {
     toggle.setAttribute('aria-label', open ? 'Close the company switcher' : 'Switch to another CNM company');
     items.forEach((a) => { a.tabIndex = open ? 0 : -1; });
     clearTimeout(idle);
-    if (open) { openedAtY = scrollY; nav.classList.remove('is-compact'); armIdle(); }
+    if (open) { openedAtY = scrollY; armIdle(); }
   }
 
   // First visit in this tab: the control rises into place. Afterwards it simply stays put between pages.
   try { if (!sessionStorage.getItem('cnm.nav')) { nav.classList.add('is-intro'); sessionStorage.setItem('cnm.nav', '1'); } } catch { /* storage blocked */ }
-  if (document.body.dataset.page === 'checkout') nav.classList.add('is-compact');
+  // It rests as the compact emblem + switch button and only opens when the switch button is clicked or tapped:
+  // no hover, scroll or long-press behaviour, so it never pops out on its own.
+  nav.classList.add('is-compact');
 
   toggle.addEventListener('click', (e) => {
-    // A click right after a hover-open means "keep it open", not "close".
-    const open = isOpen() && Date.now() - hoverOpenedAt < 700 ? true : !isOpen();
+    const open = !isOpen();
     set(open);
     if (open && e.detail === 0) items[0]?.focus({ preventScroll: true }); // keyboard
   });
 
-  if (fine) {
-    nav.addEventListener('mouseenter', () => { clearTimeout(leave); if (!isOpen()) hoverOpenedAt = Date.now(); set(true); });
-    nav.addEventListener('mouseleave', () => { clearTimeout(leave); leave = setTimeout(() => set(false), 420); });
-    if (!reduce) {
-      dock.addEventListener('pointermove', (e) => {
-        const r = dock.getBoundingClientRect();
-        dock.style.setProperty('--mx', `${e.clientX - r.left}px`);
-        dock.style.setProperty('--my', `${e.clientY - r.top}px`);
-      });
-    }
+  if (fine && !reduce) {
+    dock.addEventListener('pointermove', (e) => {
+      const r = dock.getBoundingClientRect();
+      dock.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      dock.style.setProperty('--my', `${e.clientY - r.top}px`);
+    });
   }
-
-  // Touch: a long press on the CNM emblem also opens the switcher (a normal tap still goes home).
-  let press;
-  home.addEventListener('pointerdown', (e) => {
-    if (e.pointerType === 'mouse') return;
-    clearTimeout(press);
-    press = setTimeout(() => { suppressClick = true; set(true); navigator.vibrate?.(8); }, 450);
-  });
-  ['pointerup', 'pointercancel', 'pointerleave'].forEach((t) => home.addEventListener(t, () => clearTimeout(press)));
-  home.addEventListener('contextmenu', (e) => { if (suppressClick || !fine) e.preventDefault(); });
-  home.addEventListener('click', (e) => { if (suppressClick) { e.preventDefault(); suppressClick = false; } });
 
   nav.addEventListener('pointermove', () => { if (isOpen()) armIdle(); }, { passive: true });
   nav.addEventListener('keydown', (e) => {
@@ -272,23 +254,8 @@ function initCnmNav() {
   nav.addEventListener('focusout', (e) => { if (!nav.contains(e.relatedTarget)) set(false); });
   document.addEventListener('pointerdown', (e) => { if (isOpen() && !nav.contains(e.target)) set(false); }, { passive: true });
 
-  // Reading down the page: collapse to the emblem; scrolling back up brings the label back. Scrolling closes the switcher.
-  let lastY = scrollY;
-  let ticking = false;
-  addEventListener('scroll', () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      ticking = false;
-      const y = scrollY;
-      if (isOpen() && Math.abs(y - openedAtY) > 80) set(false);
-      if (document.body.dataset.page !== 'checkout') {
-        if (y > 240 && y - lastY > 4) nav.classList.add('is-compact');
-        else if (y < 120 || lastY - y > 8) nav.classList.remove('is-compact');
-      }
-      lastY = y;
-    });
-  }, { passive: true });
+  // Scrolling away while it is open closes it; otherwise scrolling never changes it.
+  addEventListener('scroll', () => { if (isOpen() && Math.abs(scrollY - openedAtY) > 80) set(false); }, { passive: true });
 }
 
 /* ---------- light / dark switch ---------- */

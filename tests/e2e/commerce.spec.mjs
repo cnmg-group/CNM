@@ -530,7 +530,12 @@ test('floating CNM navigation: expands to the sister companies, switches, auto-c
   await expect(page.locator('.cnmnav__item').first()).toBeHidden();
   await expect(page.locator('.cnmnav__item')).toHaveCount(3); // the other three companies
   await expect(page.locator('.cnmnav__item[href="/foundation/"]')).toHaveCount(0);
-  if (isMobile) await toggle.tap(); else await page.locator('.cnmnav__home').hover();
+  // Hover and scrolling never open it; only a click / tap on the switch does
+  if (!isMobile) { await page.locator('.cnmnav__home').hover(); await page.waitForTimeout(500); await expect(nav).not.toHaveClass(/is-open/); }
+  await page.evaluate(() => scrollTo(0, 600)); await page.waitForTimeout(200); await page.evaluate(() => scrollTo(0, 0)); await page.waitForTimeout(200);
+  await expect(nav).not.toHaveClass(/is-open/);
+  await expect(nav).toHaveClass(/is-compact/);
+  if (isMobile) await toggle.tap(); else await toggle.click();
   await expect(nav).toHaveClass(/is-open/);
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await expect(page.locator('.cnmnav__item[href="/spectra/"]')).toBeVisible();
