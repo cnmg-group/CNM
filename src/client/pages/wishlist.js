@@ -19,7 +19,7 @@ export async function init() {
   const render = () => {
     const ids = shared ? shared.split(',') : S.getWish();
     const products = ids.map((id) => byId.get(id)).filter(Boolean);
-    grid.innerHTML = products.map((p, i) => productCardHTML(p, { position: i + 1, list: 'wishlist' }).replace('</article>', `<div class="card__actions">${p.stock?.quantity === 0 ? '<button class="btn btn--ghost" type="button" disabled>Sold out</button>' : `<button class="btn btn--ghost" type="button" data-move-to-bag="${p.id}" style="min-height:40px">Move to bag</button>`}${shared ? '' : `<button class="icon-btn" type="button" data-wish-remove="${p.id}" aria-label="Remove ${p.name}" style="border:1px solid var(--line);height:40px">×</button>`}</div></article>`)).join('');
+    grid.innerHTML = products.map((p, i) => productCardHTML(p, { position: i + 1, list: 'wishlist' }).replace('</article>', `<div class="card__actions">${p.stock?.quantity === 0 ? '<button class="btn btn--ghost" type="button" disabled>Sold out</button>' : `<button class="btn btn--ghost" type="button" data-move-to-bag="${p.id}">Move to bag</button>`}${shared ? '' : `<button class="icon-btn" type="button" data-wish-remove="${p.id}" aria-label="Remove ${p.name}" style="border:1px solid var(--line)">×</button>`}</div></article>`)).join('');
     empty.hidden = products.length > 0;
     paintWish(grid);
     if (shared) document.querySelector('.plp-head h1').textContent = 'Shared wishlist';

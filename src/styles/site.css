@@ -662,8 +662,11 @@ ol { margin: 0; padding: 0; list-style: none; }
 }
 .drawer:not(.is-open), .search-overlay:not(.is-open), .mobile-menu:not(.is-open) { visibility: hidden; }
 .drawer, .search-overlay, .mobile-menu { transition: transform .45s var(--ease), visibility .45s; }
-.card__actions { position: relative; z-index: 3; display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 12px; }
-.card__actions .btn { min-height: 40px; }
+.card__actions { position: relative; z-index: 3; display: grid; grid-template-columns: minmax(0, 1fr) 40px; gap: 6px; margin-top: 12px; min-width: 0; }
+.card__actions:has(> :only-child) { grid-template-columns: minmax(0, 1fr); }
+.card__actions .btn { min-width: 0; min-height: 40px; padding-inline: 8px; white-space: normal; line-height: 1.2; text-align: center; }
+.card__actions .icon-btn { width: 40px; height: 40px; }
+@media (max-width: 480px) { .card__actions .btn { font-size: .6875rem; letter-spacing: .1em; } }
 .checkout-header .sr-lock { width: 14px; height: 14px; }
 .suggest-list li a, .suggest-list li button { align-items: center; }
 @media (max-width: 640px) {
