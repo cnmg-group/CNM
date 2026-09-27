@@ -1599,3 +1599,7 @@ html[style*="overflow: hidden"] .cnmnav > * { pointer-events: none; }
   .site-header:not(.checkout-header) .site-header__row { grid-template-columns: auto auto 1fr; gap: 2px; }
   .site-header:not(.checkout-header) .logo { justify-content: flex-start; margin-left: 2px; }
 }
+
+/* Shop filter/sort bar: always sits directly under the header (and staging bar), rising when the header hides */
+.toolbar { top: calc(var(--header-offset, 0px) + var(--header-h)); transition: top .35s var(--ease); }
+body:has(.site-header.is-hidden) .toolbar { top: var(--header-offset, 0px); }
