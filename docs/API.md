@@ -96,3 +96,25 @@ Separate `cnm_admin` cookie. Roles: `owner` (everything), `manager` (catalogue, 
 - `POST /api/admin/publish` — triggers the Netlify build hook so content edits are re-rendered statically
 - `GET /api/admin/analytics` — funnel from first-party events
 - `POST /api/events` (public) — first-party analytics beacon `{ name, params }`
+
+
+## Operations — `/api/ops/*` (CNM Group OS, phase 1)
+
+Admin session + `X-CNM-Request` header, like `/api/admin/*`. Any role with orders access can read orders and move deliveries. Only owners and managers can refund, record payments, create manual orders, cancel paid orders or edit couriers; only owners can change settings. Company-scoped admins only see their companies (others return 404). Every change is audited. Creates and refunds accept `Idempotency-Key`.
+
+- `GET /api/ops/orders?q&status=all|open|<status>&company&channel&payment&location&shipment&from&to&exception=1&limit&cursor`: `{ orders, total, next, counts, exceptions, locations, couriers }`. `q` matches order number, name, email, phone (any format), product, tracking number or RMA. Pages are keyset (`cursor` = the previous `next`).
+- `GET /api/ops/orders/export?…`: CSV of the filtered orders (audited).
+- `POST /api/ops/orders`: manual order `{ items, contact, delivery, paymentMode: paid|link|unpaid, paymentMethod, paymentReason, channel: manual|pos, promoCode?, note? }`.
+- `POST /api/ops/orders/bulk`: `{ action: "pack", numbers: [...] }`.
+- `GET /api/ops/orders/:number`: order + timeline + customer summary + refunds + allowed actions + seller details for documents.
+- `POST …/notes` `{ text }` · `PATCH …/address` `{ address }` (before hand-over) · `POST …/resend` `{ kind: confirmation|status }` · `POST …/mark-paid` `{ method, reason }` · `POST …/cancel` `{ reason }`.
+- `PATCH …/shipment` `{ courier, trackingNumber, eta, promisedBy }` · `POST …/shipment` `{ status, note?, pod?: { recipient, note, photoUrl }, rescheduleTo? }`.
+- `POST …/exception` `{ kind, note }` · `PATCH …/exception` `{ resolution }`.
+- `POST …/refunds` `{ amount, reason, note?, rma? }` → issued at once below the approval threshold, otherwise `requested` · `POST …/refunds/:id/approve` (a different manager) · `POST …/refunds/:id/reject` `{ reason }`.
+- `POST …/returns` `{ lines: [{ id, qty }], reason, kind: refund|exchange|store_credit, note? }` · `POST …/returns/:rma` `{ status: approved|rejected|received|inspected|exchanged|credited, note?, restock? }`. A refund with `rma` completes the return.
+- `GET /api/ops/fulfilment`: board columns by delivery stage, open exceptions, 30-day delivery performance (success, first attempt, on time, average and p90 time, by courier and state).
+- `GET/PUT /api/ops/couriers` · `GET/PUT /api/ops/settings` `{ refundApprovalThreshold }`.
+
+### Courier webhook — `POST /api/couriers/:courier/webhook`
+
+Header `X-CNM-Signature` = hex HMAC-SHA256 of the raw body with `COURIER_WEBHOOK_SECRET_<COURIER_ID>` (e.g. `COURIER_WEBHOOK_SECRET_IN_HOUSE`). Body `{ event_id, order_number | tracking_number, status, at?, note?, recipient?, eta? }`. The same `event_id` is only applied once, and couriers may skip forward stages.

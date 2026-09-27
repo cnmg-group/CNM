@@ -1,6 +1,7 @@
 // Operations (spec §7–9): orders search, shipments & couriers, delivery exceptions, refunds with approvals, returns.
 // Everything lives on the order document (shipment, refunds[], returns[], staffNotes[]) so one read gives the whole
 // story and one write is atomic per order. Pure helpers here; the HTTP layer is netlify/functions/ops.mjs.
+import { stores } from './catalogue.mjs';
 import { randomToken } from './crypto.mjs';
 import { fail } from './http.mjs';
 import { setStatus } from './orders.mjs';
@@ -218,7 +219,8 @@ export function moveReturn(order, rma, status, note, by) {
 }
 
 /* ------------------------------------------------------------------ search, customers, timeline, stats */
-export const orderLocation = (o) => o.delivery?.address?.state || (o.delivery?.storeSlug ? `Pickup: ${o.delivery.storeSlug}` : '—');
+export const pickupStore = (o) => stores.find((st) => st.slug === o.delivery?.storeSlug) || null;
+export const orderLocation = (o) => o.delivery?.address?.state || (o.delivery?.storeSlug ? `Pickup · ${pickupStore(o)?.city || o.delivery.storeSlug}` : '—');
 const digits = (x) => String(x || '').replace(/\D/g, '');
 export function matches(o, q) {
   if (!q) return true;

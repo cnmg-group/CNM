@@ -20,10 +20,12 @@
 | Idempotency keys on creates | ✅ | `netlify/lib/idempotency.mjs` |
 | Live updates without reload (change-stamp polling) | ✅ | `/api/admin/pulse` |
 | App shell (grouped, collapsible sidebar, mobile drawer, URL-driven filters) | ✅ | `src/client/admin/admin.js`, `src/styles/admin.css` |
-| Orders lifecycle, status transitions, refunds via provider, customer emails | 🟡 | `#orders` (Essentials) |
+| **Phase 1 operations:** orders search/filters/pages/bulk/CSV, order page (timeline, customer LTV, staff notes, address edit, resend, cancel, record payment), manual orders, invoices & packing slips (A4 print/PDF) | ✅ | `netlify/functions/ops.mjs`, `netlify/lib/ops.mjs`, `src/client/admin/ops.js` |
+| **Phase 1 delivery:** shipments (courier, tracking, ETA, promised-by, attempts, reschedule, proof of delivery), delivery exceptions, fulfilment board, delivery performance, signed idempotent courier webhooks, configurable couriers | ✅ | `#fulfilment`, `/api/couriers/:id/webhook`, `#ops-settings` |
+| **Phase 1 returns & refunds:** RMA (request → approve → receive → inspect/restock → refund/exchange/credit), partial refunds, second-approver threshold, manual-payment refunds | ✅ | order page |
 | Products & inventory overrides, discounts, homepage/banners, stores, SEO, media, analytics funnel, subscribers, enquiries | 🟡 | existing admin views |
 | Relational schema for every module below | ✅ (design, validated on Postgres 16) | `docs/schema/cnm-os.sql` |
-| Everything else in §§5–17 | ⬜ | this document |
+| Everything else in §§5–6, 10–17 | ⬜ | this document |
 
 ---
 
@@ -208,7 +210,7 @@
 - **Low-stock alerts:** a Command Center attention item plus an email or push to the company's ops role. Also shows days of cover from the 28-day sales rate.
 - **Stock counts:** cycle counts by location, variance report, one-click adjust.
 
-## 7. Orders ⬜ (🟡 lifecycle + refunds for Essentials)
+## 7. Orders ✅ (phase 1)
 
 **Statuses:**
 pending payment → paid → processing → ready → dispatched → delivered
@@ -233,7 +235,7 @@ Allowed transitions are enforced server-side, with a table like the current `TRA
 - **Documents:** invoice (company logo, legal details, VAT) and packing slip, as PDF, printable. The customer receipt slip is already live on the storefront.
 - **Manual orders:** staff create an order for phone, WhatsApp or showroom sales (channel `manual`), with `placed_by_staff`, a payment link or mark-as-paid (with a reason), and an idempotency key.
 
-## 8. Delivery & logistics ⬜
+## 8. Delivery & logistics ✅ (phase 1; courier API adapters per courier once CNM chooses them)
 
 **Shipment statuses:**
 awaiting fulfilment → packed → handed over → in transit → out for delivery → delivered
@@ -248,7 +250,7 @@ Also: failed attempt, rescheduled, returned to sender, lost.
 - **Pickup points:** locations of kind `pickup_point`, with opening hours and "ready for collection" notices.
 - **KPIs:** delivery success rate (delivered ÷ (delivered + failed + returned)), average and p90 time from payment to delivery, on-time rate vs promised date, per courier and per state.
 
-## 9. Returns, refunds, exchanges ⬜ (🟡 refunds)
+## 9. Returns, refunds, exchanges ✅ (phase 1; exchanges and store credit are recorded, automatic replacement orders and a store-credit wallet are next)
 
 - **Returns (RMA):**
   1. The customer or staff requests a return, with a reason (damaged, wrong item, not as described, changed mind, other).

@@ -2,6 +2,7 @@
 // refunds with approvals, returns, couriers. Role- and company-scoped; every change is audited; creates and money
 // movements accept an Idempotency-Key.
 import { computeQuote } from '../../src/shared/pricing.mjs';
+import site from '../../content/site.json' with { type: 'json' };
 import { baseProducts, commerce, productsMap, stores } from '../lib/catalogue.mjs';
 import { emailConfigured } from '../lib/email.mjs';
 import { listCompanies, scopeFor } from '../lib/companies.mjs';
@@ -40,7 +41,21 @@ const summaryRow = (o, couriers) => ({
   tracking: o.shipment?.trackingNumber || null, exception: OPS.hasOpenException(o), refunded: OPS.refunded(o), pendingRefund: OPS.pendingRefunds(o).length > 0, returns: (o.returns || []).filter((r) => !['rejected', 'refunded', 'exchanged', 'credited'].includes(r.status)).length,
 });
 
-function detail(o, all, couriers, admin, cfg) {
+/** Seller block for invoices and packing slips — from content and the company registry, never invented. */
+function sellerFor(o, companies) {
+  const id = o.companyId || 'essentials';
+  const co = companies.find((c) => c.id === id);
+  const essentials = id === 'essentials';
+  return {
+    name: co?.legalName || co?.name || 'CNM Essentials', logo: co?.logo || '/assets/brand/cnm-logo-on-light.svg', color: co?.color || '#b99a5b',
+    addresses: essentials ? stores.filter((st) => st.verified !== false).map((st) => `${st.address}, ${st.city}`) : [site.group?.contact?.address].filter(Boolean),
+    email: essentials ? site.contact?.email?.value : site.group?.contact?.email, phone: essentials ? site.contact?.phone?.value : site.group?.contact?.phone,
+    web: essentials ? (site.productionUrl || '').replace(/^https?:\/\//, '') : (site.groupUrl || '').replace(/^https?:\/\//, ''),
+    rcNumber: co?.rcNumber || null, taxId: co?.taxId || null,
+  };
+}
+
+function detail(o, all, couriers, admin, cfg, companies = []) {
   const { accessToken, ...safe } = o;
   void accessToken;
   const courier = couriers.find((c) => c.id === o.shipment?.courier);
@@ -57,7 +72,8 @@ function detail(o, all, couriers, admin, cfg) {
       returns: ['dispatched', 'delivered', 'returned'].includes(o.status), returnNext: Object.fromEntries((o.returns || []).map((r) => [r.rma, OPS.returnNext(r.status)])),
     },
     refundApprovalThreshold: cfg.refundApprovalThreshold,
-    invoiceNumber: `INV-${o.number.slice(4)}`,
+    invoiceNumber: `INV-${o.number.slice(4)}`, seller: sellerFor(o, companies),
+    pickupStore: OPS.pickupStore(o) ? { name: OPS.pickupStore(o).name, address: `${OPS.pickupStore(o).address}, ${OPS.pickupStore(o).city}` } : null,
     paymentMethods: PAYMENT_METHODS.map(({ id, label }) => ({ id, label })),
   };
 }
@@ -144,7 +160,7 @@ export default handler(async (req, context) => {
   const order = await getOrder(number);
   if (!order || !inScope(order)) fail(404, 'not_found', 'Order not found.');
   const all = async () => (await listOrders()).filter(inScope);
-  const respond = async (status = 200) => json(detail(order, await all(), couriers, admin, cfg), status);
+  const respond = async (status = 200) => json(detail(order, await all(), couriers, admin, cfg, companies), status);
   const by = admin.email;
 
   if (req.method === 'GET' && !sub) return respond();
@@ -247,7 +263,7 @@ export default handler(async (req, context) => {
         if (r.body.refund?.status === 'failed') fail(502, 'refund_failed', `The payment provider rejected the refund: ${r.body.refund.error}`);
         const fresh = await getOrder(number);
         Object.assign(order, fresh);
-        return json({ ...detail(order, await all(), couriers, admin, cfg), refund: r.body.refund, replayed: !!r.replayed }, 201);
+        return json({ ...detail(order, await all(), couriers, admin, cfg, companies), refund: r.body.refund, replayed: !!r.replayed }, 201);
       }
       if (req.method === 'POST' && subId && ['approve', 'reject'].includes(op)) {
         const rf = (order.refunds || []).find((x) => x.id === subId);
@@ -277,7 +293,7 @@ export default handler(async (req, context) => {
           return { status: 201, body: { rma: rt.rma } };
         });
         Object.assign(order, await getOrder(number));
-        return json({ ...detail(order, await all(), couriers, admin, cfg), rma: r.body.rma }, 201);
+        return json({ ...detail(order, await all(), couriers, admin, cfg, companies), rma: r.body.rma }, 201);
       }
       if (req.method === 'POST' && subId) {
         const status = v.oneOf(b.status, ['approved', 'rejected', 'received', 'inspected', 'exchanged', 'credited'], 'Return status');

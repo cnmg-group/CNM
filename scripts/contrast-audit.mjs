@@ -16,7 +16,7 @@ const PAGES = [
   '/this-page-does-not-exist/',
 ];
 // Admin screens (CNM Group OS) — local development only; signs in with the local owner account.
-const ADMIN = process.env.ADMIN === '1' ? ['/admin/#command', '/admin/#companies', '/admin/#audit', '/admin/#orders', '/admin/#inventory', '/admin/#discounts', '/admin/#content', '/admin/#enquiries', '/admin/#analytics', '/admin/#users'] : [];
+const ADMIN = process.env.ADMIN === '1' ? ['/admin/#command', '/admin/#companies', '/admin/#audit', '/admin/#orders', '/admin/#fulfilment', '/admin/#new-order', '/admin/#ops-settings', '/admin/#inventory', '/admin/#discounts', '/admin/#content', '/admin/#enquiries', '/admin/#analytics', '/admin/#users'] : [];
 
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
 const findings = [];

@@ -1,8 +1,9 @@
 // CNM Group OS — the operating system for every CNM company (single-page, role- and company-aware).
 // All authorisation is enforced server-side; the UI only hides what a role can't use.
-import { escapeHtml as e, formatDate, formatMoney } from '../../shared/format.mjs';
+import { escapeHtml as e, formatDate } from '../../shared/format.mjs';
 import { api } from '../api.js';
 import { auditView, command, companiesView, stopLive } from './os.js';
+import { fulfilmentView, invoiceView, newOrderView, opsSettingsView, orderPage, ordersView, slipsView } from './ops.js';
 
 const root = document.querySelector('[data-admin]');
 let me = null;
@@ -13,17 +14,17 @@ const I = {
   inventory: 'M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8', discounts: 'M20 12l-8 8-9-9V3h8zM7.5 7.5h.01', content: 'M4 4h16v16H4zM4 9h16M9 9v11',
   stores: 'M3 9l1-5h16l1 5M4 9v11h16V9M9 20v-6h6v6M3 9h18', seo: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3', enquiries: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
   subscribers: 'M4 4h16v16H4zM4 7l8 6 8-6', media: 'M4 5h16v14H4zM8 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM20 16l-5-5-9 8', analytics: 'M4 20V10M10 20V4M16 20v-7M22 20H2',
-  users: 'M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21v-2a6 6 0 0 1 12 0v2M19 8v6M22 11h-6', audit: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',
+  users: 'M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21v-2a6 6 0 0 1 12 0v2M19 8v6M22 11h-6', fulfilment: 'M1 4h13v12H1zM14 8h4l3 4v4h-7M5.5 19a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM17.5 19a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z', 'ops-settings': 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z', audit: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',
 };
 const icon = (k) => `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="${I[k] || I.command}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 // [key, label, permission, section]
 const NAV = [
   ['command', 'Command Center', 'dashboard', 'Overview'], ['companies', 'Companies', 'dashboard', 'Overview'],
-  ['orders', 'Orders', 'orders', 'Commerce'], ['inventory', 'Products & inventory', 'inventory', 'Commerce'], ['customers', 'Customers', 'customers', 'Commerce'], ['discounts', 'Discounts & promotions', 'discounts', 'Commerce'],
+  ['orders', 'Orders', 'orders', 'Commerce'], ['fulfilment', 'Fulfilment', 'orders', 'Commerce'], ['inventory', 'Products & inventory', 'inventory', 'Commerce'], ['customers', 'Customers', 'customers', 'Commerce'], ['discounts', 'Discounts & promotions', 'discounts', 'Commerce'],
   ['enquiries', 'Leads & enquiries', 'enquiries', 'Commerce'],
   ['content', 'Homepage & banners', 'content', 'Content'], ['stores', 'Stores', 'content', 'Content'], ['seo', 'SEO & redirects', 'content', 'Content'], ['media', 'Media', 'media', 'Content'],
   ['analytics', 'Analytics', 'analytics', 'Insights'], ['subscribers', 'Subscribers', 'subscribers', 'Insights'],
-  ['users', 'Staff & roles', 'users', 'Settings'], ['audit', 'Audit log', 'audit', 'Settings'],
+  ['ops-settings', 'Couriers & refunds', 'orders', 'Settings'], ['users', 'Staff & roles', 'users', 'Settings'], ['audit', 'Audit log', 'audit', 'Settings'],
 ];
 const pill = (s) => `<span class="pill pill--${e(s)}">${e(String(s).replace(/_/g, ' '))}</span>`;
 const flash = (msg, ok = true) => { const f = document.querySelector('[data-flash]'); f.className = `alert ${ok ? 'alert--ok' : 'alert--err'}`; f.textContent = msg; f.hidden = false; setTimeout(() => { f.hidden = true; }, 3500); };
@@ -102,43 +103,29 @@ async function route() {
   if (key === 'dashboard') key = 'command';
   const arg = decodeURIComponent(location.hash.split('?')[0].split('/')[1] || '');
   stopLive();
-  root.querySelectorAll('[data-nav]').forEach((a) => { if (a.dataset.nav === key) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
-  const view = root.querySelector('[data-view]');
+  const navKey = ['new-order', 'invoice', 'slips'].includes(key) ? 'orders' : key;
+  root.querySelectorAll('[data-nav]').forEach((a) => { if (a.dataset.nav === navKey) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  // Each navigation renders into a fresh container, so a slower screen that finishes late can never draw over
+  // the one the person has moved on to (it writes into a detached element instead).
+  const old = root.querySelector('[data-view]');
+  const view = document.createElement('div');
+  view.setAttribute('data-view', '');
+  old.replaceWith(view);
   view.innerHTML = '<div class="skeleton" style="height:32px;width:30%"></div><div class="skeleton" style="height:240px;margin-top:24px"></div>';
   document.title = `${NAV.find(([k]) => k === key)?.[1] || 'Command Center'} · CNM Group OS`;
   try { await (VIEWS[key] || VIEWS.command)(view, arg); } catch (x) { view.innerHTML = `<p class="alert alert--err">${e(x.message)}</p>`; }
 }
 
-/* ---------- charts: single-series bars, brand green, tooltip on hover, table fallback ---------- */
-function barChart(series, { valueKey, label, fmt = (n) => n }) {
-  const max = Math.max(1, ...series.map((d) => d[valueKey]));
-  return `<figure class="chart"><figcaption class="label">${e(label)}</figcaption>
-  <div class="chart__plot" role="img" aria-label="${e(label)}">${series.map((d) => `<div class="chart__col" tabindex="0"><span class="chart__bar" style="height:${Math.max(2, (d[valueKey] / max) * 100)}%"></span><span class="chart__tip">${e(formatDate(d.date))}<br><strong>${e(fmt(d[valueKey]))}</strong></span></div>`).join('')}</div>
-  <div class="chart__axis"><span>${e(formatDate(series[0].date))}</span><span>${e(formatDate(series.at(-1).date))}</span></div>
-  <details><summary class="textlink" style="font-size:.75rem">View as table</summary><table class="table"><thead><tr><th>Date</th><th>${e(label)}</th></tr></thead><tbody>${series.map((d) => `<tr><td>${e(d.date)}</td><td>${e(fmt(d[valueKey]))}</td></tr>`).join('')}</tbody></table></details></figure>`;
-}
-
 const VIEWS = {
   command: (v) => command(v, { me }),
+  orders: (v, number) => (number ? orderPage(v, number, { me, flash }) : ordersView(v, { me, flash })),
+  fulfilment: (v) => fulfilmentView(v, { me, flash }),
+  'new-order': (v) => newOrderView(v, { me, flash }),
+  invoice: (v, number) => invoiceView(v, number),
+  slips: (v, list) => slipsView(v, list.split(',').filter(Boolean)),
+  'ops-settings': (v) => opsSettingsView(v, { me, flash }),
   companies: (v) => companiesView(v, { me }, flash),
   audit: (v) => auditView(v),
-
-  async dashboard(v) {
-    const d = await api('/api/admin/dashboard', { loader: false });
-    const k = d.kpis;
-    v.innerHTML = `<h1 class="h2">Dashboard</h1>
-    <div class="kpis">${[['Revenue (paid)', formatMoney(k.revenue)], ['Paid orders', k.orders], ['Average order', formatMoney(k.aov)], ['To fulfil', k.awaitingFulfilment], ['Awaiting payment', k.pendingPayment], ['New enquiries', k.newEnquiries], ['Subscribers', k.subscribers]].map(([l, n]) => `<div class="kpi"><span class="label muted">${l}</span><strong>${n}</strong></div>`).join('')}</div>
-    <div class="admin-grid"><div class="card-a">${barChart(d.series, { valueKey: 'revenue', label: 'Revenue per day — last 14 days', fmt: formatMoney })}</div>
-    <div class="card-a"><h2 class="label">Low stock</h2>${d.lowStock.length ? `<ul>${d.lowStock.map((p) => `<li class="row-a"><span>${e(p.name)}</span><strong class="${p.stock === 0 ? 'stock-out' : 'stock-low'}">${p.stock}</strong></li>`).join('')}</ul>` : '<p class="muted">All products healthy.</p>'}</div></div>
-    <div class="card-a"><h2 class="label">Recent orders</h2>${ordersTable(d.recentOrders)}</div>`;
-  },
-
-  async orders(v, number) {
-    if (number) return orderDetail(v, number);
-    const status = new URLSearchParams(location.hash.split('?')[1] || '').get('status') || '';
-    const { orders } = await api(`/api/admin/orders${status ? `?status=${status}` : ''}`, { loader: false });
-    v.innerHTML = `<h1 class="h2">Orders</h1><div class="search-chips" style="margin:16px 0">${['', 'pending_payment', 'paid', 'processing', 'dispatched', 'delivered', 'payment_failed', 'cancelled', 'refunded'].map((s) => `<a class="chip" href="#orders?status=${s}"${s === status ? ' aria-pressed="true"' : ''}>${s ? s.replace(/_/g, ' ') : 'All'}</a>`).join('')}</div><div class="card-a">${ordersTable(orders)}</div>`;
-  },
 
   async customers(v) {
     const { customers } = await api('/api/admin/customers', { loader: false });
@@ -317,28 +304,5 @@ const VIEWS = {
     <div class="card-a"><h2 class="label">Audit log</h2><table class="table"><tbody>${entries.map((x) => `<tr><td>${e(x.at.replace('T', ' ').slice(0, 19))}</td><td>${e(x.admin)}</td><td>${e(x.action)}</td><td class="muted">${e(JSON.stringify(x.detail))}</td></tr>`).join('') || '<tr><td class="muted">No activity yet.</td></tr>'}</tbody></table></div>`;
   },
 };
-
-function ordersTable(orders) {
-  return `<table class="table"><thead><tr><th>Order</th><th>Customer</th><th>Date</th><th>Status</th><th>Total</th></tr></thead><tbody>${orders.map((o) => `<tr><td><a class="textlink" href="#orders/${encodeURIComponent(o.number)}">${e(o.number)}</a></td><td>${e(o.customer)}</td><td>${formatDate(o.createdAt)}</td><td>${pill(o.status)}</td><td>${formatMoney(o.total)}</td></tr>`).join('') || '<tr><td colspan="5" class="muted">No orders yet.</td></tr>'}</tbody></table>`;
-}
-
-async function orderDetail(v, number) {
-  const { order: o, transitions } = await api(`/api/admin/orders/${encodeURIComponent(number)}`, { loader: false });
-  v.innerHTML = `<a class="textlink" href="#orders">← Orders</a><h1 class="h2">${e(o.number)} ${pill(o.status)}</h1>
-  <div class="admin-grid"><div class="card-a"><h2 class="label">Items</h2><table class="table"><tbody>${o.lines.map((l) => `<tr><td>${e(l.name)}</td><td>× ${l.qty}</td><td>${formatMoney(l.lineTotal)}</td></tr>`).join('')}
-    <tr><td>Subtotal</td><td></td><td>${formatMoney(o.totals.subtotal)}</td></tr>${o.totals.discount ? `<tr><td>Discount (${e(o.promoCode)})</td><td></td><td>−${formatMoney(o.totals.discount)}</td></tr>` : ''}<tr><td>Delivery</td><td></td><td>${formatMoney(o.totals.delivery)}</td></tr><tr><td><strong>Total</strong></td><td></td><td><strong>${formatMoney(o.totals.total)}</strong></td></tr></tbody></table></div>
-  <div class="card-a"><h2 class="label">Customer</h2><p>${e(o.contact.firstName)} ${e(o.contact.lastName)}<br><a class="textlink" href="mailto:${e(o.contact.email)}">${e(o.contact.email)}</a><br>${e(o.contact.phone)}</p>
-    <h2 class="label">Delivery</h2><p>${e(o.delivery.label)}<br>${o.delivery.address ? `${e(o.delivery.address.line1)}${o.delivery.address.line2 ? `, ${e(o.delivery.address.line2)}` : ''}<br>${e(o.delivery.address.city)}, ${e(o.delivery.address.state)}` : `Collect: ${e(o.delivery.storeSlug)}`}</p>${o.notes ? `<p class="muted">Note: ${e(o.notes)}</p>` : ''}
-    <h2 class="label">Payment</h2><p>${e(o.payment.provider)} · ${e(o.payment.status)}${o.payment.channel ? ` · ${e(o.payment.channel)}` : ''}<br><span class="muted mono">${e(o.payment.reference)}</span>${o.payment.refund ? `<br>Refund: ${formatMoney(o.payment.refund.amount)} · ${e(o.payment.refund.status)}` : ''}</p></div></div>
-  ${transitions.length ? `<form class="card-a form" data-status style="max-width:520px"><h2 class="label">Update status</h2><select name="status">${transitions.map((t) => `<option value="${t}">${t.replace(/_/g, ' ')}</option>`).join('')}</select><input class="in" name="note" placeholder="Note (optional, e.g. courier & tracking number)">${transitions.includes('refunded') ? `<label class="field" data-refund-amount hidden><span class="field-label">Refund amount (₦). Leave empty to refund the full ${formatMoney(o.totals.total)} via ${e(o.payment.provider)}</span><input class="in" name="amount" type="number" min="0" step="0.01" max="${o.totals.total}"></label>` : ''}<button class="btn btn--green" type="submit" style="justify-self:start">Update &amp; notify customer</button></form>` : ''}
-  <div class="card-a"><h2 class="label">History</h2><ul>${o.history.map((h) => `<li class="row-a"><span>${pill(h.status)} ${e(h.note || '')}</span><span class="muted">${e(h.by || '')} · ${formatDate(h.at)}</span></li>`).join('')}</ul></div>`;
-  v.querySelector('[data-status] select')?.addEventListener('change', (ev) => { const r = v.querySelector('[data-refund-amount]'); if (r) r.hidden = ev.target.value !== 'refunded'; });
-  v.querySelector('[data-status]')?.addEventListener('submit', async (ev) => {
-    ev.preventDefault();
-    const f = ev.currentTarget;
-    if (f.status.value === 'refunded' && !confirm(`Refund ${f.amount?.value ? `₦${f.amount.value}` : 'the full amount'} to the customer via ${o.payment.provider}?`)) return;
-    try { await api(`/api/admin/orders/${encodeURIComponent(o.number)}`, { method: 'PATCH', body: { status: f.status.value, note: f.note.value, amount: f.amount?.value || undefined } }); flash(f.status.value === 'refunded' ? 'Refund requested with the payment provider; customer notified.' : 'Status updated; customer notified.'); route(); } catch (x) { flash(x.message, false); }
-  });
-}
 
 boot();

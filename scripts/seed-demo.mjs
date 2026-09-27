@@ -14,8 +14,9 @@ const { store } = await import('../netlify/lib/store.mjs');
 const { saveOrder } = await import('../netlify/lib/orders.mjs');
 const products = (await import('../content/products.json', { with: { type: 'json' } })).default.filter((p) => p.price?.amount);
 
+// mulberry32: small, well-distributed seeded PRNG (the plain LCG it replaces produced correlated statuses)
 let seed = 20260927;
-const rnd = () => { seed = (seed * 1664525 + 1013904223) % 2 ** 32; return seed / 2 ** 32; };
+const rnd = () => { seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 const pick = (a) => a[Math.floor(rnd() * a.length)];
 const NAMES = [['Adaeze', 'Okafor'], ['Tunde', 'Bakare'], ['Chioma', 'Nwosu'], ['Ibrahim', 'Musa'], ['Funmi', 'Adeyemi'], ['Emeka', 'Eze'], ['Zainab', 'Bello'], ['Kelechi', 'Obi'], ['Bisi', 'Ogunleye'], ['Ngozi', 'Umeh']];
 const PLACES = [['Lagos', 'Ikoyi', 'lagos-standard', 3500], ['Lagos', 'Lekki', 'lagos-express', 6000], ['FCT', 'Garki', 'abuja-standard', 5000], ['Rivers', 'Port Harcourt', 'nationwide', 7500], ['Oyo', 'Ibadan', 'nationwide', 7500]];
@@ -24,6 +25,7 @@ const DAYS = 400;
 const iso = (t) => new Date(t).toISOString();
 
 let n = 0;
+let demoException = false;
 for (let d = DAYS; d >= 0; d--) {
   const growth = 0.6 + ((DAYS - d) / DAYS) * 0.9; // the business grows over the year
   const weekend = [0, 6].includes(new Date(now - d * 864e5).getUTCDay()) ? 1.35 : 1;
@@ -51,6 +53,15 @@ for (let d = DAYS; d >= 0; d--) {
     if (status === 'cancelled') step('cancelled', 30);
     if (status === 'delivered' && rnd() < 0.05) history.splice(-1, 0, { status: 'delivery_failed', at: iso(t + 50 * 36e5), by: 'courier', note: 'Customer unavailable; rescheduled' });
     const number = `CNM-${iso(t).slice(2, 10).replace(/-/g, '')}-D${String(++n).padStart(4, '0')}`;
+    // Delivery record for anything past packing (couriers are CNM's own riders in demo data)
+    const shipStatus = { processing: 'packed', dispatched: rnd() < 0.5 ? 'in_transit' : 'out_for_delivery', delivered: 'delivered', refunded: 'delivered' }[status];
+    const shipment = method === 'pickup' || !shipStatus ? null : {
+      id: `SHP-${number.slice(4)}`, courier: 'in-house', trackingNumber: `RDR-${String(n).padStart(5, '0')}`, status: shipStatus, eta: iso(t + 72 * 36e5).slice(0, 10), promisedBy: iso(t + 96 * 36e5).slice(0, 10),
+      attempts: history.some((h) => h.status === 'delivery_failed') ? 1 : 0, exception: null, pod: null,
+      events: history.filter((h) => ['processing', 'dispatched', 'delivered'].includes(h.status)).map((h) => ({ status: { processing: 'packed', dispatched: 'handed_over', delivered: 'delivered' }[h.status], at: h.at, by: 'ops@cnm.local', source: 'admin', note: '' })),
+    };
+    if (shipment?.status === 'delivered') { shipment.deliveredAt = history.findLast((h) => h.status === 'delivered')?.at; shipment.pod = { recipient: `${firstName} ${lastName}`, note: null, photoUrl: null, at: shipment.deliveredAt, by: 'ops@cnm.local' }; }
+    if (shipment && status === 'dispatched' && d <= 4 && !demoException && (demoException = true)) { shipment.status = 'failed_attempt'; shipment.attempts = 1; shipment.exception = { kind: 'failed_attempt', note: 'Customer not reachable on phone', openedAt: iso(now - 20 * 36e5), openedBy: 'ops@cnm.local', resolvedAt: null, resolution: null }; }
     await saveOrder({
       demo: true, number, accessToken: 'demo', userId: null, status, createdAt: iso(t), updatedAt: history.at(-1).at, companyId: 'essentials', channel: rnd() < 0.22 ? 'app' : rnd() < 0.08 ? 'manual' : 'web',
       contact: { firstName, lastName, email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`, phone: '+2348000000000' },
@@ -58,10 +69,15 @@ for (let d = DAYS; d >= 0; d--) {
       lines, promoCode: discount ? 'WELCOME10' : null,
       totals: { subtotal, discount, delivery: fee, vat: Math.round(((total * 7.5) / 107.5) * 100) / 100, vatIncluded: true, total, currency: 'NGN' },
       payment: { provider: 'simulated', method: pick(['card', 'card', 'bank_transfer', 'ussd']), reference: `${number}-demo`, status: status === 'pending_payment' ? 'pending' : 'paid', ...(status === 'refunded' ? { refund: { amount: rnd() < 0.5 ? total : Math.round(total / 2), at: history.at(-1).at, status: 'success' } } : {}) },
-      history,
+      history, ...(shipment ? { shipment } : {}),
+      ...(d === 1 && i === 0 && ['paid', 'processing', 'dispatched'].includes(status) ? { refunds: [{ id: 'RF-demo1', amount: Math.min(total, 120000), reason: 'damaged', note: 'Bottle arrived cracked (photo on WhatsApp)', status: 'requested', requestedBy: 'ops@cnm.local', requestedAt: iso(now - 5 * 36e5), needsApproval: true }] } : {}),
+      ...(d === 9 && i === 0 && status === 'delivered' ? { returns: [{ rma: `RMA-${number.slice(4)}-1`, status: 'received', kind: 'refund', reason: 'wrong_item', note: 'Ordered Midnight Vanilla, received Petalrich', lines: [{ id: lines[0].id, name: lines[0].name, qty: 1, unitPrice: lines[0].unitPrice, value: lines[0].unitPrice }], value: lines[0].unitPrice, createdAt: iso(now - 3 * 864e5), createdBy: 'ops@cnm.local', history: [{ status: 'requested', at: iso(now - 3 * 864e5), by: 'ops@cnm.local' }, { status: 'approved', at: iso(now - 2.8 * 864e5), by: 'ops@cnm.local' }, { status: 'received', at: iso(now - 864e5), by: 'ops@cnm.local' }] }] } : {}),
     });
   }
 }
+
+// Demo refund approval threshold (local only), so the sample refund above shows the approval flow.
+await (await store('config')).set('ops', { refundApprovalThreshold: 25000 });
 
 // Traffic: cookie-less daily active users and funnel events, per company.
 const ev = await store('events');

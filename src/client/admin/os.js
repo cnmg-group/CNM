@@ -91,7 +91,7 @@ export async function command(v, ctx) {
 
   const opsTiles = [
     ['awaitingPayment', 'Awaiting payment', '#orders?status=pending_payment'], ['toFulfil', 'To fulfil', '#orders?status=paid'], ['inTransit', 'In transit', '#orders?status=dispatched'],
-    ['lateFulfil', 'Late to dispatch', '#orders?status=paid', true], ['lateDelivery', 'Delivery overdue', '#orders?status=dispatched', true], ['lowStock', 'Low stock', '#inventory', true], ['newLeads', 'New leads', '#enquiries'],
+    ['lateFulfil', 'Late to dispatch', '#orders?status=paid', true], ['lateDelivery', 'Delivery overdue', '#orders?status=dispatched', true], ['exceptions', 'Delivery problems', '#orders?exception=1', true], ['lowStock', 'Low stock', '#inventory', true], ['newLeads', 'New leads', '#enquiries'],
   ];
 
   v.innerHTML = `<header class="os-head">

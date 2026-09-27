@@ -93,6 +93,7 @@ Full specification: [docs/ADMIN-OS-SPEC.md](docs/ADMIN-OS-SPEC.md). Target relat
 | Command Center: KPIs with comparisons, company/location/channel filters, revenue trend, gross vs net, funnel, top sellers/viewed/trending, needs-attention, live feed, CSV export | DONE |
 | Companies: create/edit/archive, logo, colour, domains, currency, payment & delivery options, company admins, company-scoped access | DONE |
 | Audit log (before → after, IP, device) · idempotent creates · live updates | DONE |
-| Orders v2, shipments & couriers, returns, catalogue editor, multi-location stock, finance, 2FA, notifications, risk | SPECIFIED (see delivery plan §25) |
+| Phase 1 operations: orders (search, filters, bulk, CSV, order page, notes, address edit, resend, cancel, record payment, manual orders), invoices & packing slips, shipments & couriers, delivery exceptions, fulfilment board & delivery performance, courier webhooks, returns (RMA), partial refunds with second approval | DONE |
+| Catalogue editor, multi-location stock, finance, customers & growth, 2FA, notifications, risk | SPECIFIED (see delivery plan §25) |
 
 Local demo data for review: `npm run seed:demo -- /path/to/dir`, then start the dev server with `CNM_DATA_DIR` set to that directory. It refuses to run outside local development.

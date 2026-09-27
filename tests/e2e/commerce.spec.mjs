@@ -191,11 +191,69 @@ test('admin: sign in, dashboard, move an order to processing', async ({ page, re
   // The paid order shows up in the Command Center and the live feed
   await expect(page.locator('.os-kpi').first()).toBeVisible();
   await expect(page.locator('.os-feed')).toContainText(r.order.number);
-  await page.goto('/admin/#orders?status=paid');
-  await page.locator('a[href^="#orders/CNM-"]').first().click();
-  await page.selectOption('[data-status] select', 'processing');
-  await page.click('[data-status] button');
-  await expect(page.locator('[data-flash]')).toContainText('customer notified');
+  // Operations: find the order, pack it, hand it to a courier, deliver it with proof, print its documents
+  await page.goto(`/admin/#orders?q=${r.order.number}`);
+  await page.locator(`tr[data-n="${r.order.number}"]`).click();
+  await expect(page.locator('.os-title')).toContainText(r.order.number);
+  await page.click('[data-ship-to="packed"]');
+  await expect(page.locator('[data-ship] .os-ship')).toHaveText('Packed');
+  await page.selectOption('[data-ship-details] select[name="courier"]', 'in-house');
+  await page.fill('[data-ship-details] input[name="trackingNumber"]', 'RIDER-42');
+  await page.click('[data-ship-details] button[type="submit"]');
+  await expect(page.locator('[data-flash]')).toContainText('Delivery details saved');
+  await page.click('[data-ship-to="handed_over"]');
+  await expect(page.locator('.os-title .pill')).toHaveText('dispatched');
+  await page.click('[data-ship-to="delivered"]');
+  await page.fill('[data-dlg] input[name="recipient"]', 'Front desk');
+  await page.click('[data-dlg] button[type="submit"]');
+  await expect(page.locator('.os-pod')).toContainText('Front desk');
+  await expect(page.locator('.os-title .pill')).toHaveText('delivered');
+  await page.fill('[data-note] textarea', 'Customer called to say thanks');
+  await page.click('[data-note] button');
+  await expect(page.locator('.os-notes')).toContainText('Customer called to say thanks');
+  await page.click('a[href^="#invoice/"]');
+  await expect(page.locator('.doc__type')).toHaveText('Invoice');
+  await expect(page.locator('.doc')).toContainText(`INV-${r.order.number.slice(4)}`);
+  await expect(page.locator('.doc')).toContainText('cnmessentials@cnm-group.net');
+  await page.emulateMedia({ media: 'print' });
+  await expect(page.locator('.os-nav')).toBeHidden();
+  await expect(page.locator('.doc')).toBeVisible();
+});
+
+test('operations: fulfilment board, new phone order paid in store, refund', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop workflow (the order screens are covered on phones above)');
+  await page.goto('/admin/');
+  await page.fill('#ae', 'admin@cnm.local');
+  await page.fill('#ap', 'cnm-local-admin');
+  await page.click('[data-login] button');
+  await page.goto('/admin/#fulfilment');
+  await expect(page.locator('.os-title')).toHaveText('Fulfilment');
+  await expect(page.locator('.os-col').first()).toBeVisible();
+  // New order (phone / showroom)
+  await page.goto('/admin/#new-order');
+  await page.fill('[data-pick]', 'Midnight Vanilla — Victoria\'s Secret');
+  await page.locator('[data-pick]').dispatchEvent('change');
+  await expect(page.locator('[data-items] tr')).toHaveCount(1);
+  await expect(page.locator('[data-quote]')).toContainText('Total');
+  await page.fill('[data-new] input[name="firstName"]', 'Ngozi');
+  await page.fill('[data-new] input[name="lastName"]', 'Umeh');
+  await page.fill('[data-new] input[name="email"]', `ngozi.${Date.now()}@example.com`);
+  await page.fill('[data-new] input[name="phone"]', '08031234567');
+  await page.selectOption('[data-new] select[name="method"]', 'store-pickup');
+  await page.fill('[data-new] input[name="paymentReason"]', 'POS slip 1182');
+  await page.selectOption('[data-new] select[name="channel"]', 'pos');
+  await page.click('[data-new] button[type="submit"]');
+  await expect(page).toHaveURL(/#orders\/CNM-/);
+  await expect(page.locator('.os-title .pill')).toHaveText('paid');
+  await expect(page.locator('.os-eyebrow')).toContainText('In store');
+  await expect(page.locator('.os-order__side')).toContainText('CNM Essentials Lagos');
+  // Partial refund (below the approval threshold) is issued straight away
+  page.once('dialog', (d) => d.accept());
+  await page.fill('[data-refund] input[name="amount"]', '1000');
+  await page.selectOption('[data-refund] select[name="reason"]', 'goodwill');
+  await page.click('[data-refund] button[type="submit"]');
+  await expect(page.locator('[data-flash]')).toContainText('Refunded');
+  await expect(page.locator('.os-sum')).toContainText('Refunded');
 });
 
 test('CNM Group OS: filters in the URL, company drill-down, create and archive a company, audit log, phone menu', async ({ page, isMobile }) => {
