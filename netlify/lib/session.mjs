@@ -96,9 +96,27 @@ export async function readAdminStep(req) {
   return p?.typ === 'admin_step' ? p : null;
 }
 export const clearAdminStep = (req) => cookie(req, ADMIN_STEP_COOKIE, '', 0, 'Strict');
+/**
+ * Admin preview: while the site is pre-launch, /admin opens straight to the dashboard with no sign-in so it can be
+ * shared for review. It is READ-ONLY (anything that changes data is refused) and switches itself off at launch
+ * (CONTEXT=production + CNM_LAUNCH_APPROVED=true), or earlier with CNM_ADMIN_PREVIEW=false. Local runs and tests
+ * keep the normal sign-in unless CNM_ADMIN_PREVIEW=true.
+ */
+export function adminPreviewOn() {
+  const flag = process.env.CNM_ADMIN_PREVIEW;
+  if (flag === 'false') return false;
+  const launched = process.env.CONTEXT === 'production' && process.env.CNM_LAUNCH_APPROVED === 'true';
+  if (launched) return false;
+  return flag === 'true' || process.env.CNM_LOCAL_STORE !== '1';
+}
+export const PREVIEW_ADMIN = Object.freeze({ typ: 'admin', email: 'preview@cnm-group.net', role: 'owner', name: 'Preview', preview: true });
+
 export async function currentAdmin(req) {
   const p = await verify(readCookie(req, ADMIN_COOKIE));
-  return p?.typ === 'admin' ? p : null;
+  if (p?.typ === 'admin') return p;
+  if (!adminPreviewOn()) return null;
+  if (!['GET', 'HEAD'].includes(req.method)) fail(403, 'preview_read_only', 'This is a preview: changes are switched off. Everything can be viewed, nothing is saved.');
+  return PREVIEW_ADMIN;
 }
 
 export const publicUser = (u) => ({ id: u.id, email: u.email, firstName: u.firstName, lastName: u.lastName, phone: u.phone || '', createdAt: u.createdAt });

@@ -191,3 +191,26 @@ test('events: counted per company and per Lagos day; enquiries carry their compa
   const { id } = await r.json();
   assert.equal((await (await store('leads')).get(`enquiry/${id}`)).companyId, 'foundation');
 });
+
+test('admin preview: opens without sign-in while pre-launch, read-only, off at launch or when switched off', async () => {
+  const saved = { preview: process.env.CNM_ADMIN_PREVIEW, context: process.env.CONTEXT, launch: process.env.CNM_LAUNCH_APPROVED };
+  try {
+    process.env.CNM_ADMIN_PREVIEW = 'true';
+    const me = await call('GET', '/api/admin/me');
+    assert.equal(me.status, 200, 'no sign-in needed');
+    assert.equal(me.data.admin.preview, true);
+    assert.equal((await call('GET', '/api/admin/command')).status, 200, 'the main screen loads');
+    const write = await call('POST', '/api/admin/companies', { body: { name: 'Preview Ltd' } });
+    assert.equal(write.status, 403);
+    assert.equal(write.data.error, 'preview_read_only', 'nothing can be changed');
+    const audit = await call('GET', '/api/admin/audit');
+    assert.ok(audit.data.entries.every((x) => x.ip === null && x.agent === null), 'staff IPs hidden in preview');
+    process.env.CONTEXT = 'production'; process.env.CNM_LAUNCH_APPROVED = 'true';
+    assert.equal((await call('GET', '/api/admin/me')).status, 401, 'switches off at launch');
+    delete process.env.CONTEXT; delete process.env.CNM_LAUNCH_APPROVED;
+    process.env.CNM_ADMIN_PREVIEW = 'false';
+    assert.equal((await call('GET', '/api/admin/me')).status, 401, 'can be switched off');
+  } finally {
+    for (const [k, v] of [['CNM_ADMIN_PREVIEW', saved.preview], ['CONTEXT', saved.context], ['CNM_LAUNCH_APPROVED', saved.launch]]) { if (v == null) delete process.env[k]; else process.env[k] = v; }
+  }
+});

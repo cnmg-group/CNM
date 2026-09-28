@@ -290,7 +290,7 @@ export default handler(async (req, context) => {
     case 'me': {
       const companies = await listCompanies();
       const scope = scopeFor(admin, companies);
-      return json({ admin: { email: admin.email, role: admin.role, name: admin.name, permissions: ROLES[admin.role], scope, remembered: !!admin.rem, expiresAt: new Date(admin.exp * 1000).toISOString() } });
+      return json({ admin: { email: admin.email, role: admin.role, name: admin.name, permissions: ROLES[admin.role], scope, ...(admin.preview ? { preview: true } : { remembered: !!admin.rem, expiresAt: new Date(admin.exp * 1000).toISOString() }) } });
     }
 
     // ---- Command Center: group / company overview with filters and comparisons ----
@@ -487,7 +487,9 @@ export default handler(async (req, context) => {
       need(admin, 'audit');
       const a = await store('audit');
       const keys = (await a.list('')).sort().slice(-300).reverse();
-      return json({ entries: await Promise.all(keys.map(async (k) => ({ at: k.slice(0, 24), ...(await a.get(k)) }))) });
+      const entries = await Promise.all(keys.map(async (k) => ({ at: k.slice(0, 24), ...(await a.get(k)) })));
+      // Preview visitors see what happened, not staff IP addresses or devices.
+      return json({ entries: admin.preview ? entries.map((x) => ({ ...x, ip: null, agent: null })) : entries });
     }
 
     default:

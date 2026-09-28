@@ -289,6 +289,7 @@ body[data-page="admin"] { --os-bg: #f6f4ef; --os-card: #fff; --os-line: #e7e3da;
 .os-audit__d { max-width: 520px; overflow-wrap: anywhere; color: var(--os-ink); }
 .os-login > div { border-radius: 18px; box-shadow: 0 30px 80px -30px rgba(11, 17, 32, .3); }
 .os-login img { width: 56px; height: auto; }
+.os-preview { margin: 0 0 16px; padding: 10px 14px; border: 1px solid var(--os-accent); border-radius: 10px; background: var(--os-warn-bg); color: var(--os-ink); font-size: .8125rem; }
 .os-login__lead { font-size: .875rem; line-height: 1.5; }
 .os-login__steps { display: flex; gap: 6px; margin: 4px 0 6px; padding: 0; list-style: none; counter-reset: s; font-size: .75rem; font-weight: 600; color: var(--os-mute); }
 .os-login__steps li { flex: 1; padding-top: 8px; border-top: 3px solid var(--os-line); counter-increment: s; }
