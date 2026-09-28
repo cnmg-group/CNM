@@ -1,15 +1,14 @@
 // Persistence adapters, all with the same get/set/delete/list interface:
 //   1. Supabase (Postgres) when SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY are set — see supabase/migrations/
 //   2. Netlify Blobs on Netlify otherwise
-//   3. A JSON-file store locally (tests, dev server) when CNM_LOCAL_STORE=1
-import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
-import path from 'node:path';
+//   3. Cloudflare D1 when the site runs on Cloudflare Pages with a D1 database bound as CNM_DB (see functions/api/)
+//   4. A JSON-file store locally (tests, dev server) when CNM_LOCAL_STORE=1
+// Node's fs is only loaded for the local store, so the same code runs on Cloudflare's Workers runtime.
 
-const LOCAL = process.env.CNM_LOCAL_STORE === '1';
-const LOCAL_DIR = process.env.CNM_DATA_DIR || path.resolve('.data');
-
-function fsStore(name) {
-  const dir = path.join(LOCAL_DIR, name);
+async function fsStore(name) {
+  const { mkdir, readdir, readFile, rm, writeFile } = await import('node:fs/promises');
+  const path = (await import('node:path')).default;
+  const dir = path.join(process.env.CNM_DATA_DIR || path.resolve('.data'), name);
   const file = (key) => path.join(dir, `${encodeURIComponent(key)}.json`);
   return {
     async get(key) {
@@ -80,14 +79,49 @@ export function supabaseStore(name, { url = process.env.SUPABASE_URL, key = proc
   };
 }
 
-export const storeBackend = () => (LOCAL ? 'local' : process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY ? 'supabase' : 'netlify-blobs');
+/**
+ * Cloudflare D1 adapter: the same one-row-per-record table as Supabase (store, key, value), created on first use.
+ * D1 reads see the latest write, which sign-in codes, rate limits and idempotency rely on.
+ */
+export function d1Store(name, db = globalThis.__CNM_D1) {
+  let ready = d1Store.ready?.get(db);
+  if (!ready) {
+    ready = db.prepare('CREATE TABLE IF NOT EXISTS cnm_kv (store TEXT NOT NULL, key TEXT NOT NULL, value TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (store, key))').run();
+    (d1Store.ready ||= new WeakMap()).set(db, ready);
+  }
+  return {
+    async get(k) {
+      await ready;
+      const row = await db.prepare('SELECT value FROM cnm_kv WHERE store = ?1 AND key = ?2').bind(name, k).first();
+      return row ? JSON.parse(row.value) : null;
+    },
+    async set(k, value) {
+      await ready;
+      await db.prepare('INSERT INTO cnm_kv (store, key, value, updated_at) VALUES (?1, ?2, ?3, ?4) ON CONFLICT (store, key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at')
+        .bind(name, k, JSON.stringify(value), new Date().toISOString()).run();
+    },
+    async delete(k) {
+      await ready;
+      await db.prepare('DELETE FROM cnm_kv WHERE store = ?1 AND key = ?2').bind(name, k).run();
+    },
+    async list(prefix = '') {
+      await ready;
+      const { results } = await db.prepare("SELECT key FROM cnm_kv WHERE store = ?1 AND substr(key, 1, length(?2)) = ?2 ORDER BY key").bind(name, prefix).all();
+      return results.map((r) => r.key);
+    },
+  };
+}
+
+export const storeBackend = () => (process.env.CNM_LOCAL_STORE === '1' ? 'local'
+  : process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY ? 'supabase'
+    : globalThis.__CNM_D1 ? 'cloudflare-d1' : 'netlify-blobs');
 
 const cache = new Map();
 /** @returns {Promise<{get(k:string):Promise<any>, set(k:string,v:any):Promise<void>, delete(k:string):Promise<void>, list(p?:string):Promise<string[]>}>} */
 export async function store(name) {
   if (!cache.has(name)) {
     const backend = storeBackend();
-    cache.set(name, backend === 'local' ? fsStore(name) : backend === 'supabase' ? supabaseStore(name) : await blobStore(name));
+    cache.set(name, backend === 'local' ? await fsStore(name) : backend === 'supabase' ? supabaseStore(name) : backend === 'cloudflare-d1' ? d1Store(name) : await blobStore(name));
   }
   return cache.get(name);
 }

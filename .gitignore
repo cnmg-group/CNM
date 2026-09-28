@@ -5,3 +5,7 @@ test-results/
 playwright-report/
 .data-e2e/
 exports/
+
+# Cloudflare local dev (wrangler pages dev)
+.dev.vars
+.wrangler/

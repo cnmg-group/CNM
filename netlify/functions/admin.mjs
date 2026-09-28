@@ -470,8 +470,10 @@ export default handler(async (req, context) => {
     case 'publish': {
       need(admin, 'publish');
       if (req.method !== 'POST') fail(405, 'method', 'Method not allowed.');
-      if (!process.env.NETLIFY_BUILD_HOOK_URL) fail(501, 'not_configured', 'Set NETLIFY_BUILD_HOOK_URL to enable publishing from the admin.');
-      const r = await fetch(process.env.NETLIFY_BUILD_HOOK_URL, { method: 'POST' });
+      // A build/deploy hook URL: Netlify build hook or Cloudflare Pages deploy hook.
+      const hook = process.env.DEPLOY_HOOK_URL || process.env.NETLIFY_BUILD_HOOK_URL;
+      if (!hook) fail(501, 'not_configured', 'Set DEPLOY_HOOK_URL (a Cloudflare Pages deploy hook or Netlify build hook) to enable publishing from the admin.');
+      const r = await fetch(hook, { method: 'POST' });
       await audit('publish', { status: r.status });
       return json({ ok: r.ok });
     }
